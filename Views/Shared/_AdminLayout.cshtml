@@ -16,6 +16,11 @@
     @* [LAYOUT] *@
     <link rel="shortcut icon" type="image/png" href="~/images/AdminL" />
     <link rel="stylesheet" href="~/adminLayout/css/styles.min.css" />
+
+    @* [Owner] *@
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <!--  Body Wrapper -->
@@ -201,7 +206,7 @@
                 </nav>
             </header>
             <!--  Header End -->
-            <div class="container-fluid">
+            <div class="container-fluid" style="padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; width: 100%; max-width: 2000px">
                 @RenderBody()
             </div>
         </div>

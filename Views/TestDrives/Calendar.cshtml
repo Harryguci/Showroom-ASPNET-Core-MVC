@@ -1,0 +1,106 @@
+﻿@using ShowroomManagement.Models
+@{
+    ViewData["Title"] = "Lịch đăng ký lái thử";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@model IEnumerable<TestDrive>
+@section Styles {
+    <link rel="stylesheet" href="~/css/calendar.css" />
+}
+
+<div class="calendar-container">
+    <div class="calendar-header">
+        <div class="d-flex mx-auto" style="max-width: 200px; gap: 1rem">
+            <label class="d-block my-auto">Tháng</label>
+            <select class="form-control" name="month" id="month" onchange="getMonth(this)">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+        </div>
+        <p id="year">@DateTime.Now.ToString("yyyy")</p>
+    </div>
+    <div id="calendar-container">
+        <div class="calendar">
+            <span class="day-name">Mon</span>
+            <span class="day-name">Tue</span>
+            <span class="day-name">Wed</span>
+            <span class="day-name">Thu</span>
+            <span class="day-name">Fri</span>
+            <span class="day-name">Sat</span>
+            <span class="day-name">Sun</span>
+            <div class="day">1</div>
+            <div class="day">2</div>
+            <div class="day">3</div>
+            <div class="day">4</div>
+            <div class="day">5</div>
+            <div class="day">6</div>
+            <div class="day">7</div>
+            <div class="day">8</div>
+            <div class="day">9</div>
+            <div class="day">10</div>
+            <div class="day">11</div>
+            <div class="day">12</div>
+            <div class="day">13</div>
+            <div class="day">14</div>
+            <div class="day">15</div>
+            <div class="day">16</div>
+            <div class="day">17</div>
+            <div class="day">18</div>
+            <div class="day">19</div>
+            <div class="day">20</div>
+            <div class="day">21</div>
+            <div class="day">22</div>
+            <div class="day">23</div>
+            <div class="day">24</div>
+            <div class="day">25</div>
+            <div class="day">26</div>
+            <div class="day">27</div>
+            <div class="day">28</div>
+            <div class="day">29</div>
+            <div class="day">30</div>
+            <div class="day">31</div>
+            <div class="day day--disabled">1</div>
+            <div class="day day--disabled">2</div>
+            <div class="day day--disabled">3</div>
+            <div class="day day--disabled">4</div>
+            <section class="task task--warning" style="grid-column: 3 / span 1">Projects</section>
+            @* <section class="task task--danger">Design Sprint</section>
+            <section class="task task--primary">
+                Product Checkup 1
+                <div class="task__detail">
+                    <h2>Product Checkup 1</h2>
+                    <p>15-17th November</p>
+                </div>
+            </section>
+            <section class="task task--info">Product Checkup 2</section> *@
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js//RenderCalendar.js" defer></script>
+    <script type="text/javascript">
+        async function getMonth(selectObject) {
+            var month = selectObject.value;
+            var year = document.getElementById('year').textContent.trim();
+            
+            console.log(month, year);
+
+            var response = await RenderCalendar(year, month);
+            // console.log(response);
+            document.getElementById('calendar-container').removeChild(document.querySelector('#calendar-container .calendar'))
+            document.getElementById('calendar-container').appendChild(response)
+        }
+    </script>
+}

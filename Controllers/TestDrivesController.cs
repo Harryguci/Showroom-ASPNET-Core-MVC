@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ namespace ShowroomManagement.Controllers
     public class TestDrivesController : Controller
     {
         private readonly ShowroomContext _context;
+        public static int LIST_LIMITS = 5;
 
         public TestDrivesController(ShowroomContext context)
         {
@@ -20,11 +22,61 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: TestDrives
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-              return _context.TestDrives != null ? 
-                          View(await _context.TestDrives.ToListAsync()) :
-                          Problem("Entity set 'ShowroomContext.TestDrives'  is null.");
+            if (_context.TestDrives == null)
+                return Problem("Entity set 'ShowroomContext.TestDrives'  is null.");
+
+            var query = _context.TestDrives.Select(p => new TestDrive()
+            {
+                DriveId = p.DriveId,
+                ClientId = p.ClientId,
+                BookDate = p.BookDate,
+                Note = p.Note,
+                Status = p.Status,
+            }).Skip(LIST_LIMITS * (page - 1))
+            .Take(LIST_LIMITS);
+
+            var total = _context.TestDrives.Count();
+
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = total / LIST_LIMITS;
+            ViewBag.currentPage = page;
+            return View(await query.ToListAsync());
+        }
+
+        // GET: TestDrives/Calendar
+        public IActionResult Calendar()
+        {
+            DateTime date = DateTime.Today;
+            int offset = date.DayOfWeek - DayOfWeek.Monday;
+            DateTime lastMonday = date.AddDays(-offset);
+            DateTime nextSunday = lastMonday.AddDays(6);
+
+            var queryTestDrives =
+                from testDrive in _context.TestDrives
+                where
+                    testDrive.BookDate >= lastMonday
+                    && testDrive.BookDate <= nextSunday
+                select testDrive;
+
+            queryTestDrives.ToList();
+
+            return View(queryTestDrives);
+        }
+
+        // GET: TestDrives/GetList
+        public IEnumerable<TestDrive> GetList(int year, int month)
+        {
+            var queryTestDrives =
+                from testDrive in _context.TestDrives
+                where
+                    testDrive.BookDate.Month == month
+                    && testDrive.BookDate.Year == year
+                select testDrive;
+
+            return queryTestDrives.ToList();
         }
 
         // GET: TestDrives/Details/5
@@ -53,7 +105,6 @@ namespace ShowroomManagement.Controllers
 
         // POST: TestDrives/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DriveId,ClientId,BookDate,Note,Status")] TestDrive testDrive)
@@ -150,14 +201,14 @@ namespace ShowroomManagement.Controllers
             {
                 _context.TestDrives.Remove(testDrive);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TestDriveExists(string id)
         {
-          return (_context.TestDrives?.Any(e => e.DriveId == id)).GetValueOrDefault();
+            return (_context.TestDrives?.Any(e => e.DriveId == id)).GetValueOrDefault();
         }
     }
 }
