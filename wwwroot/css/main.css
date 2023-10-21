@@ -1,4 +1,21 @@
-﻿form .form-group {
+﻿.welcome-wrap {
+    animation-name: welcome;
+    animation-duration: 2s;
+    animation-fill-mode: both;
+}
+
+@keyframes welcome {
+    0% {
+        opacity: 0;
+        transform: translate(0, 3rem)
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0)
+    }
+}
+
+form .form-group {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
