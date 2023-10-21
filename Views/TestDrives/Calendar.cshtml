@@ -10,8 +10,8 @@
 }
 
 <div class="calendar-container">
-    <div class="calendar-header">
-        <div class="d-flex mx-auto" style="max-width: 200px; gap: 1rem">
+    <div class="calendar-header d-flex gap-2" style="justify-content: center">
+        <div class="d-flex my-auto" style="max-width: 200px; gap: 1rem">
             <label class="d-block my-auto">Tháng</label>
             <select class="form-control" name="month" id="month" onchange="getMonth(this)">
                 <option value="1">1</option>
@@ -28,7 +28,19 @@
                 <option value="12">12</option>
             </select>
         </div>
-        <p id="year">@DateTime.Now.ToString("yyyy")</p>
+        <div class="d-flex gap-1" style="font-size: 1rem">
+            <p class="d-block my-auto">Năm</p>
+            @* <p id="year" class="d-block my-auto">
+                <b>@DateTime.Now.ToString("yyyy")</b>
+            </p> *@
+            <select class="form-control" name="year" id="year" onchange="handleChange()">
+                @for (int y = 2015; y < DateTime.Now.Year; y++)
+                {
+                    <option value="@y">@y</option>
+                }
+                <option value="@DateTime.Now.Year" selected>@DateTime.Now.Year</option>
+            </select>
+        </div>
     </div>
     <div id="calendar-container">
         <div class="calendar">
@@ -77,11 +89,11 @@
             <section class="task task--warning" style="grid-column: 3 / span 1">Projects</section>
             @* <section class="task task--danger">Design Sprint</section>
             <section class="task task--primary">
-                Product Checkup 1
-                <div class="task__detail">
-                    <h2>Product Checkup 1</h2>
-                    <p>15-17th November</p>
-                </div>
+            Product Checkup 1
+            <div class="task__detail">
+            <h2>Product Checkup 1</h2>
+            <p>15-17th November</p>
+            </div>
             </section>
             <section class="task task--info">Product Checkup 2</section> *@
         </div>
@@ -93,8 +105,20 @@
     <script type="text/javascript">
         async function getMonth(selectObject) {
             var month = selectObject.value;
-            var year = document.getElementById('year').textContent.trim();
-            
+            var year = document.getElementById('year').value;
+
+            console.log(month, year);
+
+            var response = await RenderCalendar(year, month);
+            // console.log(response);
+            document.getElementById('calendar-container').removeChild(document.querySelector('#calendar-container .calendar'))
+            document.getElementById('calendar-container').appendChild(response)
+        }
+
+        async function handleChange() {
+            var month = document.getElementById('month').value;
+            var year = document.getElementById('year').value;
+
             console.log(month, year);
 
             var response = await RenderCalendar(year, month);

@@ -17,6 +17,15 @@
     <link rel="shortcut icon" type="image/png" href="~/images/AdminL" />
     <link rel="stylesheet" href="~/adminLayout/css/styles.min.css" />
 
+    @* [GG Icon] *@
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+        }
+    </style>
+
     @* [Owner] *@
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
 
@@ -141,8 +150,12 @@
                     <div class="unlimited-access hide-menu bg-light-primary position-relative mb-7 mt-5 rounded">
                         <div class="d-flex">
                             <div class="unlimited-access-title me-3">
-                                <h6 class="fw-semibold fs-4 mb-6 text-dark w-85">Upgrade to pro</h6>
-                                <a href="https://adminmart.com/product/modernize-bootstrap-5-admin-template/" target="_blank" class="btn btn-primary fs-2 fw-semibold lh-sm">Buy Pro</a>
+                                <h6 class="fw-semibold fs-5 mb-6 text-dark w-85" style="margin-right: 0.5rem">
+                                    Thông báo lỗi
+                                </h6>
+                                <a href="#" target="_blank" class="btn btn-primary fs-2 mx-1 fw-semibold lh-sm">
+                                    Gửi   
+                                </a>
                             </div>
                             <div class="unlimited-access-img">
                                 <img src="~/images/AdminLayout/backgrounds/rocket.png" alt="" class="img-fluid">
@@ -175,6 +188,16 @@
                     </ul>
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                         <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+                            <li class="nav-item d-flex">
+                                <button type="button" class="btn btn-outline-primary"
+                                        style="border-bottom-right-radius: 0;border-top-right-radius: 0;">
+                                    <span class="material-symbols-outlined">
+                                        search
+                                    </span>
+                                </button>
+                                <input class="form-control" type="text" placeholder="Search..."
+                                       style="border-bottom-left-radius: 0;border-top-left-radius: 0;" />
+                            </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
                                    aria-expanded="false">
