@@ -58,11 +58,11 @@
                             <span class="hide-menu">Chức năng</span>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" asp-controller="Product" asp-action="Index">
+                            <a class="sidebar-link" asp-controller="Products" asp-action="Index">
                                 <span>
                                     <i class="ti ti-article"></i>
                                 </span>
-                                <span class="hide-menu">Products</span>
+                                <span class="hide-menu">Sản phẩm</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -70,7 +70,7 @@
                                 <span>
                                     <i class="ti ti-alert-circle"></i>
                                 </span>
-                                <span class="hide-menu">Customers</span>
+                                <span class="hide-menu">Khách hàng</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -78,7 +78,7 @@
                                 <span>
                                     <i class="ti ti-cards"></i>
                                 </span>
-                                <span class="hide-menu">Employees</span>
+                                <span class="hide-menu">Nhân viên</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -86,15 +86,15 @@
                                 <span>
                                     <i class="ti ti-file-description"></i>
                                 </span>
-                                <span class="hide-menu">Lịch đăng ký lái thử</span>
+                                <span class="hide-menu">Lịch lái thử</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="./ui-typography.html" aria-expanded="false">
+                            <a class="sidebar-link" asp-controller="PurchaseInvoices" asp-action="Index" aria-expanded="false">
                                 <span>
                                     <i class="ti ti-typography"></i>
                                 </span>
-                                <span class="hide-menu">Typography</span>
+                                <span class="hide-menu">Hóa đơn</span>
                             </a>
                         </li>
                         <li class="nav-small-cap">
@@ -206,7 +206,7 @@
                 </nav>
             </header>
             <!--  Header End -->
-            <div class="container-fluid" style="padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; width: 100%; max-width: 2000px">
+            <div class="container-fluid" style="margin-left: 0; margin-right: 0; width: 100%; max-width: 2000px">
                 @RenderBody()
             </div>
         </div>

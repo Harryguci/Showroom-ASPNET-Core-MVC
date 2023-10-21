@@ -35,7 +35,7 @@ namespace ShowroomManagement.Controllers
                 Note = p.Note,
                 Status = p.Status,
             }).Skip(LIST_LIMITS * (page - 1))
-            .Take(LIST_LIMITS);
+            .Take(LIST_LIMITS).OrderByDescending(p => p.BookDate);
 
             var total = _context.TestDrives.Count();
 

@@ -5,16 +5,21 @@ namespace ShowroomManagement.Models
 {
     public class Device
     {
-        public Device()
+        public Device(string deviceId, string deviceName)
         {
-            DeviceId = string.Empty;
-            Serial = string.Empty;
+            DeviceId = deviceId;
+            DeviceName = deviceName;
         }
         [Key]
+        [Display(Name = "Mã")]
         public string DeviceId { get; set; }
-        public string Serial { get; set; }
+        [Display(Name = "Tên")]
+        public string DeviceName { get; set; }
+        [Display(Name = "Ngày nhập")]
         public DateTime? DateEntry { get; set; }
+        [Display(Name = "Trạng thái")]
         public string? Status { get; set; }
+        [Display(Name = "Giá trị")]
         public int? Price { get; set; }
     }
 }

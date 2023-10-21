@@ -13,6 +13,7 @@ namespace ShowroomManagement.Controllers
     public class EmployeesController : Controller
     {
         private readonly ShowroomContext _context;
+        private static int LIST_LIMITS = 5;
 
         public EmployeesController(ShowroomContext context)
         {
@@ -20,11 +21,35 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page = 1)
         {
-              return _context.Employees != null ? 
-                          View(await _context.Employees.ToListAsync()) :
-                          Problem("Entity set 'ShowroomContext.Employees'  is null.");
+            if (_context.Employees == null) return BadRequest();
+            var skip = (page - 1) * LIST_LIMITS;
+            skip = skip != null ? skip : 0;
+
+            var query = _context.Employees.Select(p => new Employee()
+            {
+                EmployeeId = p.EmployeeId,
+                Firstname = p.Firstname,
+                Lastname = p.Lastname,
+                DateBirth = p.DateBirth,
+                Cccd = p.Cccd,
+                Position = p.Position,
+                StartDate = p.StartDate,
+                Salary = p.Salary,
+                Email = p.Email,
+                SaleId = p.SaleId,
+                Gender = p.Gender,
+            }).Skip((int)skip).Take(LIST_LIMITS);
+
+            var total = _context.Employees.Count();
+
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = total / LIST_LIMITS;
+            ViewBag.currentPage = page;
+
+            return View(await query.ToListAsync());
         }
 
         // GET: Employees/Details/5
@@ -56,7 +81,7 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeId,Firstname,Lastname,DateBirth,Cccd,Postion,StartDate,Salary,Email,SaleId")] Employee employee)
+        public async Task<IActionResult> Create([Bind("EmployeeId,Firstname,Lastname,DateBirth,Cccd,Postion,StartDate,Salary,Email,SaleId,Gender")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -88,7 +113,7 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("EmployeeId,Firstname,Lastname,DateBirth,Cccd,Postion,StartDate,Salary,Email,SaleId")] Employee employee)
+        public async Task<IActionResult> Edit(string id, [Bind("EmployeeId,Firstname,Lastname,DateBirth,Cccd,Postion,StartDate,Salary,Email,SaleId,Gender")] Employee employee)
         {
             if (id != employee.EmployeeId)
             {
@@ -150,14 +175,14 @@ namespace ShowroomManagement.Controllers
             {
                 _context.Employees.Remove(employee);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool EmployeeExists(string id)
         {
-          return (_context.Employees?.Any(e => e.EmployeeId == id)).GetValueOrDefault();
+            return (_context.Employees?.Any(e => e.EmployeeId == id)).GetValueOrDefault();
         }
     }
 }

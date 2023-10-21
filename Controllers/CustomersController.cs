@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
@@ -51,7 +56,7 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,Firstname,Lastname,DateBirth,Cccd,Email,Address")] Customer customer)
+        public async Task<IActionResult> Create([Bind("ClientId,Firstname,Lastname,DateBirth,Cccd,Email,Address,Gender")] Customer customer)
         {
             if (ModelState.IsValid)
             {
@@ -83,7 +88,7 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("ClientId,Firstname,Lastname,DateBirth,Cccd,Email,Address")] Customer customer)
+        public async Task<IActionResult> Edit(string id, [Bind("ClientId,Firstname,Lastname,DateBirth,Cccd,Email,Address,Gender")] Customer customer)
         {
             if (id != customer.ClientId)
             {

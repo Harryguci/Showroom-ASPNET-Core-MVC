@@ -15,6 +15,6 @@ namespace ShowroomManagement.Models
         public int Total { get; set; }
         public int Target { get; set; }
         public string? Status { get; set; }
-        public int Rate { get; set; }
+        public float? Reward { get; set; }
     }
 }

@@ -9,69 +9,73 @@
     Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
     bool hasNext = ViewBag.nextPage;
 }
-<main class="list-container px-2 px-md-5">
-    <h1>Danh sách lịch lái thử</h1>
-    <p>
-        <a class="btn btn-outline-primary" asp-action="Create">Tạo mới</a>
-        <a class="btn btn-outline-primary" asp-action="Calendar">Lịch</a>
-    </p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.ClientId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.BookDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Note)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Status)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @item.ClientId
-                    </td>
-                    <td>
-                        @item.BookDate.ToString("dd-MM-yyyy")
-                    </td>
-                    <td>
-                        @item.Note
-                    </td>
-                    <td>
-                        @item.Status
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.DriveId">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.DriveId">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.DriveId">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <div class="pagination-container d-flex gap-1">
-        @for (int i = 0; i < total; i++)
+<h1>Danh sách lịch lái thử</h1>
+<p>
+    <a class="btn btn-outline-primary" asp-action="Create">Tạo mới</a>
+    <a class="btn btn-outline-primary" asp-action="Calendar">Lịch</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ClientId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BookDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Note)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
         {
-            @if (i + 1 == page)
-            {
-                <button class="btn btn-outline-primary" disabled>@(i + 1)</button>
-            }
-            else
-            {
-                <a class="btn btn-outline-primary"
-                   asp-action="Index" asp-route-page="@(i + 1)">
-                    @(i + 1)
-                </a>
-            }
+            <tr>
+                <td>
+                    @item.ClientId
+                </td>
+                <td>
+                    @item.EmployeeId
+                </td>
+                <td>
+                    @item.BookDate.ToString("dd-MM-yyyy")
+                </td>
+                <td>
+                    @item.Note
+                </td>
+                <td>
+                    @item.Status
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.DriveId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.DriveId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.DriveId">Delete</a>
+                </td>
+            </tr>
         }
-    </div>
-</main>
+    </tbody>
+</table>
+<div class="pagination-container d-flex gap-1">
+    @for (int i = 0; i < total; i++)
+    {
+        @if (i + 1 == page)
+        {
+            <button class="btn btn-outline-primary" disabled>@(i + 1)</button>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary"
+               asp-action="Index" asp-route-page="@(i + 1)">
+                @(i + 1)
+            </a>
+        }
+    }
+</div>

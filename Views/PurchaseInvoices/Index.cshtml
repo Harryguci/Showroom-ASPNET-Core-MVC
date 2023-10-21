@@ -1,0 +1,57 @@
+﻿@model IEnumerable<ShowroomManagement.Models.PurchaseInvoice>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Danh sách hóa đơn nhập</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-outline-primary">
+        Tạo mới
+    </a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Source)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EnteredDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantityPurchase)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Source)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EnteredDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.QuantityPurchase)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.InEnterId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.InEnterId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.InEnterId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

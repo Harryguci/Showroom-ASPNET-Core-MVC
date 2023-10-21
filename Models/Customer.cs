@@ -25,5 +25,7 @@ namespace ShowroomManagement.Models
         public string? Email { get; set; }
         [Display(Name = "Địa chỉ")]
         public string? Address { get; set; }
+        [Display(Name = "Giới tính")]
+        public bool Gender { get; set; }
     }
 }

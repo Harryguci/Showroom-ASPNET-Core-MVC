@@ -34,5 +34,7 @@ namespace ShowroomManagement.Data
         }
 
         public DbSet<ShowroomManagement.Models.Customer>? Customer { get; set; }
+
+        public DbSet<ShowroomManagement.Models.Source>? Source { get; set; }
     }
 }
