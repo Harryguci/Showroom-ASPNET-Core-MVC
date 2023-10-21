@@ -39,7 +39,6 @@ function GetLastDate(year, month) {
     return d;
 }
 
-
 async function GetTask(year, month) {
     var url = `https://localhost:3000/TestDrives/GetList?year=${year}&month=${month}`;
 

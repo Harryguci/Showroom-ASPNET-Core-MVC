@@ -13,25 +13,24 @@
     <div class="calendar-header d-flex gap-2" style="justify-content: center">
         <div class="d-flex my-auto" style="max-width: 200px; gap: 1rem">
             <label class="d-block my-auto">Tháng</label>
-            <select class="form-control" name="month" id="month" onchange="getMonth(this)">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
+            <select class="form-control" name="month" id="month" onchange="handleChange()">
+                @for (int m = 1; m <= 12; m++)
+                {
+                    @if (m == DateTime.Now.Month)
+                    {
+                        <option value="@m" selected>@m</option>
+                    }
+                    else
+                    {
+                        <option value="@m">@m</option>
+                    }
+                }
             </select>
         </div>
         <div class="d-flex gap-1" style="font-size: 1rem">
             <p class="d-block my-auto">Năm</p>
             @* <p id="year" class="d-block my-auto">
-                <b>@DateTime.Now.ToString("yyyy")</b>
+            <b>@DateTime.Now.ToString("yyyy")</b>
             </p> *@
             <select class="form-control" name="year" id="year" onchange="handleChange()">
                 @for (int y = 2015; y < DateTime.Now.Year; y++)
@@ -103,18 +102,6 @@
 @section Scripts {
     <script src="~/js//RenderCalendar.js" defer></script>
     <script type="text/javascript">
-        async function getMonth(selectObject) {
-            var month = selectObject.value;
-            var year = document.getElementById('year').value;
-
-            console.log(month, year);
-
-            var response = await RenderCalendar(year, month);
-            // console.log(response);
-            document.getElementById('calendar-container').removeChild(document.querySelector('#calendar-container .calendar'))
-            document.getElementById('calendar-container').appendChild(response)
-        }
-
         async function handleChange() {
             var month = document.getElementById('month').value;
             var year = document.getElementById('year').value;
@@ -126,5 +113,8 @@
             document.getElementById('calendar-container').removeChild(document.querySelector('#calendar-container .calendar'))
             document.getElementById('calendar-container').appendChild(response)
         }
+        
+        // Render the data after the Html content is Loaded.
+        window.onload = () => handleChange();
     </script>
 }
