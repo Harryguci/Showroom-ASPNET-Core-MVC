@@ -1,24 +1,14 @@
-﻿@using System.Diagnostics;
-@model IEnumerable<ShowroomManagement.Models.Employee>
+﻿@model IEnumerable<ShowroomManagement.Models.Employee>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Trash";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    int page = ViewBag.currentPage;
-    int total = ViewBag.totalPage;
-    Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
-    bool hasNext = ViewBag.nextPage;
 }
 
-<h1>Danh sách nhân viên</h1>
-<p><small><a asp-action="Trash">Thùng rác</a></small></p>
+<h1>Trash</h1>
+
 <p>
-    <a asp-action="Create" class="btn btn-outline-primary">
-        Tạo mới
-    </a>
-    <a asp-action="SignWorkDate" class="btn btn-outline-primary">
-        Đăng ký lịch
-    </a>
+    Tổng: @Model.Count()
 </p>
 <table class="table">
     <thead>
@@ -47,9 +37,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Email)
             </th>
-            @*             <th>
-            @Html.DisplayNameFor(model => model.SaleId)
-            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.SaleId)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Gender)
             </th>
@@ -67,8 +57,7 @@
                     @Html.DisplayFor(modelItem => item.Lastname)
                 </td>
                 <td>
-                    @(item.DateBirth != null ?
-                        item.DateBirth.Value.ToString("dd/MM/yyyy") : "-")
+                    @Html.DisplayFor(modelItem => item.DateBirth)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Cccd)
@@ -77,7 +66,7 @@
                     @Html.DisplayFor(modelItem => item.Position)
                 </td>
                 <td>
-                    @(item.StartDate != null ? item.StartDate.Value.ToString("dd/MM/yyyy") : "-")
+                    @Html.DisplayFor(modelItem => item.StartDate)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Salary)
@@ -85,40 +74,21 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
-                @*
-            <td>
-            @Html.DisplayFor(modelItem => item.SaleId)
-            </td>
-            *@
                 <td>
-                    @(item.Gender != null && (bool)item.Gender ? "Nam" : "Nữ")
+                    @Html.DisplayFor(modelItem => item.SaleId)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.EmployeeId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.EmployeeId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.EmployeeId">Delete</a>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td>
+                <td>
+                    <form asp-action="UndoFromTrash" method="POST">
+                        <input type="hidden" name="id" value="@item.EmployeeId" />
+                        <button type="submit" class="btn btn-outline-primary">
+                            Hoàn tác
+                        </button>
+                    </form>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-<div class="pagination-container d-flex gap-1 justify-content-center">
-    @for (int i = 0; i < total; i++)
-    {
-        @if (i + 1 == page)
-        {
-            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
-        }
-        else if (total > 10 && i > 5 && i < 8)
-        {
-            <span>.</span>
-        }
-        else
-        {
-            <a class="btn btn-outline-primary"
-               asp-action="Index" asp-route-page="@(i + 1)">
-                @(i + 1)
-            </a>
-        }
-    }
-</div>

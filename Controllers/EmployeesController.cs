@@ -40,7 +40,10 @@ namespace ShowroomManagement.Controllers
                 Email = p.Email,
                 SaleId = p.SaleId,
                 Gender = p.Gender,
-            }).Skip((int)skip).Take(LIST_LIMITS);
+                Deleted = p.Deleted,
+            })
+            .Where(p => !p.Deleted)
+            .Skip((int)skip).Take(LIST_LIMITS);
 
             var total = _context.Employees.Count();
 
@@ -143,6 +146,34 @@ namespace ShowroomManagement.Controllers
             return View(employee);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Trash(int? page, int? limits)
+        {
+            if (_context.Employees == null) return BadRequest();
+            if (page == null) page = 1;
+            if (limits == null) limits = 10;
+
+            var query = _context.Employees.Select(p => new Employee()
+            {
+                EmployeeId = p.EmployeeId,
+                Firstname = p.Firstname,
+                Lastname = p.Lastname,
+                DateBirth = p.DateBirth,
+                Cccd = p.Cccd,
+                Position = p.Position,
+                StartDate = p.StartDate,
+                Salary = p.Salary,
+                Email = p.Email,
+                SaleId = p.SaleId,
+                Gender = p.Gender,
+                Deleted = p.Deleted,
+            }).Where(p => p.Deleted)
+            .Skip((page - 1).Value * limits.Value)
+            .Take(limits.Value);
+
+            return View(await query.ToListAsync());
+        }
+
         // GET: Employees/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -162,7 +193,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: Employees/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
@@ -180,11 +211,32 @@ namespace ShowroomManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // POST: Employees/DeleteSoft
+        [HttpPost]
+        public async Task<IActionResult> DeleteSoft(string id)
+        {
+            // TODO: Move the employee which has
+            // EmployeeId equals id to Bin trash (Set Deteted Prop to TRUE).
+
+            if (_context.Employees == null)
+            {
+                return Problem("Entity set 'ShowroomContext.Employees'  is null.");
+            }
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee != null)
+            {
+                employee.Deleted = true;
+                _context.Employees.Update(employee);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
         private bool EmployeeExists(string id)
         {
             return (_context.Employees?.Any(e => e.EmployeeId == id)).GetValueOrDefault();
         }
-
 
         [HttpGet]
         public IActionResult SignWorkDate()
