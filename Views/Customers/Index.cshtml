@@ -147,7 +147,7 @@
                     @Html.DisplayFor(modelItem => item.Lastname)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.DateBirth)
+                    @(item.DateBirth != null ? item.DateBirth.Value.ToString("dd/MM/yyyy") : "-")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Cccd)

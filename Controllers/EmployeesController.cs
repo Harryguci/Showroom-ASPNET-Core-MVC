@@ -184,5 +184,12 @@ namespace ShowroomManagement.Controllers
         {
             return (_context.Employees?.Any(e => e.EmployeeId == id)).GetValueOrDefault();
         }
+
+
+        [HttpGet]
+        public IActionResult SignWorkDate()
+        {
+            return View();
+        }
     }
 }

@@ -27,6 +27,7 @@ namespace ShowroomManagement.Controllers
                 tasks.Add(client.GetAsync(absoluteUrl + @"/SalesInvoices/GetList"));
                 tasks.Add(client.GetAsync(absoluteUrl + @"/PurchaseInvoices/GetList"));
 
+                // Parallel mutiple APIs at the same time.
                 var results = await Task.WhenAll(tasks);
 
                 var apiRes1 = await results[0].Content.ReadAsStringAsync();
