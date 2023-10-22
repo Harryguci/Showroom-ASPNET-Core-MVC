@@ -1,0 +1,130 @@
+﻿@{
+    ViewData["Title"] = "Invoice List";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    IEnumerable<PurchaseInvoice> purchaseInvoices = ViewBag.PurchaseInvoices;
+    IEnumerable<SalesInvoice> salesInvoices = ViewBag.SalesInvoices;
+}
+
+<h1 style="font-size: 2rem">Hóa đơn</h1>
+<hr />
+<div class="purchase-invoice-container mt-5">
+    <h2>Danh sách hóa đơn nhập</h2>
+
+    <p>
+        <a asp-controller="PurchaseInvoices" asp-action="Create" class="btn btn-outline-primary">
+            Tạo mới
+        </a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    InEnterId
+                </th>
+                <th>
+                    SourceId
+                </th>
+                <th>
+                    EnteredDate
+                </th>
+                <th>
+                    QuantityPurchase
+                </th>
+                <th>
+                    Status
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in purchaseInvoices)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.InEnterId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SourceId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EnteredDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.QuantityPurchase)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.InEnterId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.InEnterId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.InEnterId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        <a asp-controller="PurchaseInvoices" asp-action="Index">Xem tất cả</a>
+    </div>
+</div>
+<div class="sales-invoices mt-3 mt-md-5">
+    <h2>Danh sách hóa đơn bán</h2>
+
+    <p>
+        <a class="btn btn-outline-primary" asp-controller="SalesInvoices" asp-action="Create">Tạo mới</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    ClientId
+                </th>
+                <th>
+                    SaleDate
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    ProductId
+                </th>
+                <th>
+                    QuantitySale
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in salesInvoices)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ClientId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SaleDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductId)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.QuantitySale)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.InSaleId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.InSaleId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.InSaleId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        <a asp-controller="SalesInvoices" asp-action="Index">Xem tất cả</a>
+    </div>
+</div>

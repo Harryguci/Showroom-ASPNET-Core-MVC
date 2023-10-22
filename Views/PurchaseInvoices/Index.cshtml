@@ -16,7 +16,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Source)
+                @Html.DisplayNameFor(model => model.InEnterId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SourceId)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.EnteredDate)
@@ -35,7 +38,10 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Source)
+                    @Html.DisplayFor(modelItem => item.InEnterId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SourceId)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.EnteredDate)

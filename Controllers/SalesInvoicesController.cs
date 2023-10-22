@@ -36,7 +36,7 @@ namespace ShowroomManagement.Controllers
             }
 
             var salesInvoice = await _context.SalesInvoices
-                .FirstOrDefaultAsync(m => m.InSalesId == id);
+                .FirstOrDefaultAsync(m => m.InSaleId == id);
             if (salesInvoice == null)
             {
                 return NotFound();
@@ -90,7 +90,7 @@ namespace ShowroomManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("InSalesId,ClientId,SaleDate,Status,QuantitySale")] SalesInvoice salesInvoice)
         {
-            if (id != salesInvoice.InSalesId)
+            if (id != salesInvoice.InSaleId)
             {
                 return NotFound();
             }
@@ -104,7 +104,7 @@ namespace ShowroomManagement.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SalesInvoiceExists(salesInvoice.InSalesId))
+                    if (!SalesInvoiceExists(salesInvoice.InSaleId))
                     {
                         return NotFound();
                     }
@@ -127,7 +127,7 @@ namespace ShowroomManagement.Controllers
             }
 
             var salesInvoice = await _context.SalesInvoices
-                .FirstOrDefaultAsync(m => m.InSalesId == id);
+                .FirstOrDefaultAsync(m => m.InSaleId == id);
             if (salesInvoice == null)
             {
                 return NotFound();
@@ -157,7 +157,21 @@ namespace ShowroomManagement.Controllers
 
         private bool SalesInvoiceExists(string id)
         {
-          return (_context.SalesInvoices?.Any(e => e.InSalesId == id)).GetValueOrDefault();
+          return (_context.SalesInvoices?.Any(e => e.InSaleId == id)).GetValueOrDefault();
+        }
+
+        // GET: SalesInvoices/GetList
+        [HttpGet]
+        public async Task<List<SalesInvoice>> GetList(int? page, int? limits)
+        {
+            if (limits == null) limits = 10;
+            if (page == null) page = 1;
+
+            if (_context.SalesInvoices == null) return new List<SalesInvoice>();
+            return await _context.SalesInvoices
+                .Skip((page.Value - 1) * limits.Value)
+                .Take(limits.Value)
+                .ToListAsync();
         }
     }
 }

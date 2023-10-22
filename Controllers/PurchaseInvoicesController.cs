@@ -22,9 +22,9 @@ namespace ShowroomManagement.Controllers
         // GET: PurchaseInvoices
         public async Task<IActionResult> Index()
         {
-              return _context.PurchaseInvoices != null ? 
-                          View(await _context.PurchaseInvoices.ToListAsync()) :
-                          Problem("Entity set 'ShowroomContext.PurchaseInvoices'  is null.");
+            return _context.PurchaseInvoices != null ?
+                        View(await _context.PurchaseInvoices.ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.PurchaseInvoices'  is null.");
         }
 
         // GET: PurchaseInvoices/Details/5
@@ -150,14 +150,29 @@ namespace ShowroomManagement.Controllers
             {
                 _context.PurchaseInvoices.Remove(purchaseInvoice);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool PurchaseInvoiceExists(string id)
         {
-          return (_context.PurchaseInvoices?.Any(e => e.InEnterId == id)).GetValueOrDefault();
+            return (_context.PurchaseInvoices?.Any(e => e.InEnterId == id)).GetValueOrDefault();
+        }
+
+
+        // GET: PurchaseInvoices/GetList
+        [HttpGet]
+        public async Task<List<PurchaseInvoice>> GetList(int? page, int? limits)
+        {
+            if (limits == null) limits = 10;
+            if (page == null) page = 1;
+            if (_context.PurchaseInvoices == null) return new List<PurchaseInvoice>();
+
+            return await _context.PurchaseInvoices
+                .Skip((page - 1).Value * limits.Value)
+                .Take(limits.Value)
+                .ToListAsync();
         }
     }
 }
