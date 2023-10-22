@@ -189,14 +189,16 @@
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                         <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
                             <li class="nav-item d-flex">
-                                <button type="button" class="btn btn-outline-primary"
-                                        style="border-bottom-right-radius: 0;border-top-right-radius: 0;">
+                                <button type="submit" class="btn btn-outline-primary"
+                                        style="border-bottom-right-radius: 0;border-top-right-radius: 0;"
+                                        onclick="handleSearch()">
                                     <span class="material-symbols-outlined">
                                         search
                                     </span>
                                 </button>
-                                <input class="form-control" type="text" placeholder="Search..."
+                                <input  id="search-input" class="form-control" type="text" name="q" placeholder="Search..."
                                        style="border-bottom-left-radius: 0;border-top-left-radius: 0;" />
+                                
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
@@ -243,7 +245,13 @@
     <script src="~/adminLayout/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="~/adminLayout/libs/simplebar/dist/simplebar.js"></script>
     <script src="~/adminLayout/js/dashboard.js"></script>
-
+    <script type="text/javascript">
+        function handleSearch() {
+            var q = document.getElementById('search-input').value;
+            console.log(q);
+            window.location = `/Home/Search?q=${q}`;
+        }    
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
