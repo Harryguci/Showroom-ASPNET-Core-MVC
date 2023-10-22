@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 
@@ -20,11 +21,91 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? asc, string? desc)
         {
-              return _context.Customer != null ? 
-                          View(await _context.Customer.ToListAsync()) :
-                          Problem("Entity set 'ShowroomContext.Customer'  is null.");
+            ViewBag.asc = asc;
+            ViewBag.desc = desc;
+
+            if (asc != null)
+            {
+                switch (asc.ToLower())
+                {
+                    case "clientname":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderBy(p => p.ClientId).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "firstname":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderBy(p => p.Firstname).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "lastname":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderBy(p => p.Lastname).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "datebirth":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderBy(p => p.DateBirth).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "cccd":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderBy(p => p.Cccd).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "email":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderBy(p => p.Email).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "gender":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderBy(p => p.Gender).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    default:
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderBy(p => p.ClientId).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                }
+            }
+            else if (desc != null)
+            {
+                switch (desc.ToLower())
+                {
+                    case "clientname":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderByDescending(p => p.ClientId).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "firstname":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderByDescending(p => p.Firstname).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "lastname":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderByDescending(p => p.Lastname).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "datebirth":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderByDescending(p => p.DateBirth).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "cccd":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderByDescending(p => p.Cccd).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "email":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderByDescending(p => p.Email).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    case "gender":
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderByDescending(p => p.Gender).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                    default:
+                        return _context.Customer != null ?
+                        View(await _context.Customer.OrderByDescending(p => p.ClientId).ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
+                }
+            }
+
+            return _context.Customer != null ?
+                        View(await _context.Customer.ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.Customer'  is null.");
         }
 
         // GET: Customers/Details/5
@@ -150,14 +231,14 @@ namespace ShowroomManagement.Controllers
             {
                 _context.Customer.Remove(customer);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CustomerExists(string id)
         {
-          return (_context.Customer?.Any(e => e.ClientId == id)).GetValueOrDefault();
+            return (_context.Customer?.Any(e => e.ClientId == id)).GetValueOrDefault();
         }
     }
 }

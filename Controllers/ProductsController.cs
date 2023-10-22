@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +22,53 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? orderby, string? orderbydesc)
         {
-              return _context.Products != null ? 
-                          View(await _context.Products.ToListAsync()) :
-                          Problem("Entity set 'ShowroomContext.Products'  is null.");
+            ViewBag.orderby = orderby;
+            ViewBag.orderbydesc = orderbydesc;
+
+            if (_context.Products == null) return BadRequest(new
+            {
+                error = "Can not find the table in the Database."
+            });
+            PropertyInfo? propertyInfo = typeof(Products).GetProperty("Name");
+
+            var query = _context.Products.Select(p => new Products()
+            {
+                Serial = p.Serial,
+                ProductName = p.ProductName,
+                PurchasePrice = p.PurchasePrice,
+                SalePrice = p.SalePrice,
+                Quantity = p.Quantity,
+                Status = p.Status,
+            });
+
+
+            var list = await query.ToListAsync();
+
+            return View(list);
         }
 
+        // GET: Products
+        public async Task<IActionResult> Search(string name)
+        {
+            if (_context.Products == null) return BadRequest(new
+            {
+                error = "Can not find the table."
+            });
+
+            var query = _context.Products.Select(p => new Products()
+            {
+                Serial = p.Serial,
+                ProductName = p.ProductName,
+                PurchasePrice = p.PurchasePrice,
+                SalePrice = p.SalePrice,
+                Quantity = p.Quantity,
+                Status = p.Status,
+            }).Where(p => p.ProductName.StartsWith(name.ToLower()));
+
+            return View(await query.ToListAsync());
+        }
         // GET: Products/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -88,7 +130,8 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Serial,Name,PurchasePrice,SalePrice,Quantity,SourceId,Status")] Products products)
+        public async Task<IActionResult> Edit(string id,
+            [Bind("Serial,Name,PurchasePrice,SalePrice,Quantity,SourceId,Status")] Products products)
         {
             if (id != products.Serial)
             {
@@ -150,14 +193,14 @@ namespace ShowroomManagement.Controllers
             {
                 _context.Products.Remove(products);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductsExists(string id)
         {
-          return (_context.Products?.Any(e => e.Serial == id)).GetValueOrDefault();
+            return (_context.Products?.Any(e => e.Serial == id)).GetValueOrDefault();
         }
     }
 }

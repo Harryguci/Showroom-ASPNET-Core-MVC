@@ -2,15 +2,13 @@
 {
     public class Account
     {
-        public Account(string accountId, string employeeId)
+        public Account()
         {
-            AccountId = accountId;
-            EmployeeId = employeeId;
+            AccountId = string.Empty;
         }
         public string AccountId { get; set; }
-        public string EmployeeId { get; set; }
-        public bool Deleted { get; set; }
+        public bool Deleted { get; set; } = false;
         public DateTime CreateAt { get; set; } = DateTime.Now;
-        public DateTime? DeteleAt { get; set; }
+        public DateTime? DeteleAt { get; set; } = null;
     }
 }

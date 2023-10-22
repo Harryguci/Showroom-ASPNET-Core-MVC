@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var orderby = ViewBag.asc;
+    var orderbydesc = ViewBag.desc;
 }
 
 <h1>Danh sách Khách hàng</h1>
@@ -15,58 +18,162 @@
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Firstname)
+                @if (orderby == "firstname")
+                {
+                    <a action="Index" asp-action="Index" asp-route-desc="firstname" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </a>
+                }
+                else
+                {
+                    <a action="Index" asp-action="Index" asp-route-asc="firstname" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </a>
+                }
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Lastname)
+                @if (orderby == "lastname")
+                {
+                    <a action="Index" asp-action="Index" asp-route-desc="lastname" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </a>
+                }
+                else
+                {
+                    <a action="Index" asp-action="Index" asp-route-asc="lastname" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </a>
+                }
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.DateBirth)
+                @if (orderby == "datebirth")
+                {
+                    <a action="Index" asp-action="Index" asp-route-desc="datebirth" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </a>
+                }
+                else
+                {
+                    <a action="Index" asp-action="Index" asp-route-asc="datebirth" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </a>
+                }
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Cccd)
+                @if (orderby == "cccd")
+                {
+                    <a action="Index" asp-action="Index" asp-route-desc="cccd" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </a>
+                }
+                else
+                {
+                    <a action="Index" asp-action="Index" asp-route-asc="cccd" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </a>
+                }
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Email)
+                @if (orderby == "email")
+                {
+                    <a action="Index" asp-action="Index" asp-route-desc="email" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </a>
+                }
+                else
+                {
+                    <a action="Index" asp-action="Index" asp-route-asc="email" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </a>
+                }
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Address)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Gender)
+                @if (orderby == "gender")
+                {
+                    <a action="Index" asp-action="Index" asp-route-desc="gender" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </a>
+                }
+                else
+                {
+                    <a action="Index" asp-action="Index" asp-route-asc="gender" class="btn p-0 m-0">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </a>
+                }
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Firstname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Lastname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateBirth)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cccd)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gender)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ClientId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ClientId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ClientId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Firstname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Lastname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateBirth)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Cccd)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @(item.Gender ? "Nam" : "Nữ")
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ClientId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ClientId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ClientId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+
+@section Scripts {
+    <srcipt type="text/javascript">
+
+    </srcipt>
+}

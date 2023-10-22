@@ -27,5 +27,6 @@ namespace ShowroomManagement.Models
         public string? Address { get; set; }
         [Display(Name = "Giới tính")]
         public bool Gender { get; set; }
+        public bool Deleted { get; set; } = false;
     }
 }

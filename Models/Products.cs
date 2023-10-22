@@ -10,7 +10,7 @@ namespace ShowroomManagement.Models
         public string Serial { get; set; }
 
         [Display(Name = "Tên")]
-        public string Name { get; set; }
+        public string ProductName { get; set; }
 
         [Display(Name = "Giá nhập")]
         public int? PurchasePrice { get; set; }
@@ -21,18 +21,13 @@ namespace ShowroomManagement.Models
         [Display(Name = "Số lượng")]
         public int? Quantity { get; set; }
         
-        [Display(Name = "Nhà cung cấp")]
-        public string? SourceId { get; set; }
-        
         [Display(Name = "Trạng thái")]
         public string? Status { get; set; }
-
-        public List<Source>? Sources { get; set; }
 
         public Products()
         {
             Serial = string.Empty;
-            Name = string.Empty;
+            ProductName = string.Empty;
         }
-    }
+    }   
 }

@@ -9,6 +9,7 @@ namespace ShowroomManagement.Models
             EmployeeId = Firstname = Lastname = Cccd = Position = string.Empty;
             Salary = 0;
         }
+
         [Key]
         [Display(Name = "ID")]
         [StringLength(maximumLength: 10)]
@@ -45,5 +46,10 @@ namespace ShowroomManagement.Models
 
         [Display(Name = "Giới tính")]
         public bool? Gender { get; set; }
+
+        public bool Deleted { get; set; } = false;
+
+        [Display(Name = "Ảnh")]
+        public string? Url_image { get; set; }
     }
 }
