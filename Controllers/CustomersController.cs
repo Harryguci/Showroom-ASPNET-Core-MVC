@@ -108,6 +108,20 @@ namespace ShowroomManagement.Controllers
                         Problem("Entity set 'ShowroomContext.Customer'  is null.");
         }
 
+        // GET: Customers/Search
+        public async Task<List<Customer>> Search(string q)
+        {
+            if (_context.Customer == null) return new List<Customer>();
+            
+            var query = _context.Customer.Where(p => !p.Deleted
+                && (p.ClientId.ToLower().Contains(q)
+                || p.Firstname.ToLower().Contains(q)
+                || p.Lastname.ToLower().Contains(q))
+            );
+
+            return await query.ToListAsync();
+        }
+
         // GET: Customers/Details/5
         public async Task<IActionResult> Details(string id)
         {

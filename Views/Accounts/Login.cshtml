@@ -1,0 +1,78 @@
+﻿@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    ViewData["Title"] = "Login";
+}
+
+@section Styles {
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/all.css'>
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/fontawesome.css'>
+    <link rel="stylesheet" href="~/css/login/style.css">
+}
+
+<div class="container">
+    <div class="screen">
+        <div class="screen__content">
+            <form class="login" asp-action="Login" method="POST" onsubmit="HandleSubmit(event)">
+            @* <form class="login" asp-controller="Login" asp-action="Login" method="POST"> *@
+                <div class="login__field">
+                    <i class="login__icon fas fa-user"></i>
+                    <input type="text" name="username" class="login__input" placeholder="User name / Email">
+                </div>
+                <div class="login__field">
+                    <i class="login__icon fas fa-lock"></i>
+                    <input type="password" name="password" class="login__input" placeholder="Password">
+                </div>
+                <button class="button login__submit">
+                    <span class="button__text">Log In Now</span>
+                    <i class="button__icon fas fa-chevron-right"></i>
+                </button>
+            </form>
+            <div class="social-login">
+                <h3>log in via</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-login__icon fab fa-instagram"></a>
+                    <a href="#" class="social-login__icon fab fa-facebook"></a>
+                    <a href="#" class="social-login__icon fab fa-twitter"></a>
+                </div>
+            </div>
+        </div>
+        <div class="screen__background">
+            <span class="screen__background__shape screen__background__shape4"></span>
+            <span class="screen__background__shape screen__background__shape3"></span>
+            <span class="screen__background__shape screen__background__shape2"></span>
+            <span class="screen__background__shape screen__background__shape1"></span>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        function HandleSubmit(e) {
+            e.preventDefault();
+
+            var username = document.querySelector(`input[name="username"]`).value;
+            var password = document.querySelector(`input[name="password"]`).value;
+
+            if (username.length < 3) {
+                alert("Tên đăng nhập quá ngắn.");
+            }
+            if (password.length < 6) {
+                alert("Mật khẩu phải trên 6 ký tự.")
+            }
+            var url = "https://localhost3000/api/Login";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { username: username, password: password },
+                contenttype: "application/json",
+                success: function (resposne) {
+                    console.log(JSON.stringify(response))
+                },
+                error: function (error) {
+                    alert("Error: " + JSON.stringify(error))
+                }
+            });
+        }
+    </script>
+}
+

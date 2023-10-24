@@ -37,6 +37,8 @@ namespace ShowroomManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string q)
         {
+            ViewBag.q = q;
+
             using (HttpClient client = new HttpClient())
             {
                 string absoluteUrl = @"https://localhost:3000";
@@ -56,20 +58,25 @@ namespace ShowroomManagement.Controllers
                 var productsResponse = await responses[1].Content.ReadAsStringAsync();
                 var employeesResponse = await responses[2].Content.ReadAsStringAsync();
 
-                IEnumerable<Customer>? customers = JsonSerializer.Deserialize<List<Customer>>(customersResponse);
-                IEnumerable<Products>? products = JsonSerializer.Deserialize<List<Products>>(productsResponse);
-                IEnumerable<Employee>? employees = JsonSerializer.Deserialize<List<Employee>>(employeesResponse);
+                customersResponse = customersResponse != null ? customersResponse : "[]";
+                productsResponse = productsResponse != null ? productsResponse : "[]";
+                employeesResponse = employeesResponse != null ? employeesResponse : "[]";
 
-                ViewBag.customers = customers;
-                ViewBag.products = products;
-                ViewBag.employees = employees;
-
-                return Ok(new
+                try
                 {
-                    customers = customers,
-                    products = products,
-                    employees = employees
-                });
+                    IEnumerable<Customer>? customers = JsonSerializer.Deserialize<List<Customer>>(customersResponse);
+                    IEnumerable<Products>? products = JsonSerializer.Deserialize<List<Products>>(productsResponse);
+                    IEnumerable<Employee>? employees = JsonSerializer.Deserialize<List<Employee>>(employeesResponse);
+                    ViewBag.customers = customers;
+                    ViewBag.products = products;
+                    ViewBag.employees = employees;
+
+                    return View();
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
             }
         }
     }

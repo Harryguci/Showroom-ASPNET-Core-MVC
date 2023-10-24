@@ -243,5 +243,34 @@ namespace ShowroomManagement.Controllers
         {
             return View();
         }
+
+        // GET: Employees/Search
+        [HttpGet]
+        public async Task<List<Employee>> Search(string q)
+        {
+            if (_context.Employees == null) 
+                return new List<Employee>();
+            q = q.ToLower().Trim();
+
+            var query = _context.Employees.Select(p => new Employee()
+            {
+                EmployeeId = p.EmployeeId,
+                Firstname = p.Firstname,
+                Lastname = p.Lastname,
+                DateBirth = p.DateBirth,
+                Cccd = p.Cccd,
+                Position = p.Position,
+                StartDate = p.StartDate,
+                Salary = p.Salary,
+                Email = p.Email,
+                SaleId = p.SaleId,
+                Gender = p.Gender,
+                Deleted = p.Deleted,
+            }).Where(p => !p.Deleted && (p.Firstname.ToLower().Contains(q)
+            || (p.Lastname.ToLower().Contains(q))
+            || (p.EmployeeId.ToLower().Contains(q))));
+
+            return await query.ToListAsync();
+        }
     }
 }

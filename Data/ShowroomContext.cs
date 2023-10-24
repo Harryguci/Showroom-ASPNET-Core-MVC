@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Humanizer.Bytes;
+using Microsoft.EntityFrameworkCore;
 using ShowroomManagement.Models;
+using System.Text;
 
 namespace ShowroomManagement.Data
 {
@@ -15,6 +17,8 @@ namespace ShowroomManagement.Data
 
         public DbSet<TestDrive>? TestDrives { get; set; }
 
+        public DbSet<Account>? Accounts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -25,6 +29,7 @@ namespace ShowroomManagement.Data
             modelBuilder.Entity<SalesInvoice>().ToTable("SalesInvoices");
             modelBuilder.Entity<SalesTarget>().ToTable("SalesTargets");
             modelBuilder.Entity<TestDrive>().ToTable("TestDrive");
+            modelBuilder.Entity<Account>().ToTable("Account");
         }
 
         public ShowroomContext(DbContextOptions<ShowroomContext> options)
@@ -36,5 +41,10 @@ namespace ShowroomManagement.Data
         public DbSet<ShowroomManagement.Models.Customer>? Customer { get; set; }
 
         public DbSet<ShowroomManagement.Models.Source>? Source { get; set; }
+
+        [DbFunction("login_check")]
+        public static bool CheckLogin(string username,
+            string password)
+            => throw new Exception();
     }
 }

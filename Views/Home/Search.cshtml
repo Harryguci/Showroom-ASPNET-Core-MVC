@@ -1,0 +1,88 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Search | " + ViewBag.q;
+    IEnumerable<Products> products = ViewBag.products;
+    IEnumerable<Customer> customers = ViewBag.customers;
+    IEnumerable<Employee> employees = ViewBag.employees;
+}
+
+<style>
+    h1 {
+        font-size: 2.5rem;
+    }
+    h2 {
+        font-size: 2rem;
+    }
+    h3 {
+        font-size: 1.5rem;
+        font-style: normal;
+    }
+    main ul {
+        padding-left: 1rem;
+    }
+    main li {
+        background: rgba(150,150,150,0.1);
+        padding: 0.6rem;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+
+</style>
+
+<main class="my-4">
+    <h1 class="fw-bold" style="font-size: 2.5rem">
+        Tìm kiếm:
+        <span style="font-style: italic">@ViewBag.q</span>
+    </h1>
+    <hr />
+    <div class="product-container">
+        <h2>Sản phẩm</h2>
+        <ul>
+            @foreach (var product in products)
+            {
+                <li>
+                    <h3>@product.Serial</h3>
+                    <p>@product.ProductName</p>
+                </li>
+            }
+        </ul>
+        @if (products.Count() <= 0)
+        {
+            <p>Không tìm thấy sản phẩm nào.</p>
+        }
+    </div>
+    <hr />
+    <div class="employee-container">
+        <h2>Nhân viên</h2>
+        <ul>
+            @foreach (var employee in employees)
+            {
+                <li>
+                    <h3>@employee.EmployeeId</h3>
+                    <p>@employee.Firstname @employee.Lastname</p>
+                </li>
+            }
+        </ul>
+        @if (employees.Count() <= 0)
+        {
+            <p>Không tìm thấy nhân viên nào.</p>
+        }
+    </div>
+    <hr />
+    <div class="customer-container">
+        <h2>Khách hàng</h2>
+        <ul>
+            @foreach (var customer in customers)
+            {
+                <li>
+                    <h3>@customer.ClientId</h3>
+                    <p>@customer.Firstname @customer.Lastname</p>
+                </li>
+            }
+        </ul>
+        @if (customers.Count() <= 0)
+        {
+            <p>Không tìm thấy khách hàng nào.</p>
+        }
+    </div>
+</main>

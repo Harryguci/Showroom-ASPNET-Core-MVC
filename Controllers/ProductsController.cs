@@ -50,12 +50,9 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Search(string name)
+        public async Task<List<Products>> Search(string q)
         {
-            if (_context.Products == null) return BadRequest(new
-            {
-                error = "Can not find the table."
-            });
+            if (_context.Products == null) return new List<Products>();
 
             var query = _context.Products.Select(p => new Products()
             {
@@ -64,10 +61,10 @@ namespace ShowroomManagement.Controllers
                 PurchasePrice = p.PurchasePrice,
                 SalePrice = p.SalePrice,
                 Quantity = p.Quantity,
-                Status = p.Status,
-            }).Where(p => p.ProductName.StartsWith(name.ToLower()));
+                Status = p.Status
+            }).Where(p => p.ProductName.Contains(q.ToLower()));
 
-            return View(await query.ToListAsync());
+            return await query.ToListAsync();
         }
         // GET: Products/Details/5
         public async Task<IActionResult> Details(string id)
