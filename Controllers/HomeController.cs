@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 using System.Diagnostics;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace ShowroomManagement.Controllers
 {
@@ -64,9 +69,9 @@ namespace ShowroomManagement.Controllers
 
                 try
                 {
-                    IEnumerable<Customer>? customers = JsonSerializer.Deserialize<List<Customer>>(customersResponse);
-                    IEnumerable<Products>? products = JsonSerializer.Deserialize<List<Products>>(productsResponse);
-                    IEnumerable<Employee>? employees = JsonSerializer.Deserialize<List<Employee>>(employeesResponse);
+                    IEnumerable<Customer> customers = JsonSerializer.Deserialize<List<Customer>>(customersResponse);
+                    IEnumerable<Products> products = JsonSerializer.Deserialize<List<Products>>(productsResponse);
+                    IEnumerable<Employee> employees = JsonSerializer.Deserialize<List<Employee>>(employeesResponse);
                     ViewBag.customers = customers;
                     ViewBag.products = products;
                     ViewBag.employees = employees;
@@ -78,6 +83,23 @@ namespace ShowroomManagement.Controllers
                     return BadRequest(ex.Message);
                 }
             }
+        }
+
+        public static async Task<Account> GetCurrentAccount()
+        {
+            using(HttpClient client = new HttpClient())
+            {
+                var currentAcc = await client.GetAsync("https://localhost:3000/Accounts/GetCurrentAccount");
+                return JsonSerializer.Deserialize<Account>(await currentAcc.Content.ReadAsStringAsync());
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Accounts");
         }
     }
 }

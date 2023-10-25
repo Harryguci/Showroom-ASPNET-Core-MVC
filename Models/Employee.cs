@@ -20,12 +20,12 @@ namespace ShowroomManagement.Models
         [Display(Name = "Họ")]
         [StringLength(maximumLength: 190)]
         [JsonPropertyName("firstname")]
-        public string? Firstname { get; set; }
+        public string Firstname { get; set; }
 
         [Display(Name = "Tên")]
         [JsonPropertyName("lastname")]
         [StringLength(maximumLength: 190)]
-        public string? Lastname { get; set; }
+        public string Lastname { get; set; }
 
         [Display(Name = "Ngày sinh")]
         [JsonPropertyName("datebirth")]
@@ -33,10 +33,10 @@ namespace ShowroomManagement.Models
 
         [Display(Name = "CCCD")]
         [JsonPropertyName("cccd")]
-        public string? Cccd { get; set; }
+        public string Cccd { get; set; }
 
         [Display(Name = "Vị trí")]
-        public string? Position { get; set; }
+        public string Position { get; set; }
 
         [Display(Name = "Ngày bắt đầu")]
         [JsonPropertyName("startdate")]
@@ -48,20 +48,20 @@ namespace ShowroomManagement.Models
 
         [Display(Name = "Email")]
         [JsonPropertyName("email")]
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         [Display(Name = "Doanh số")]
         [JsonPropertyName("saleId")]
-        public string? SaleId { get; set; }
+        public string SaleId { get; set; }
 
         [Display(Name = "Giới tính")]
         [JsonPropertyName("gender")]
-        public bool? Gender { get; set; }
+        public bool Gender { get; set; }
 
         public bool Deleted { get; set; } = false;
 
         [Display(Name = "Ảnh")]
         [JsonPropertyName("url_image")]
-        public string? Url_image { get; set; }
+        public string Url_image { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Employees
+        [Authorize(Roles = "1,2")]
         public async Task<IActionResult> Index(int? page = 1)
         {
             if (_context.Employees == null) return BadRequest();
@@ -74,6 +76,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Employees/Create
+        [Authorize(Roles = "2")]
         public IActionResult Create()
         {
             return View();
@@ -84,6 +87,7 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> Create([Bind("EmployeeId,Firstname,Lastname,DateBirth,Cccd,Postion,StartDate,Salary,Email,SaleId,Gender")] Employee employee)
         {
             if (ModelState.IsValid)
@@ -96,6 +100,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Employees/Edit/5
+        [Authorize("2")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Employees == null)
@@ -116,6 +121,7 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> Edit(string id, [Bind("EmployeeId,Firstname,Lastname,DateBirth,Cccd,Postion,StartDate,Salary,Email,SaleId,Gender")] Employee employee)
         {
             if (id != employee.EmployeeId)
@@ -147,6 +153,7 @@ namespace ShowroomManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> Trash(int? page, int? limits)
         {
             if (_context.Employees == null) return BadRequest();
@@ -175,6 +182,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Employees/Delete/5
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Employees == null)
@@ -194,6 +202,7 @@ namespace ShowroomManagement.Controllers
 
         // POST: Employees/Delete/5
         [HttpPost]
+        [Authorize(Roles = "2")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
@@ -213,6 +222,7 @@ namespace ShowroomManagement.Controllers
 
         // POST: Employees/DeleteSoft
         [HttpPost]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> DeleteSoft(string id)
         {
             // TODO: Move the employee which has
@@ -246,6 +256,7 @@ namespace ShowroomManagement.Controllers
 
         // GET: Employees/Search
         [HttpGet]
+        [Authorize(Roles = "2")]
         public async Task<List<Employee>> Search(string q)
         {
             if (_context.Employees == null) 

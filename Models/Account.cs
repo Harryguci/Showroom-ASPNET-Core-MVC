@@ -17,17 +17,22 @@ namespace ShowroomManagement.Models
 
         [Column(name: "Password_foruser", TypeName = "varbinary(500)")]
         [JsonPropertyName("password")]
-        
         public string Password { get; set; }
+        
+        [JsonPropertyName("employeeid")]
+        public string EmployeeId { get; set; }
 
-        public string? EmployeeId { get; set; }
+        [JsonPropertyName("level_account")]
+        public int? Level_account { get; set; } = 0;
 
-        [Column("Level_account")]
-        public int? Level { get; set; } = 0;
-
+        [JsonPropertyName("deleted")]
         public bool? Deleted { get; set; } = false;
 
+        [JsonPropertyName("createAt")]
         public DateTime? CreateAt { get; set; }
+        [JsonPropertyName("deleteAt")]
         public DateTime? DeleteAt { get; set; }
+        [JsonPropertyName("keepLoggined")]
+        public bool KeepLoggined { get; set; } = true;
     }
 }

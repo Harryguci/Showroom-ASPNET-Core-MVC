@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
+using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ShowroomManagement.Controllers
 {
@@ -172,29 +170,56 @@ namespace ShowroomManagement.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            ClaimsPrincipal claimUser = HttpContext.User;
+            if (claimUser.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login([FromForm] Account account)
         {
             using (HttpClient client = new HttpClient())
             {
-                IDictionary<string, object> dict = new Dictionary<string, object>() {
-                    { "username", username },
-                    { "password", password }
-                };
+                string serialized = JsonConvert.SerializeObject(account);
 
-                string serialized = JsonConvert.SerializeObject(dict);
                 StringContent stringContent = new StringContent(serialized);
+                stringContent.Headers.Remove("Content-Type");
+                stringContent.Headers.Add("Content-Type", "application/json");
 
-                var res = await client.PostAsync("https://localhost:3000/api/Login", stringContent);
+                //var res = await client.PostAsync(@"https://localhost:3000/api/Login", stringContent);
+                var res = Authenticate(account);
 
                 if (res != null)
                 {
-                    return Ok(res);
+                    List<Claim> claims = new List<Claim>()
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, account.Username),
+                        new Claim(ClaimTypes.Role, res.Level_account.ToString()),
+                        new Claim("CreateAt", res.CreateAt.ToString()),
+                    };
+
+                    ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,
+                        CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    AuthenticationProperties properties = new AuthenticationProperties()
+                    {
+                        AllowRefresh = true,
+                        IsPersistent = account.KeepLoggined
+                    };
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity), properties);
+
+                    return RedirectToAction("Index", "Home");
                 }
-                else return BadRequest(new { username = username, password = password });
+                else
+                {
+                    ViewBag.ValidateMessage = "User not found.";
+                    return View();
+                }
             }
         }
 
@@ -208,25 +233,43 @@ namespace ShowroomManagement.Controllers
                 return BadRequest("NOT FOUND current account");
             }
 
-            return Ok($"Hi {currentResult.Username}, your level is {currentResult.Level}");
+            return Ok($"Hi {currentResult.Username}, your level is {currentResult.Level_account}");
         }
 
         [HttpGet]
-        public Account? GetCurrentAccount()
+        [Authorize(Roles = "1, 2")]
+        public Account GetCurrentAccount()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity != null)
             {
                 var accountClaim = identity.Claims;
-                if (accountClaim == null) return null;
+                //if (accountClaim == null) return null;
 
                 return new Account()
                 {
                     Username = accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
-                    Level = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                    Level_account = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
                 };
             }
             return null;
+        }
+
+        private Account Authenticate(Account account)
+        {
+            // TODO: authenticate the account
+            if (_context.Accounts == null) return null;
+
+            var query = _context.Accounts.FromSqlRaw("SELECT * FROM DBO.LOGIN_CHECK(@username, @password)",
+                 new SqlParameter("@username", account.Username),
+                 new SqlParameter("@password", account.Password)).Select(p => new Account()
+                 {
+                     Username = p.Username,
+                     Password = p.Password,
+                     Level_account = p.Level_account,
+                 }).FirstOrDefault();
+
+            return query;
         }
     }
 }

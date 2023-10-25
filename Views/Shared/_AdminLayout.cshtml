@@ -1,5 +1,29 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims;
+@{
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
 
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+
+    }
+
+
+}
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -110,14 +134,28 @@
                             <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                             <span class="hide-menu">AUTH</span>
                         </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" asp-controller="Accounts" asp-action="Login" aria-expanded="false">
-                                <span>
-                                    <i class="ti ti-login"></i>
-                                </span>
-                                <span class="hide-menu">Login</span>
-                            </a>
-                        </li>
+                        @if (currentAccount == null)
+                        {
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" asp-controller="Accounts" asp-action="Login" aria-expanded="false">
+                                    <span>
+                                        <i class="ti ti-login"></i>
+                                    </span>
+                                    <span class="hide-menu">Login</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" asp-controller="Home" asp-action="Logout" aria-expanded="false" onclick="localStorage.removeItem('access_token')">
+                                    <span>
+                                        <i class="ti ti-logout"></i>
+                                    </span>
+                                    <span class="hide-menu">Logout</span>
+                                </a>
+                            </li>
+                        }
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="./authentication-register.html" aria-expanded="false">
                                 <span>
@@ -196,9 +234,9 @@
                                         search
                                     </span>
                                 </button>
-                                <input  id="search-input" class="form-control" type="text" name="q" placeholder="Search..."
+                                <input id="search-input" class="form-control" type="text" name="q" placeholder="Search..."
                                        style="border-bottom-left-radius: 0;border-top-left-radius: 0;" />
-                                
+
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
@@ -209,7 +247,9 @@
                                     <div class="message-body">
                                         <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
                                             <i class="ti ti-user fs-6"></i>
-                                            <p class="mb-0 fs-3">My Profile</p>
+                                            <p class="mb-0 fs-3">
+                                                @(currentAccount != null ? currentAccount.Username : "-")
+                                            </p>
                                         </a>
                                         <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
                                             <i class="ti ti-mail fs-6"></i>
@@ -219,7 +259,7 @@
                                             <i class="ti ti-list-check fs-6"></i>
                                             <p class="mb-0 fs-3">My Task</p>
                                         </a>
-                                        <a asp-controller="Auth" asp-action="Logout"
+                                        <a asp-controller="Home" asp-action="Logout"
                                            class="btn btn-outline-primary mx-3 mt-2 d-block">
                                             Logout
                                         </a>
@@ -250,7 +290,7 @@
             var q = document.getElementById('search-input').value;
             console.log(q);
             window.location = `/Home/Search?q=${q}`;
-        }    
+        }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

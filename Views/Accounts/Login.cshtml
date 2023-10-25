@@ -12,21 +12,28 @@
 <div class="container">
     <div class="screen">
         <div class="screen__content">
-            <form class="login" asp-action="Login" method="POST" onsubmit="HandleSubmit(event)">
-            @* <form class="login" asp-controller="Login" asp-action="Login" method="POST"> *@
+            @* <form class="login" asp-controller="Auth" asp-action="LoginForm" onsubmit="HandleSubmit(event)"> *@
+                <form class="login" asp-controller="Accounts" asp-action="Login">
                 <div class="login__field">
                     <i class="login__icon fas fa-user"></i>
-                    <input type="text" name="username" class="login__input" placeholder="User name / Email">
+                    <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">
                 </div>
                 <div class="login__field">
                     <i class="login__icon fas fa-lock"></i>
-                    <input type="password" name="password" class="login__input" placeholder="Password">
+                    <input type="password" id="password" name="password" class="login__input" placeholder="Password">
                 </div>
-                <button class="button login__submit">
+                <p class="form-helper text-danger" style="font-size: 12px">
+                    @if (ViewBag.ValidateMessage != null)
+                    {
+                        @ViewBag.ValidateMessage
+                    }
+                </p>
+                <button class="button login__submit" type="submit">
                     <span class="button__text">Log In Now</span>
                     <i class="button__icon fas fa-chevron-right"></i>
                 </button>
             </form>
+            
             <div class="social-login">
                 <h3>log in via</h3>
                 <div class="social-icons">
@@ -45,34 +52,6 @@
     </div>
 </div>
 @section Scripts {
-    <script type="text/javascript">
-        function HandleSubmit(e) {
-            e.preventDefault();
-
-            var username = document.querySelector(`input[name="username"]`).value;
-            var password = document.querySelector(`input[name="password"]`).value;
-
-            if (username.length < 3) {
-                alert("Tên đăng nhập quá ngắn.");
-            }
-            if (password.length < 6) {
-                alert("Mật khẩu phải trên 6 ký tự.")
-            }
-            var url = "https://localhost3000/api/Login";
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: { username: username, password: password },
-                contenttype: "application/json",
-                success: function (resposne) {
-                    console.log(JSON.stringify(response))
-                },
-                error: function (error) {
-                    alert("Error: " + JSON.stringify(error))
-                }
-            });
-        }
-    </script>
+    <script src="~/js/login/HandleSubmit.js" defer></script>
 }
 

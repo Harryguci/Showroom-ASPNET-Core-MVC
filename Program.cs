@@ -3,28 +3,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ShowroomManagement.Data;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add Cors
+builder.Services.AddCors();
+
 // Add the Database context
 builder.Services.AddDbContext<ShowroomContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("ShowroomAutoContext")));
 
 // Add the authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        options.LoginPath = "/Accounts/Login";
+        options.ExpireTimeSpan = TimeSpan.FromDays(1);
     });
 
 
@@ -44,6 +43,7 @@ using (var scope = app.Services.CreateScope())
     DbInitialize.ShowroomDBInitialize(services);
 }
 
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -52,8 +52,16 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// global cors policy
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true) // allow any origin
+                                        //.WithOrigins("https://localhost:44351")); // Allow only this origin can also have multiple origins separated with comma
+    .AllowCredentials()); // allow credentials
+       
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Accounts}/{action=Login}/{id?}");
 
 app.Run();

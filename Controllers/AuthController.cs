@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -8,32 +10,67 @@ using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Policy;
 using System.Text;
 
 namespace ShowroomManagement.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class LoginController : ControllerBase
+    [DisableCors]
+    public class AuthController : Controller
     {
         private IConfiguration _config;
         private ShowroomContext db;
 
-        public LoginController(IConfiguration config, ShowroomContext context)
+        public AuthController(IConfiguration config, ShowroomContext context)
         {
             _config = config;
             db = context;
         }
+        public IActionResult Index()
+        {
+            return View();
+        }
 
         [AllowAnonymous]
-        public Task<IActionResult> Login([Bind("username, password")]Account account)
+        [HttpPost]
+        public Task<IActionResult> Login([FromBody] Account account)
         {
-            Account? user = Authenticate(new Account() { Username = account.Username, Password = account.Password });
+            var username = account.Username;
+            var password = account.Password;
+
+            Account user = Authenticate(new Account()
+            {
+                Username = username,
+                Password = password
+            });
 
             if (user != null)
             {
                 var token = Generate(user);
+                return Task.FromResult<IActionResult>(Ok(new { access_token = token }));
+            }
+            else
+            {
+                return Task.FromResult<IActionResult>(Ok(new { error = "Username hoặc Password không đúng." }));
+            }
+        }
+
+        public IActionResult Logout()
+        {
+            // 
+            return Ok();
+        }
+
+        public Task<IActionResult> LoginForm([FromForm] Account account)
+        {
+            var username = account.Username;
+            var password = account.Password;
+
+            Account user = Authenticate(new Account() { Username = username, Password = password });
+
+            if (user != null)
+            {
+                var token = Generate(user);
+
                 return Task.FromResult<IActionResult>(Ok(token));
             }
 
@@ -51,17 +88,18 @@ namespace ShowroomManagement.Controllers
                 new Claim(ClaimTypes.Role, Convert.ToString(account.Level_account))
             };
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-                _config["Jwt:Audience"],
-                claims,
-                expires: DateTime.Now.AddMinutes(15),
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: crendentials
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private Account? Authenticate(Account account)
+        private Account Authenticate(Account account)
         {
             // TODO: authenticate the account
             if (db.Accounts == null) return null;
