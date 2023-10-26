@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -249,8 +250,35 @@ namespace ShowroomManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "1")]
         public IActionResult SignWorkDate()
         {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "1")]
+        public IActionResult SignWorkDate(string workdate, string calam)
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var accountClaim = identity.Claims;
+
+                var currentAccount = new Account()
+                {
+                    Username = accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value),
+                    EmployeeId = accountClaim.FirstOrDefault(p => p.Type == "EmployeeId")?.Value
+                };
+
+                return Ok(new
+                {
+                    user = currentAccount,
+                    sign = new { workdate = workdate, calam = calam }
+                });
+            }
+
             return View();
         }
 
@@ -259,7 +287,7 @@ namespace ShowroomManagement.Controllers
         [Authorize(Roles = "2")]
         public async Task<List<Employee>> Search(string q)
         {
-            if (_context.Employees == null) 
+            if (_context.Employees == null)
                 return new List<Employee>();
             q = q.ToLower().Trim();
 

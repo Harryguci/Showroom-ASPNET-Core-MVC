@@ -13,7 +13,8 @@
     <div class="screen">
         <div class="screen__content">
             @* <form class="login" asp-controller="Auth" asp-action="LoginForm" onsubmit="HandleSubmit(event)"> *@
-                <form class="login" asp-controller="Accounts" asp-action="Login">
+            <form class="login" asp-controller="Accounts" asp-action="Login">
+                <h1 class="fw-bold" style="color: rgb(0, 0, 150)">Login</h1>
                 <div class="login__field">
                     <i class="login__icon fas fa-user"></i>
                     <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">
@@ -33,9 +34,9 @@
                     <i class="button__icon fas fa-chevron-right"></i>
                 </button>
             </form>
-            
-            <div class="social-login">
-                <h3>log in via</h3>
+
+            <div class="social-login" style="padding-top: 10px">
+                @* <h3>log in via</h3> *@
                 <div class="social-icons">
                     <a href="#" class="social-login__icon fab fa-instagram"></a>
                     <a href="#" class="social-login__icon fab fa-facebook"></a>

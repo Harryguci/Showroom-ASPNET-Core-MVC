@@ -49,15 +49,15 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Accounts/Create
+        [Authorize(Roles = "2")]
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Accounts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "2")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AccountId,Username,Password,Level,Deleted,CreateAt,DeteleAt")] Account account)
         {
@@ -88,8 +88,6 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: Accounts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [Authorize(Roles = "2")]
         [ValidateAntiForgeryToken]
@@ -168,6 +166,7 @@ namespace ShowroomManagement.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             ClaimsPrincipal claimUser = HttpContext.User;
@@ -179,6 +178,7 @@ namespace ShowroomManagement.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromForm] Account account)
         {
             using (HttpClient client = new HttpClient())
@@ -199,6 +199,7 @@ namespace ShowroomManagement.Controllers
                         new Claim(ClaimTypes.NameIdentifier, account.Username),
                         new Claim(ClaimTypes.Role, res.Level_account.ToString()),
                         new Claim("CreateAt", res.CreateAt.ToString()),
+                        new Claim("EmployeeId", res.EmployeeId.ToString())
                     };
 
                     ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,
@@ -223,21 +224,8 @@ namespace ShowroomManagement.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("[controller]/Admins")]
-        public IActionResult AdminsEndpoint()
-        {
-            var currentResult = GetCurrentAccount();
-            if (currentResult == null)
-            {
-                return BadRequest("NOT FOUND current account");
-            }
-
-            return Ok($"Hi {currentResult.Username}, your level is {currentResult.Level_account}");
-        }
-
         [HttpGet]
-        [Authorize(Roles = "1, 2")]
+        [Authorize]
         public Account GetCurrentAccount()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -249,7 +237,8 @@ namespace ShowroomManagement.Controllers
                 return new Account()
                 {
                     Username = accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
-                    Level_account = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                    Level_account = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value),
+                    EmployeeId = accountClaim.FirstOrDefault(p => p.Type == "EmployeeId")?.Value
                 };
             }
             return null;
@@ -262,14 +251,51 @@ namespace ShowroomManagement.Controllers
 
             var query = _context.Accounts.FromSqlRaw("SELECT * FROM DBO.LOGIN_CHECK(@username, @password)",
                  new SqlParameter("@username", account.Username),
-                 new SqlParameter("@password", account.Password)).Select(p => new Account()
-                 {
-                     Username = p.Username,
-                     Password = p.Password,
-                     Level_account = p.Level_account,
-                 }).FirstOrDefault();
+                 new SqlParameter("@password", account.Password))
+                .Select(p => new Account()
+                {
+                    Username = p.Username,
+                    Password = p.Password,
+                    EmployeeId = p.EmployeeId,
+                    Level_account = p.Level_account,
+                }).FirstOrDefault();
 
             return query;
+        }
+
+        // GET: Accounts/Person/{id}
+        [Authorize]
+        public async Task<IActionResult> Person(string id = null)
+        {
+            if (id == null)
+            {
+                var curr = GetCurrentAccount();
+
+                Employee currEmployee = _context.Employees
+                       .Where(p => p.EmployeeId == curr.EmployeeId)
+                       .FirstOrDefault();
+                ViewBag.currEmployee = currEmployee;
+
+                if (curr.Level_account == 1) // EMPLOYEE
+                {
+                    List<SalesTarget> currSales = await _context.SalesTargets
+                        .Where(p => p.SaleId == currEmployee.SaleId)
+                        .ToListAsync();
+
+                    ViewBag.employeeSalesTargets = currSales;
+                   
+                } else if (curr.Level_account == 2) // MANAGER
+                {
+                    //TODO: Handle manager information
+                }
+
+                return View(curr);
+            }
+            else
+            {
+                var account = _context.Accounts.Find(id);
+                return View(account);
+            }
         }
     }
 }

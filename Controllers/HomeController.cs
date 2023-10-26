@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 using System.Diagnostics;
-using System.Security.Claims;
-using System.Security.Principal;
 using System.Text.Json;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using NuGet.Protocol;
 
 namespace ShowroomManagement.Controllers
 {
@@ -40,28 +39,21 @@ namespace ShowroomManagement.Controllers
 
         // GET: Home/Search
         [HttpGet]
-        public async Task<IActionResult> Search(string q)
+        public IActionResult Search(string q)
         {
             ViewBag.q = q;
+            q = q.ToLower();
 
             using (HttpClient client = new HttpClient())
             {
-                string absoluteUrl = @"https://localhost:3000";
+                var customersResponse = _context.Customer.Take(10)
+                    .Where(p => (p.Firstname.ToLower().Contains(q) || p.Lastname.ToLower().Contains(q))).ToJson();
 
-                var getEmployees = client.GetAsync(absoluteUrl + @"/Employees/Search?q=" + q);
-                var getProducts = client.GetAsync(absoluteUrl + @"/Products/Search?q=" + q);
-                var getCustomers = client.GetAsync(absoluteUrl + @"/Customers/Search?q=" + q);
+                var productsResponse = _context.Products.Take(10)
+                    .Where(p => (p.Serial.ToLower().Contains(q) || p.ProductName.ToLower().Contains(q))).ToJson();
 
-                List<Task<HttpResponseMessage>> tasks = new List<Task<HttpResponseMessage>>();
-                tasks.Add(getCustomers);
-                tasks.Add(getProducts);
-                tasks.Add(getEmployees);
-
-                var responses = await Task.WhenAll(tasks);
-
-                var customersResponse = await responses[0].Content.ReadAsStringAsync();
-                var productsResponse = await responses[1].Content.ReadAsStringAsync();
-                var employeesResponse = await responses[2].Content.ReadAsStringAsync();
+                var employeesResponse = _context.Employees.Take(10)
+                    .Where(p => (p.Firstname.ToLower().Contains(q) || p.Lastname.ToLower().Contains(q))).ToJson();
 
                 customersResponse = customersResponse != null ? customersResponse : "[]";
                 productsResponse = productsResponse != null ? productsResponse : "[]";
@@ -87,7 +79,7 @@ namespace ShowroomManagement.Controllers
 
         public static async Task<Account> GetCurrentAccount()
         {
-            using(HttpClient client = new HttpClient())
+            using (HttpClient client = new HttpClient())
             {
                 var currentAcc = await client.GetAsync("https://localhost:3000/Accounts/GetCurrentAccount");
                 return JsonSerializer.Deserialize<Account>(await currentAcc.Content.ReadAsStringAsync());
@@ -96,6 +88,7 @@ namespace ShowroomManagement.Controllers
 
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

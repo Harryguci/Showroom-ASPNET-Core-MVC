@@ -10,19 +10,23 @@
     h1 {
         font-size: 2.5rem;
     }
+
     h2 {
         font-size: 2rem;
     }
+
     h3 {
         font-size: 1.5rem;
         font-style: normal;
     }
+
     main ul {
         padding-left: 1rem;
     }
+
     main li {
-        background: rgba(150,150,150,0.1);
-        padding: 0.6rem;
+        background: rgba(200,200,200,0.1);
+        padding: 0.6rem 1.5rem;
         border-radius: 5px;
         margin: 10px 0;
     }
@@ -41,8 +45,10 @@
             @foreach (var product in products)
             {
                 <li>
-                    <h3>@product.Serial</h3>
-                    <p>@product.ProductName</p>
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Serial">
+                        <h3>@product.Serial</h3>
+                        <p>@product.ProductName</p>
+                    </a>
                 </li>
             }
         </ul>
@@ -58,8 +64,10 @@
             @foreach (var employee in employees)
             {
                 <li>
-                    <h3>@employee.EmployeeId</h3>
-                    <p>@employee.Firstname @employee.Lastname</p>
+                    <a asp-controller="Employees" asp-action="Details" asp-route-id="@employee.EmployeeId">
+                        <h3>@employee.EmployeeId</h3>
+                        <p>@employee.Firstname @employee.Lastname</p>
+                    </a>
                 </li>
             }
         </ul>
@@ -75,8 +83,10 @@
             @foreach (var customer in customers)
             {
                 <li>
-                    <h3>@customer.ClientId</h3>
-                    <p>@customer.Firstname @customer.Lastname</p>
+                    <a asp-controller="Customers" asp-action="Details" asp-route-id="@customer.ClientId">
+                        <h3>@customer.ClientId</h3>
+                        <p>@customer.Firstname @customer.Lastname</p>
+                    </a>
                 </li>
             }
         </ul>

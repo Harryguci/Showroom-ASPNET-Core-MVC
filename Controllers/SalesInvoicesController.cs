@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 
 namespace ShowroomManagement.Controllers
 {
+    [Authorize]
     public class SalesInvoicesController : Controller
     {
         private readonly ShowroomContext _context;
@@ -22,9 +19,9 @@ namespace ShowroomManagement.Controllers
         // GET: SalesInvoices
         public async Task<IActionResult> Index()
         {
-              return _context.SalesInvoices != null ? 
-                          View(await _context.SalesInvoices.ToListAsync()) :
-                          Problem("Entity set 'ShowroomContext.SalesInvoices'  is null.");
+            return _context.SalesInvoices != null ?
+                        View(await _context.SalesInvoices.ToListAsync()) :
+                        Problem("Entity set 'ShowroomContext.SalesInvoices'  is null.");
         }
 
         // GET: SalesInvoices/Details/5
@@ -122,16 +119,13 @@ namespace ShowroomManagement.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.SalesInvoices == null)
-            {
                 return NotFound();
-            }
 
             var salesInvoice = await _context.SalesInvoices
                 .FirstOrDefaultAsync(m => m.InSaleId == id);
+
             if (salesInvoice == null)
-            {
                 return NotFound();
-            }
 
             return View(salesInvoice);
         }
@@ -150,14 +144,14 @@ namespace ShowroomManagement.Controllers
             {
                 _context.SalesInvoices.Remove(salesInvoice);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool SalesInvoiceExists(string id)
         {
-          return (_context.SalesInvoices?.Any(e => e.InSaleId == id)).GetValueOrDefault();
+            return (_context.SalesInvoices?.Any(e => e.InSaleId == id)).GetValueOrDefault();
         }
 
         // GET: SalesInvoices/GetList
@@ -167,7 +161,9 @@ namespace ShowroomManagement.Controllers
             if (limits == null) limits = 10;
             if (page == null) page = 1;
 
-            if (_context.SalesInvoices == null) return new List<SalesInvoice>();
+            if (_context.SalesInvoices == null)
+                return new List<SalesInvoice>();
+
             return await _context.SalesInvoices
                 .Skip((page.Value - 1) * limits.Value)
                 .Take(limits.Value)

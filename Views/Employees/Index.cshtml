@@ -1,4 +1,5 @@
 ﻿@using System.Diagnostics;
+@using System.Security.Claims;
 @model IEnumerable<ShowroomManagement.Models.Employee>
 
 @{
@@ -6,19 +7,50 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     int page = ViewBag.currentPage;
     int total = ViewBag.totalPage;
-    Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
+    // Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
     bool hasNext = ViewBag.nextPage;
+}
+@{
+    Account currentAccount = null;
+
+    var identity = Context.User.Identity as ClaimsIdentity;
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value),
+                    EmployeeId = accountClaims.FirstOrDefault(p => p.Type == "EmployeeId")?.Value
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+
+    }
 }
 
 <h1>Danh sách nhân viên</h1>
-<p><small><a asp-action="Trash">Thùng rác</a></small></p>
+@if (currentAccount.Level_account >= 2)
+{
+    <p><small><a asp-action="Trash">Thùng rác</a></small></p>
+}
 <p>
-    <a asp-action="Create" class="btn btn-outline-primary">
-        Tạo mới
-    </a>
-    <a asp-action="SignWorkDate" class="btn btn-outline-primary">
-        Đăng ký lịch
-    </a>
+    @if (currentAccount.Level_account >= 2)
+    {
+        <a asp-action="Create" class="btn btn-outline-primary">
+            Tạo mới
+        </a>
+    }
+    @if (currentAccount.Level_account == 1)
+    {
+        <a asp-action="SignWorkDate" class="btn btn-outline-primary">
+            Đăng ký lịch
+        </a>
+    }
 </p>
 <table class="table">
     <thead>
@@ -47,9 +79,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Email)
             </th>
-            @*             <th>
-            @Html.DisplayNameFor(model => model.SaleId)
-            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.Gender)
             </th>
@@ -67,8 +96,7 @@
                     @Html.DisplayFor(modelItem => item.Lastname)
                 </td>
                 <td>
-                    @(item.DateBirth != null ?
-                        item.DateBirth.Value.ToString("dd/MM/yyyy") : "-")
+                    @item.DateBirth.ToString("dd/MM/yyyy")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Cccd)
@@ -77,7 +105,7 @@
                     @Html.DisplayFor(modelItem => item.Position)
                 </td>
                 <td>
-                    @(item.StartDate != null ? item.StartDate.Value.ToString("dd/MM/yyyy") : "-")
+                    @item.StartDate.ToString("dd/MM/yyyy")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Salary)
@@ -85,18 +113,31 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
-                @*
-            <td>
-            @Html.DisplayFor(modelItem => item.SaleId)
-            </td>
-            *@
                 <td>
-                    @(item.Gender != null && (bool)item.Gender ? "Nam" : "Nữ")
+                    @(item.Gender ? "Nam" : "Nữ")
                 </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.EmployeeId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.EmployeeId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.EmployeeId">Delete</a>
+                <td class="d-flex gap-1">
+                    @if (currentAccount.Level_account >= 2)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.EmployeeId">
+                            <span class="material-symbols-outlined">
+                                edit
+                            </span>
+                        </a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.EmployeeId">
+                        <span class="material-symbols-outlined">
+                            info
+                        </span>
+                    </a>
+                    @if (currentAccount.Level_account >= 2)
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.EmployeeId">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </a>
+                    }
                 </td>
             </tr>
         }

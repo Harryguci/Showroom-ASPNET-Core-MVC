@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
+using Microsoft.AspNetCore.Authorization;
+using NuGet.Protocol;
 
 namespace ShowroomManagement.Controllers
 {
+    [Authorize]
     public class InvoiceController : Controller
     {
         private readonly ShowroomContext _context;
@@ -16,32 +18,25 @@ namespace ShowroomManagement.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        // GET: Invoices
+        [HttpGet]
+        [Authorize(Roles = "1,2")]
+        public IActionResult Index()
         {
             if (_context.PurchaseInvoices == null || _context.SalesInvoices == null) return BadRequest();
             using (var client = new HttpClient())
             {
-                string absoluteUrl = @"https://localhost:3000";
-                var tasks = new List<Task<HttpResponseMessage>>();
+                var apiRes1 = _context.SalesInvoices.OrderByDescending(p => p.SaleDate).Take(LIST_LIMITS).ToJson();
+                var apiRes2 = _context.PurchaseInvoices.OrderByDescending(p => p.EnteredDate).Take(LIST_LIMITS).ToJson();
 
-                tasks.Add(client.GetAsync(absoluteUrl + @"/SalesInvoices/GetList"));
-                tasks.Add(client.GetAsync(absoluteUrl + @"/PurchaseInvoices/GetList"));
+                IEnumerable<SalesInvoice> salesInvoices = JsonSerializer.Deserialize<List<SalesInvoice>>(apiRes1);
+                IEnumerable<PurchaseInvoice> purchaseInvoices = JsonSerializer.Deserialize<List<PurchaseInvoice>>(apiRes2);
 
-                // Parallel mutiple APIs at the same time.
-                var results = await Task.WhenAll(tasks);
+                ViewBag.PurchaseInvoices = purchaseInvoices;
+                ViewBag.SalesInvoices = salesInvoices;
 
-                var apiRes1 = await results[0].Content.ReadAsStringAsync();
-                var apiRes2 = await results[1].Content.ReadAsStringAsync();
-
-                IEnumerable<SalesInvoice>? list1 = JsonSerializer.Deserialize<List<SalesInvoice>>(apiRes1);
-                IEnumerable<PurchaseInvoice>? list2 = JsonSerializer.Deserialize<List<PurchaseInvoice>>(apiRes2);
-
-                ViewBag.PurchaseInvoices = list2;
-                ViewBag.SalesInvoices = list1;
                 return View();
             }
         }
-
-
     }
 }

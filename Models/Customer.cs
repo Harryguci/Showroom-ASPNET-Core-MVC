@@ -13,36 +13,36 @@ namespace ShowroomManagement.Models
 
         [Key]
         [Display(Name = "ID")]
-        [JsonPropertyName("clientId")]
+        [JsonPropertyName("ClientId")]
         public string ClientId { get; set; }
 
         [Display(Name = "Họ")]
-        [JsonPropertyName("firstname")]
+        [JsonPropertyName("Firstname")]
         public string Firstname { get; set; }
 
-        [JsonPropertyName("lastname")]
+        [JsonPropertyName("Lastname")]
         [Display(Name = "Tên")]
         public string Lastname { get; set; }
 
         [Display(Name = "Ngày sinh")]
-        [JsonPropertyName("datebirth")]
-        public DateTime? DateBirth { get; set; }
+        [JsonPropertyName("DateBirth")]
+        public DateTime DateBirth { get; set; }
         
         [Display(Name = "CCCD")]
-        [JsonPropertyName("cccd")]
-        public string? Cccd { get; set; }
+        [JsonPropertyName("Cccd")]
+        public string Cccd { get; set; }
 
         [Display(Name = "Email")]
-        [JsonPropertyName("email")]
-        public string? Email { get; set; }
+        [JsonPropertyName("Email")]
+        public string Email { get; set; }
         [Display(Name = "Địa chỉ")]
-        public string? Address { get; set; }
+        public string Address { get; set; }
 
         [Display(Name = "Giới tính")]
-        [JsonPropertyName("gender")]
+        [JsonPropertyName("Gender")]
         public bool Gender { get; set; }
 
-        [JsonPropertyName("deleted")]
+        [JsonPropertyName("Deleted")]
         public bool Deleted { get; set; } = false;
     }
 }

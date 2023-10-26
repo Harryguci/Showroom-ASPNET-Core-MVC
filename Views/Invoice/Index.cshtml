@@ -1,8 +1,30 @@
-﻿@{
+﻿@using System.Security.Claims;
+@{
     ViewData["Title"] = "Invoice List";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     IEnumerable<PurchaseInvoice> purchaseInvoices = ViewBag.PurchaseInvoices;
     IEnumerable<SalesInvoice> salesInvoices = ViewBag.SalesInvoices;
+
+    Account currentAccount = null;
+
+    var identity = Context.User.Identity as ClaimsIdentity;
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value),
+                    EmployeeId = accountClaims.FirstOrDefault(p => p.Type == "EmployeeId")?.Value
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+
+    }
 }
 
 <h1 style="font-size: 2rem">Hóa đơn</h1>
@@ -19,19 +41,19 @@
         <thead>
             <tr>
                 <th>
-                    InEnterId
+                    Mã hóa đơn
                 </th>
                 <th>
-                    SourceId
+                    Mã NCC
                 </th>
                 <th>
-                    EnteredDate
+                    Ngày nhập
                 </th>
                 <th>
-                    QuantityPurchase
+                    Số lượng
                 </th>
                 <th>
-                    Status
+                    Trạng thái
                 </th>
                 <th></th>
             </tr>
@@ -55,10 +77,28 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Status)
                     </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.InEnterId">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.InEnterId">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.InEnterId">Delete</a>
+                    <td class="d-flex gap-1">
+                        @if (currentAccount.Level_account >= 2)
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.InEnterId">
+                                <span class="material-symbols-outlined">
+                                    edit
+                                </span>
+                            </a>
+                        }
+                        <a asp-action="Details" asp-route-id="@item.InEnterId">
+                            <span class="material-symbols-outlined">
+                                info
+                            </span>
+                        </a>
+                        @if (currentAccount.Level_account >= 2)
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.InEnterId">
+                                <span class="material-symbols-outlined">
+                                    delete
+                                </span>
+                            </a>
+                        }
                     </td>
                 </tr>
             }
@@ -78,19 +118,22 @@
         <thead>
             <tr>
                 <th>
-                    ClientId
+                    Mã hóa đơn
                 </th>
                 <th>
-                    SaleDate
+                    Mã KH
                 </th>
                 <th>
-                    Status
+                    Ngày bán
                 </th>
                 <th>
-                    ProductId
+                    Mã sản phẩm
                 </th>
                 <th>
-                    QuantitySale
+                    Số lượng
+                </th>
+                <th>
+                    Trạng thái
                 </th>
                 <th></th>
             </tr>
@@ -100,25 +143,45 @@
             {
                 <tr>
                     <td>
+                        @Html.DisplayFor(modelItem => item.InSaleId)
+                    </td>
+                    <td>
                         @Html.DisplayFor(modelItem => item.ClientId)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.SaleDate)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </td>
-                    <td>
                         @Html.DisplayFor(modelItem => item.ProductId)
                     </td>
-
                     <td>
                         @Html.DisplayFor(modelItem => item.QuantitySale)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.InSaleId">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.InSaleId">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.InSaleId">Delete</a>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td class="d-flex gap-1">
+                        @if (currentAccount.Level_account >= 2)
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.InSaleId">
+                                <span class="material-symbols-outlined">
+                                    edit
+                                </span>
+                            </a>
+                        }
+                        <a asp-action="Details" asp-route-id="@item.InSaleId">
+                            <span class="material-symbols-outlined">
+                                info
+                            </span>
+                        </a>
+                        @if (currentAccount.Level_account >= 2)
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.InSaleId">
+                                <span class="material-symbols-outlined">
+                                    delete
+                                </span>
+                            </a>
+                        }
                     </td>
                 </tr>
             }

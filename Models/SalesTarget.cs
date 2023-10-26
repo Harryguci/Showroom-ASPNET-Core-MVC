@@ -12,31 +12,31 @@ namespace ShowroomManagement.Models
         [Key]
 
         [Display(Name = "ID")]
-        [JsonPropertyName("saleId")]
+        [JsonPropertyName("SaleId")]
         public string SaleId { get; set; }
 
         [Display(Name = "Ngày bắt đầu")]
-        [JsonPropertyName("startDate")]
+        [JsonPropertyName("StartDate")]
         public DateTime StartDate { get; set; }
 
         [Display(Name = "Ngày kết thúc")]
-        [JsonPropertyName("endDate")]
+        [JsonPropertyName("EndDate")]
         public DateTime EndDate { get; set; }
 
         [Display(Name = "Tổng")]
-        [JsonPropertyName("total")]
+        [JsonPropertyName("Total")]
         public int Total { get; set; }
 
         [Display(Name = "Mục tiêu")]
-        [JsonPropertyName("target")]
+        [JsonPropertyName("Target")]
         public int Target { get; set; }
         
         [Display(Name = "Trạng thái")]
-        [JsonPropertyName("status")]
-        public string? Status { get; set; }
+        [JsonPropertyName("Status")]
+        public string Status { get; set; }
 
         [Display(Name = "Tổng thưởng")]
-        [JsonPropertyName("reward")]
-        public float? Reward { get; set; }
+        [JsonPropertyName("Reward")]
+        public double Reward { get; set; }
     }
 }

@@ -12,24 +12,24 @@ namespace ShowroomManagement.Models
         }
         [Key]
         [Display(Name = "ID")]
-        [JsonPropertyName("inEnterId")]
+        [JsonPropertyName("InEnterId")]
         public string InEnterId { get; set; }
 
         [Display(Name = "Nhà cung cấp")]
-        [JsonPropertyName("sourceId")]
+        [JsonPropertyName("SourceId")]
         public string SourceId { get; set; }
 
         [Column("Date")]
         [Display(Name = "Ngày nhập")]
-        [JsonPropertyName("enteredDate")]
+        [JsonPropertyName("EnteredDate")]
         public DateTime EnteredDate { get; set; }
 
         [Display(Name = "Số lượng")]
-        [JsonPropertyName("quantityPurchase")]
-        public int? QuantityPurchase { get; set; }
+        [JsonPropertyName("QuantityPurchase")]
+        public int QuantityPurchase { get; set; }
 
         [Display(Name = "Trạng thái")]
-        [JsonPropertyName("status")]
-        public string? Status { get; set; }
+        [JsonPropertyName("Status")]
+        public string Status { get; set; }
     }
 }

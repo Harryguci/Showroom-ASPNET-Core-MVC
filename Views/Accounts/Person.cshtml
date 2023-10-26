@@ -1,0 +1,145 @@
+﻿@using ShowroomManagement.Models;
+@model Account
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var role = Model.Level_account;
+    Employee currEmployee = (Employee)ViewBag.currEmployee;
+}
+<style>
+
+    h2 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: rgb(50,50, 150);
+    }
+
+    h2, h3 {
+        margin: 1rem 0;
+    }
+</style>
+<div class="row my-4" style="position: relative; flex-wrap: nowrap">
+    <div class="col-12 col-md-4">
+        <h2>Thông tin tài khoản</h2>
+        <form class="d-block">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>Username</td>
+                        <td>
+                            @if (role == 2)
+                            {
+                                <input class="form-control" type="text" value="@Model.Username" />
+                            }
+                            else
+                            {
+                                <input class="form-control" type="text" value="@Model.Username" disabled />
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Chức vụ</td>
+                        <td>
+                            @if (role == 2)
+                            {
+                                @* <input class="form-control" type="number" value="@Model.Level_account" /> *@
+                                <p>Quản lý</p>
+                            }
+                            else if (role == 1)
+                            {
+                                @* <input class="form-control" type="number" value="@Model.Level_account" disabled /> *@
+                                <p>Nhân viên</p>
+                            }
+                            else
+                            {
+                                <p>None</p>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mã nhân viên</td>
+                        <td>
+                            <a target="_blank" asp-controller="Employees"
+                               asp-action="Details" asp-route-id="@Model.EmployeeId">
+                                @Model.EmployeeId
+                            </a>
+                        </td>
+                    </tr>
+                    @if (Model.CreateAt != null)
+                    {
+                        <tr>
+                            <td>Ngày tạo</td>
+                            <td>@Model.CreateAt.Value.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    }
+                    @if (currEmployee != null)
+                    {
+                        <tr>
+                            <td>Họ tên</td>
+                            <td>@currEmployee.Firstname @currEmployee.Lastname</td>
+                        </tr>
+                        <tr>
+                            <td>Giới tính</td>
+                            <td>@(currEmployee.Gender ? "Nam" : "Nữ")</td>
+                        </tr>
+                        <tr>
+                            <td>Ngày sinh</td>
+                            <td>@currEmployee.DateBirth.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                        <tr>
+                            <td>Lương</td>
+                            <td>@currEmployee.Salary</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (role == 2)
+            {
+                <button class="btn btn-outline-primary">Lưu thay đổi</button>
+            }
+        </form>
+    </div>
+    <div class="col-12 col-md-8">
+        <h2>Thông tin khác</h2>
+        @if (Model.Level_account == 1)
+        {
+            <h3>Doanh số</h3>
+            @if (ViewBag.employeeSalesTargets != null)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Ngày bắt đầu</th>
+                            <th>Ngày kết thúc</th>
+                            <th>Tổng</th>
+                            <th>Mục tiêu</th>
+                            <th>Trạng thái</th>
+                            <th>Thưởng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var salesTarget in (IEnumerable<SalesTarget>)ViewBag.employeeSalesTargets)
+                        {
+                            <tr>
+                                <td>
+                                    @salesTarget.StartDate.ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    @salesTarget.EndDate.ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    @salesTarget.Total
+                                </td>
+                                <td>
+                                    @salesTarget.Target
+                                </td>
+                                <td>@salesTarget.Status</td>
+                                <td>@salesTarget.Reward</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+    </div>
+</div>
+

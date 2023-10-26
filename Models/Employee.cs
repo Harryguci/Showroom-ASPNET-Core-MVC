@@ -14,54 +14,55 @@ namespace ShowroomManagement.Models
         [Key]
         [Display(Name = "ID")]
         [StringLength(maximumLength: 10)]
-        [JsonPropertyName("employeeId")]
+        [JsonPropertyName("EmployeeId")]
         public string EmployeeId { get; set; }
 
         [Display(Name = "Họ")]
         [StringLength(maximumLength: 190)]
-        [JsonPropertyName("firstname")]
+        [JsonPropertyName("Firstname")]
         public string Firstname { get; set; }
 
         [Display(Name = "Tên")]
-        [JsonPropertyName("lastname")]
+        [JsonPropertyName("Lastname")]
         [StringLength(maximumLength: 190)]
         public string Lastname { get; set; }
 
         [Display(Name = "Ngày sinh")]
-        [JsonPropertyName("datebirth")]
-        public DateTime? DateBirth { get; set; }
+        [JsonPropertyName("DateBirth")]
+        public DateTime DateBirth { get; set; }
 
         [Display(Name = "CCCD")]
-        [JsonPropertyName("cccd")]
+        [JsonPropertyName("Cccd")]
         public string Cccd { get; set; }
 
         [Display(Name = "Vị trí")]
+        [JsonPropertyName("Position")]
         public string Position { get; set; }
 
         [Display(Name = "Ngày bắt đầu")]
-        [JsonPropertyName("startdate")]
-        public DateTime? StartDate { get; set; }
+        [JsonPropertyName("StartDate")]
+        public DateTime StartDate { get; set; }
 
         [Display(Name = "Lương")]
-        [JsonPropertyName("salary")]
+        [JsonPropertyName("Salary")]
         public int Salary { get; set; }
 
         [Display(Name = "Email")]
-        [JsonPropertyName("email")]
+        [JsonPropertyName("Email")]
         public string Email { get; set; }
 
         [Display(Name = "Doanh số")]
-        [JsonPropertyName("saleId")]
+        [JsonPropertyName("SaleId")]
         public string SaleId { get; set; }
 
         [Display(Name = "Giới tính")]
-        [JsonPropertyName("gender")]
+        [JsonPropertyName("Gender")]
         public bool Gender { get; set; }
 
         public bool Deleted { get; set; } = false;
 
         [Display(Name = "Ảnh")]
-        [JsonPropertyName("url_image")]
+        [JsonPropertyName("Url_image")]
         public string Url_image { get; set; }
     }
 }

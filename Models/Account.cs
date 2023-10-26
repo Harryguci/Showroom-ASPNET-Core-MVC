@@ -19,7 +19,8 @@ namespace ShowroomManagement.Models
         [JsonPropertyName("password")]
         public string Password { get; set; }
         
-        [JsonPropertyName("employeeid")]
+        [JsonPropertyName("employeeId")]
+        [Column("EmployeeId")]
         public string EmployeeId { get; set; }
 
         [JsonPropertyName("level_account")]

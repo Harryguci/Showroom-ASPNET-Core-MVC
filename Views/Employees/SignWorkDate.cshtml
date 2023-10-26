@@ -11,15 +11,15 @@
 </ul>
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="SignWorkDate">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label class="control-label">Ngày</label>
-                <input class="form-control" type="date" id="workdate" name="workdate" value="@DateTime.Now.ToString("dd/MM/yyyy") />
+                <input class="form-control" type="date" id="workdate" name="workdate" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
             </div>
             <div class="form-group">
                 <label class="control-label">Ca làm</label>
-                <select>
+                <select name="calam">
                     <option value="1">ca 1: 7h - 12h</option>
                     <option value="2">ca 2: 12h - 18h</option>
                     <option value="3">ca 3: 18h - 21h</option>

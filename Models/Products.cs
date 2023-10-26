@@ -8,27 +8,27 @@ namespace ShowroomManagement.Models
     {
         [Key]
         [Display(Name = "Số seri")]
-        [JsonPropertyName("serial")]
+        [JsonPropertyName("Serial")]
         public string Serial { get; set; }
 
         [Display(Name = "Tên")]
-        [JsonPropertyName("productName")]
+        [JsonPropertyName("ProductName")]
         public string ProductName { get; set; }
 
         [Display(Name = "Giá nhập")]
-        [JsonPropertyName("purchasePrice")]
+        [JsonPropertyName("PurchasePrice")]
         public int? PurchasePrice { get; set; }
         
         [Display(Name = "Giá bán")]
-        [JsonPropertyName("salePrice")]
+        [JsonPropertyName("SalePrice")]
         public int? SalePrice { get; set; }
         
         [Display(Name = "Số lượng")]
-        [JsonPropertyName("quantity")]
+        [JsonPropertyName("Quantity")]
         public int? Quantity { get; set; }
         
         [Display(Name = "Trạng thái")]
-        [JsonPropertyName("status")]
+        [JsonPropertyName("Status")]
         public string? Status { get; set; }
 
         public Products()
