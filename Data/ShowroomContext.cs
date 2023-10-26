@@ -7,17 +7,18 @@ namespace ShowroomManagement.Data
 {
     public class ShowroomContext : DbContext
     {
-        public DbSet<Products>? Products { get; set; }
-        public DbSet<Employee>? Employees { get; set; }
-        public DbSet<Device>? Devices { get; set; }
+        public DbSet<Products> Products { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Device> Devices { get; set; }
 
-        public DbSet<PurchaseInvoice>? PurchaseInvoices { get; set; }
-        public DbSet<SalesInvoice>? SalesInvoices { get; set; }
-        public DbSet<SalesTarget>? SalesTargets { get; set; }
+        public DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
+        public DbSet<SalesInvoice> SalesInvoices { get; set; }
+        public DbSet<SalesTarget> SalesTargets { get; set; }
 
-        public DbSet<TestDrive>? TestDrives { get; set; }
+        public DbSet<TestDrive> TestDrives { get; set; }
 
-        public DbSet<Account>? Accounts { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Product_Images> Product_Images { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,6 +31,7 @@ namespace ShowroomManagement.Data
             modelBuilder.Entity<SalesTarget>().ToTable("SalesTargets");
             modelBuilder.Entity<TestDrive>().ToTable("TestDrive");
             modelBuilder.Entity<Account>().ToTable("Account");
+            modelBuilder.Entity<Product_Images>().ToTable("Product_Images");
         }
 
         public ShowroomContext(DbContextOptions<ShowroomContext> options)
@@ -38,9 +40,9 @@ namespace ShowroomManagement.Data
             // TODO: Config the Context.
         }
 
-        public DbSet<ShowroomManagement.Models.Customer>? Customer { get; set; }
+        public DbSet<ShowroomManagement.Models.Customer> Customer { get; set; }
 
-        public DbSet<ShowroomManagement.Models.Source>? Source { get; set; }
+        public DbSet<ShowroomManagement.Models.Source> Source { get; set; }
 
         [DbFunction("login_check")]
         public static bool CheckLogin(string username,

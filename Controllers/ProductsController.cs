@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
@@ -22,7 +24,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index(string? orderby, string? orderbydesc)
+        public async Task<IActionResult> Index(string orderby, string orderbydesc)
         {
             ViewBag.orderby = orderby;
             ViewBag.orderbydesc = orderbydesc;
@@ -31,7 +33,7 @@ namespace ShowroomManagement.Controllers
             {
                 error = "Can not find the table in the Database."
             });
-            PropertyInfo? propertyInfo = typeof(Products).GetProperty("Name");
+            PropertyInfo propertyInfo = typeof(Products).GetProperty("Name");
 
             var query = _context.Products.Select(p => new Products()
             {
@@ -47,6 +49,31 @@ namespace ShowroomManagement.Controllers
             var list = await query.ToListAsync();
 
             return View(list);
+        }
+
+        // GET: Show
+        public async Task<IActionResult> Show(int? page)
+        {
+            if (page == null) page = 1;
+            int limits = 9;
+
+            List<Products> query = await _context.Products
+                .Skip((int)((page - 1) * limits))
+                .Take(limits).ToListAsync();
+
+            for (int i = 0; i < query.Count(); i++)
+            {
+                var imageUrls = await _context.Product_Images.Select(p => new Product_Images()
+                {
+                    Id = p.Id,
+                    ProductSerial = p.ProductSerial,
+                    Url_image = p.Url_image
+                }).Where(p => p.ProductSerial == query[i].Serial)
+                .ToListAsync();
+                query[i].ImageUrls = imageUrls;
+            }
+
+            return View(query);
         }
 
         // GET: Products

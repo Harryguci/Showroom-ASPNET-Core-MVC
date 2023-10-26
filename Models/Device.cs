@@ -23,7 +23,7 @@ namespace ShowroomManagement.Models
         public DateTime? DateEntry { get; set; }
         
         [Display(Name = "Trạng thái")]
-        public string? Status { get; set; }
+        public string Status { get; set; }
         
         [Display(Name = "Giá trị")]
         public int? Price { get; set; }

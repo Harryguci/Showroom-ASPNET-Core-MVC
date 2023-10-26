@@ -29,7 +29,9 @@ namespace ShowroomManagement.Models
         
         [Display(Name = "Trạng thái")]
         [JsonPropertyName("Status")]
-        public string? Status { get; set; }
+        public string Status { get; set; }
+
+        public List<Product_Images> ImageUrls { get; set; }
 
         public Products()
         {

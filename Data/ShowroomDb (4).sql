@@ -117,7 +117,8 @@ CREATE TABLE Source(
 go
 ---- PRODUCT  __ IMAGE -----
 CREATE TABLE Product_Images(
-    Serial NVARCHAR(100),
+	ID INT IDENTITY(1,1) PRIMARY KEY,
+    ProductSerial NVARCHAR(100),
     Url_image NVARCHAR(500)
 )
 
@@ -183,7 +184,7 @@ AS
 RETURN(
     SELECT Product_Images.Url_image
     from Product_Images
-    WHERE Product_Images.Serial = (
+    WHERE Product_Images.ProductSerial = (
         SELECT Products.Serial
         FROM Products
         WHERE ProductName LIKE N'%' +@name +N'%'
@@ -201,7 +202,7 @@ as
 RETURN(
     SELECT Url_image
     from Product_Images
-    WHERE Serial = @id
+    WHERE ProductSerial = @id
 )
 go
 -- SELECT * from SearchProductUrlBySerial(N'P001')
@@ -359,7 +360,7 @@ VALUES
 
 
 ---##### PRODUCT___IMAGE
-INSERT INTO Product_Images (Serial, Url_image)
+INSERT INTO Product_Images (ProductSerial, Url_image)
 VALUES
     (N'P001', N'URL_1'),
     (N'P002', N'URL_2'),

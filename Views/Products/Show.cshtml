@@ -1,0 +1,57 @@
+﻿@using ShowroomManagement.Models;
+@model IEnumerable<Products>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .card-content {
+        color: white;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        line-height: 0.7rem;
+    }
+
+    .card img {
+        filter: brightness(70%);
+    }
+
+    .card:hover img {
+        filter: brightness(100%);
+    }
+</style>
+<div class="row my-3">
+    <a class="btn btn-outline-primary" asp-action="Index"
+       style="width: max-content;">
+        Xem danh sách
+    </a>
+</div>
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-6 col-md-4">
+            <div class="card">
+                <div class="thumbnail rounded-2">
+                    @if (@item.ImageUrls.FirstOrDefault().Url_image != null
+                   && @item.ImageUrls.FirstOrDefault().Url_image != string.Empty)
+                    {
+                        <img src="@item.ImageUrls.FirstOrDefault().Url_image" />
+                    }
+                    else
+                    {
+                        <p>Không có ảnh</p>
+                    }
+                </div>
+                <div class="card-content p-3">
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Serial">
+                        <p style="font-size: 1.5rem; font-weight: bold; color: white">
+                            @item.ProductName
+                        </p>
+                    </a>
+                    <p>Giá bán: <b>@item.SalePrice</b> TR Đồng</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

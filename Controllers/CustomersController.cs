@@ -21,7 +21,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index(string? asc, string? desc)
+        public async Task<IActionResult> Index(string asc, string desc)
         {
             ViewBag.asc = asc;
             ViewBag.desc = desc;

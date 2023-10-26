@@ -29,7 +29,7 @@ namespace ShowroomManagement.Controllers
         [AllowAnonymous]
         public Task<IActionResult> Login([Bind("username, password")]Account account)
         {
-            Account? user = Authenticate(new Account() { Username = account.Username, Password = account.Password });
+            Account user = Authenticate(new Account() { Username = account.Username, Password = account.Password });
 
             if (user != null)
             {
@@ -61,7 +61,7 @@ namespace ShowroomManagement.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private Account? Authenticate(Account account)
+        private Account Authenticate(Account account)
         {
             // TODO: authenticate the account
             if (db.Accounts == null) return null;
