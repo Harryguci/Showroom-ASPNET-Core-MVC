@@ -52,13 +52,13 @@
             var username = document.querySelector(`input[name="username"]`).value;
             var password = document.querySelector(`input[name="password"]`).value;
 
-            if (username.length < 3) {
+            if (username &&  username.length < 3) {
                 alert("Tên đăng nhập quá ngắn.");
             }
-            if (password.length < 6) {
+            if (password && password.length < 6) {
                 alert("Mật khẩu phải trên 6 ký tự.")
             }
-            var url = "https://localhost3000/api/Login";
+            var url = "https://localhost:3000/api/Login";
 
             $.ajax({
                 type: "POST",

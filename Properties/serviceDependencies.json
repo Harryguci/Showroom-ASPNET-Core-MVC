@@ -5,8 +5,7 @@
     },
     "mssql1": {
       "type": "mssql",
-      "connectionId": "ConnectionStrings:ShowroomAutoContext",
-      "dynamicId": null
+      "connectionId": "ConnectionStrings:ShowroomContext"
     }
   }
 }
