@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <Folder Include="Identity\" />
+    <Folder Include="Middlewares\" />
+    <Folder Include="wwwroot\images\uploaded\" />
   </ItemGroup>
 
 </Project>
