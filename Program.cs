@@ -62,6 +62,6 @@ app.UseCors(x => x
        
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Accounts}/{action=Login}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,6 +1,6 @@
 ﻿,@{
     Layout = "~/Views/Shared/_LoginLayout.cshtml";
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "SingUp";
 }
 
 @section Styles {
@@ -12,9 +12,8 @@
 <div class="container">
     <div class="screen">
         <div class="screen__content">
-            @* <form class="login" asp-controller="Auth" asp-action="LoginForm" onsubmit="HandleSubmit(event)"> *@
-            <form class="login" asp-controller="Accounts" asp-action="Login">
-                <h1 class="fw-bold" style="color: rgb(0, 0, 150)">Login</h1>
+            <form class="signup" asp-controller="Accounts" asp-action="SignUp">
+                <h1 class="fw-bold" style="color: rgb(0, 0, 150)">SignUp</h1>
                 <div class="login__field">
                     <i class="login__icon fas fa-user"></i>
                     <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">
@@ -23,6 +22,11 @@
                     <i class="login__icon fas fa-lock"></i>
                     <input type="password" id="password" name="password" class="login__input" placeholder="Password">
                 </div>
+                <div class="login__field">
+                    <i class="login__icon fas fa-lock"></i>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="login__input" placeholder="Confirm Password">
+                </div>
+
                 <p class="form-helper text-danger" style="font-size: 12px">
                     @if (ViewBag.ValidateMessage != null)
                     {
@@ -30,13 +34,12 @@
                     }
                 </p>
                 <button class="button login__submit" type="submit">
-                    <span class="button__text">Log In Now</span>
+                    <span class="button__text">Sign Up Now</span>
                     <i class="button__icon fas fa-chevron-right"></i>
                 </button>
             </form>
 
-            <div class="social-login" style="padding-top: 10px">
-                @* <h3>log in via</h3> *@
+            <div class="social-signup" style="padding-top: 10px">
                 <div class="social-icons">
                     <a href="#" class="social-login__icon fab fa-instagram"></a>
                     <a href="#" class="social-login__icon fab fa-facebook"></a>
@@ -53,6 +56,5 @@
     </div>
 </div>
 @section Scripts {
-    <script src="~/js/login/HandleSubmit.js" defer></script>
+    @*<script src="~/js/signup/HandleSubmit.js" defer></script>*@
 }
-

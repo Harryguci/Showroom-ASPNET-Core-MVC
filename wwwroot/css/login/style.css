@@ -90,10 +90,25 @@ body {
 	padding-top: 156px;
 }
 
+.signup {
+	width: 320px;
+	padding: 30px;
+	padding-top: 86px;
+}
+
 .login__field {
 	padding: 20px 0px;	
 	position: relative;	
 }
+
+.im_admin {
+	display: flex;
+	align-items: center;
+}
+
+.im_admin label {
+		margin-left: 10px; 
+}	
 
 .login__icon {
 	position: absolute;
@@ -153,6 +168,16 @@ body {
 .social-login {	
 	position: absolute;
 	height: 140px;
+	width: 160px;
+	text-align: center;
+	bottom: 0px;
+	right: 0px;
+	color: #fff;
+}
+
+.social-signup {
+	position: absolute;
+	height: 87px;
 	width: 160px;
 	text-align: center;
 	bottom: 0px;

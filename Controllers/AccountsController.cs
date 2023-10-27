@@ -8,6 +8,9 @@ using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authentication;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Data;
+using System.Text;
 
 namespace ShowroomManagement.Controllers
 {
@@ -177,6 +180,7 @@ namespace ShowroomManagement.Controllers
             return View();
         }
 
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromForm] Account account)
@@ -297,5 +301,148 @@ namespace ShowroomManagement.Controllers
                 return View(account);
             }
         }
+
+        #region Sign up
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult SignUp()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> SignUp([FromForm] string username, [FromForm] string password)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                // Thực hiện quá trình đăng ký và kiểm tra xác thực của người dùng ở đây.
+                var registrationResult = RegisterUser(username, password);
+
+                if (registrationResult.Success)
+                {
+                    // Nếu đăng ký thành công, thực hiện thêm dữ liệu tài khoản vào cơ sở dữ liệu bằng SQL.
+                    bool insertionResult = InsertAccountIntoDatabase(username, password);
+
+                    if (insertionResult)
+                    {
+                        await _context.SaveChangesAsync();
+                        // Nếu thêm dữ liệu thành công, hiển thị thông báo tạo tài khoản thành công.
+                        ViewBag.ValidateMessage = "Account created successfully.";
+
+                        // Sau đó, chuyển hướng người dùng đến trang đăng nhập.
+                        return RedirectToAction("Login");
+                    }
+                    else
+                    {
+                        // Nếu có lỗi trong quá trình thêm dữ liệu, hiển thị thông báo lỗi và giữ người dùng ở trang đăng ký.
+                        ViewBag.ValidateMessage = "An error occurred while creating the account.";
+                    }
+                }
+                else
+                {
+                    // Nếu đăng ký không thành công, hiển thị thông báo lỗi và giữ người dùng ở trang đăng ký.
+                    ViewBag.ValidateMessage = registrationResult.ErrorMessage;
+                }
+
+                // Nếu có lỗi hoặc đăng ký không thành công, hiển thị lại trang đăng ký.
+                return View();
+            }
+        }
+
+        private string GetEmployeeId()
+        {
+            //Lấy employeeId
+            string selectEmployeeIdQuery = "SELECT TOP 1 EmployeeId  FROM Account order by EmployeeId desc";
+            var selectEmployeeIdQueryResult = _context.Database.ExecuteSqlRaw(selectEmployeeIdQuery).ToString();
+            string employeeId = selectEmployeeIdQueryResult;
+            string numericPart = employeeId.Substring(1);
+
+            // Chuyển phần số sang kiểu int
+            int.TryParse(numericPart, out int numericValue);
+            // Tăng giá trị số lên 1
+            numericValue++;
+
+            // Tạo chuỗi mới bằng cách ghép chữ "E" và giá trị số đã tăng
+            string newEmployeeId = "E" + numericValue.ToString();
+            return newEmployeeId;
+        }
+
+        private bool InsertAccountIntoDatabase(string username, string password)
+        {   
+            string newEmployeeId = GetEmployeeId();
+            // Tạo các tham số SqlParameter cho giá trị cần chèn
+            var parameter1 = new SqlParameter("@EmployeeId", newEmployeeId);
+            var parameter2 = new SqlParameter("@Username", username);
+            // Chuyển đổi mật khẩu (password) thành kiểu varbinary
+            var passwordBytes = Encoding.Unicode.GetBytes(password);
+            var parameter3 = new SqlParameter("@Password", SqlDbType.VarBinary, passwordBytes.Length)
+            {
+                Value = passwordBytes
+            };
+            var parameter4 = new SqlParameter("@CreateAt", Convert.ToString(DateTime.Now));
+
+            //Insert dữ liệu
+            string insertQuery = "INSERT INTO Account (EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt) " +
+                "VALUES ('E003', @Username, @Password , 1 , 0, @CreateAt)";
+            
+            
+            // Thực thi câu lệnh SQL sử dụng ExecuteSqlRaw và truyền các tham số
+            _context.Database.ExecuteSqlRaw(insertQuery, parameter1, parameter2, parameter3, parameter4);
+
+            //Kiểm tra 
+            string checkUsernameQuery = "SELECT COUNT(*) FROM Account WHERE Username = @Username";
+            int existingUserCount = _context.Database.ExecuteSqlRaw(checkUsernameQuery, parameter2);
+
+            if (existingUserCount > 0)
+            {
+                return true;
+            }else
+            {
+                return false;
+            }
+        }
+
+        public RegistrationResult RegisterUser(string username, string password)
+        {
+            // Kiểm tra xem tên đăng nhập đã tồn tại trong cơ sở dữ liệu chưa
+            string checkUsernameQuery = "SELECT COUNT(*) FROM Account WHERE Username = @Username";
+            var usernameParameter = new SqlParameter("@Username", username);
+            int existingUserCount = _context.Database.ExecuteSqlRaw(checkUsernameQuery, usernameParameter);
+
+            if (existingUserCount > 0)
+            {
+                return new RegistrationResult
+                {
+                    Success = false,
+                    ErrorMessage = "Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác."
+                };
+            }
+
+            // Tiếp tục kiểm tra các điều kiện khác và thực hiện lưu thông tin người dùng vào cơ sở dữ liệu (nếu hợp lệ)
+
+            return new RegistrationResult
+            {
+                Success = true
+            };
+        }
+
+
+        #endregion
     }
+
+    #region Tạo class RegistrationResult (vì ko biết đặt đâu)
+    public class RegistrationResult
+    {   
+        public RegistrationResult ()
+        {
+            Success = true;
+            ErrorMessage = string.Empty;
+        }
+        public bool Success { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+    #endregion
 }
