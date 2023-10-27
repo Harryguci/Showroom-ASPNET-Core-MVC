@@ -5,6 +5,10 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <style>
+    .card {
+        margin: 0;
+    }
+
     .card-content {
         color: white;
         position: absolute;
@@ -15,24 +19,34 @@
 
     .card img {
         filter: brightness(70%);
+        padding: 0;
     }
 
     .card:hover img {
         filter: brightness(100%);
     }
 </style>
+<h1>Sản phẩm</h1>
 <div class="row my-3">
+    <a asp-action="Create" class="btn btn-outline-primary d-flex justify-content-center gap-2" style="width: max-content; align-items: center">
+        <span class="material-symbols-outlined">
+            add_circle
+        </span>
+        Tạo mới
+    </a>
     <a class="btn btn-outline-primary" asp-action="Index"
        style="width: max-content;">
-        Xem danh sách
+        <span class="material-symbols-outlined">
+            format_list_bulleted
+        </span>
     </a>
 </div>
 <div class="row">
     @foreach (var item in Model)
     {
-        <div class="col-6 col-md-4">
-            <div class="card">
-                <div class="thumbnail rounded-2">
+        <div class="col-6 col-md-4 m-0 p-0">
+            <div class="card rounded-0">
+                <div class="thumbnail">
                     @if (@item.ImageUrls.FirstOrDefault().Url_image != null
                    && @item.ImageUrls.FirstOrDefault().Url_image != string.Empty)
                     {

@@ -101,7 +101,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Employees/Edit/5
-        [Authorize("2")]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Employees == null)

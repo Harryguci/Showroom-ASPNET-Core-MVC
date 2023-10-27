@@ -283,8 +283,9 @@ namespace ShowroomManagement.Controllers
                         .ToListAsync();
 
                     ViewBag.employeeSalesTargets = currSales;
-                   
-                } else if (curr.Level_account == 2) // MANAGER
+
+                }
+                else if (curr.Level_account == 2) // MANAGER
                 {
                     //TODO: Handle manager information
                 }
@@ -296,6 +297,37 @@ namespace ShowroomManagement.Controllers
                 var account = _context.Accounts.Find(id);
                 return View(account);
             }
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> UpadateAvatar(string employeeId)
+        {
+            var files = HttpContext.Request.Form.Files;
+            foreach (var image in files)
+            {
+                if (image != null && image.Length > 0)
+                {
+                    var file = image;
+                    //There is an error here
+                    var uploads = Path.Combine("wwwroot", "images", "uploaded");
+                    if (file.Length > 0)
+                    {
+                        //var fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(file.FileName);
+                        var fileName = file.FileName;
+                        using (var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
+                            var employee = _context.Employees.Where(p => p.EmployeeId == employeeId).FirstOrDefault();
+                            employee.Url_image = "/" + Path.Combine("images", "uploaded", fileName);
+                            _context.Update(employee);
+                        }
+                    }
+                }
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Person");
         }
     }
 }

@@ -30,14 +30,34 @@
 <h1 style="font-size: 2rem">Hóa đơn</h1>
 <hr />
 <div class="purchase-invoice-container mt-5">
-    <h2>Danh sách hóa đơn nhập</h2>
+    <div class="d-flex align-items-center">
+        <h2>Danh sách hóa đơn nhập</h2>
+        <button id="toggle-purch-btn" class="btn" onclick="HandleTogglePurchaTable()">
+            <span class="material-symbols-outlined">
+                expand_more
+            </span>
+        </button>
+        <script>
+            function HandleTogglePurchaTable() {
+                var tb = document.getElementById('purchase-invoices-table');
+                if (tb.classList.contains('d-none')) {
+                    tb.classList.remove('d-none')
+                    document.querySelector('#toggle-purch-btn span').innerHTML = 'expand_more';
+                }
+                else {
+                    tb.classList.add('d-none');
+                    document.querySelector('#toggle-purch-btn span').innerHTML = 'expand_less';
+                }
+            }
+        </script>
+    </div>
 
     <p>
         <a asp-controller="PurchaseInvoices" asp-action="Create" class="btn btn-outline-primary">
             Tạo mới
         </a>
     </p>
-    <table class="table">
+    <table id="purchase-invoices-table" class="table">
         <thead>
             <tr>
                 <th>
@@ -80,20 +100,20 @@
                     <td class="d-flex gap-1">
                         @if (currentAccount.Level_account >= 2)
                         {
-                            <a asp-action="Edit" asp-route-id="@item.InEnterId">
+                            <a asp-controller="PurchaseInvoices" asp-action="Edit" asp-route-id="@item.InEnterId" title="Sửa thông tin">
                                 <span class="material-symbols-outlined">
                                     edit
                                 </span>
                             </a>
                         }
-                        <a asp-action="Details" asp-route-id="@item.InEnterId">
+                        <a asp-controller="PurchaseInvoices" asp-action="Details" asp-route-id="@item.InEnterId" title="Chi tiết">
                             <span class="material-symbols-outlined">
                                 info
                             </span>
                         </a>
                         @if (currentAccount.Level_account >= 2)
                         {
-                            <a asp-action="Delete" asp-route-id="@item.InEnterId">
+                            <a asp-controller="PurchaseInvoices" asp-action="Delete" asp-route-id="@item.InEnterId" title="Xóa">
                                 <span class="material-symbols-outlined">
                                     delete
                                 </span>
@@ -109,12 +129,32 @@
     </div>
 </div>
 <div class="sales-invoices mt-3 mt-md-5">
-    <h2>Danh sách hóa đơn bán</h2>
+    <div class="d-flex align-items-center">
+        <h2>Danh sách hóa đơn bán</h2>
+        <button id="toggle-sale-btn" class="btn" onclick="HandleToggleSaleTable()">
+            <span class="material-symbols-outlined">
+                expand_more
+            </span>
+        </button>
+        <script>
+            function HandleToggleSaleTable() {
+                var tb = document.getElementById('sale-invoices-table');
+                if (tb.classList.contains('d-none')) {
+                    tb.classList.remove('d-none')
+                    document.querySelector('#toggle-sale-btn span').innerHTML = 'expand_more';
+                }
+                else {
+                    tb.classList.add('d-none');
+                    document.querySelector('#toggle-sale-btn span').innerHTML = 'expand_less';
+                }
+            }
+        </script>
+    </div>
 
     <p>
         <a class="btn btn-outline-primary" asp-controller="SalesInvoices" asp-action="Create">Tạo mới</a>
     </p>
-    <table class="table">
+    <table id="sale-invoices-table" class="table">
         <thead>
             <tr>
                 <th>
@@ -163,20 +203,20 @@
                     <td class="d-flex gap-1">
                         @if (currentAccount.Level_account >= 2)
                         {
-                            <a asp-action="Edit" asp-route-id="@item.InSaleId">
+                            <a asp-controller="SalesInvoices" asp-action="Edit" asp-route-id="@item.InSaleId" title="Sửa thông tin">
                                 <span class="material-symbols-outlined">
                                     edit
                                 </span>
                             </a>
                         }
-                        <a asp-action="Details" asp-route-id="@item.InSaleId">
+                        <a asp-controller="SalesInvoices" asp-action="Details" asp-route-id="@item.InSaleId" title="Chi tiết">
                             <span class="material-symbols-outlined">
                                 info
                             </span>
                         </a>
                         @if (currentAccount.Level_account >= 2)
                         {
-                            <a asp-action="Delete" asp-route-id="@item.InSaleId">
+                            <a asp-controller="SalesInvoices" asp-action="Delete" asp-route-id="@item.InSaleId"title="Xóa">
                                 <span class="material-symbols-outlined">
                                     delete
                                 </span>

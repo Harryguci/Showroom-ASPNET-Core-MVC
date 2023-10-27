@@ -69,3 +69,10 @@ form .form-group {
     top: 50%;
     transform: translate(-50%, -50%);
 }
+
+h1 {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 2.5rem;
+    color: rgb(50, 50, 100);
+}
