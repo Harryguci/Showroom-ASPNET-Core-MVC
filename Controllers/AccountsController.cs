@@ -308,7 +308,18 @@ namespace ShowroomManagement.Controllers
         [AllowAnonymous]
         public IActionResult SignUp()
         {
-            return View();
+            if (_context.Employees == null) return BadRequest();
+            var employees = _context.Employees
+            .Where(p => !p.Deleted)
+            .Select(p => new Employee
+            {
+                EmployeeId = p.EmployeeId,
+                Firstname = p.Firstname,
+                Lastname = p.Lastname,
+            })
+            .ToList();
+
+            return View(employees);
         }
 
 
@@ -355,18 +366,24 @@ namespace ShowroomManagement.Controllers
         private string GetEmployeeId()
         {
             //Lấy employeeId
-            string selectEmployeeIdQuery = "SELECT TOP 1 EmployeeId  FROM Account order by EmployeeId desc";
-            var selectEmployeeIdQueryResult = _context.Database.ExecuteSqlRaw(selectEmployeeIdQuery).ToString();
-            string employeeId = selectEmployeeIdQueryResult;
-            string numericPart = employeeId.Substring(1);
+            var selectEmployeeIdQueryResult = _context.Employees.OrderByDescending(p => p.EmployeeId).FirstOrDefault().EmployeeId;
+            //string employeeId = selectEmployeeIdQueryResult;
+            string numericPart = selectEmployeeIdQueryResult.Substring(1);
 
             // Chuyển phần số sang kiểu int
             int.TryParse(numericPart, out int numericValue);
             // Tăng giá trị số lên 1
             numericValue++;
-
             // Tạo chuỗi mới bằng cách ghép chữ "E" và giá trị số đã tăng
-            string newEmployeeId = "E" + numericValue.ToString();
+            string newEmployeeId = numericValue.ToString();
+
+            for (int i =1; i <= 3- numericValue.ToString().Length; i++)
+            {
+                newEmployeeId = "0" + newEmployeeId;
+            }
+
+            newEmployeeId = "E" + newEmployeeId;
+            
             return newEmployeeId;
         }
 
@@ -386,7 +403,7 @@ namespace ShowroomManagement.Controllers
 
             //Insert dữ liệu
             string insertQuery = "INSERT INTO Account (EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt) " +
-                "VALUES ('E003', @Username, @Password , 1 , 0, @CreateAt)";
+                "VALUES (@EmployeeId, @Username, @Password , 1 , 0, @CreateAt)";
             
             
             // Thực thi câu lệnh SQL sử dụng ExecuteSqlRaw và truyền các tham số

@@ -16,6 +16,17 @@
                 <h1 class="fw-bold" style="color: rgb(0, 0, 150)">SignUp</h1>
                 <div class="login__field">
                     <i class="login__icon fas fa-user"></i>
+                    <select id="employeeId" name="employeeId" class="login__input">
+                        <option value="">Select Employee</option>
+                        @foreach (var employee in Model)
+                        {
+                            <option value="@employee.EmployeeId">@employee.Firstname @employee.Lastname</option>
+                        }
+                    </select>
+                    <input type="text" id="searchEmployee" class="search-employee" placeholder="Search Employee">
+                </div>
+                <div class="login__field">
+                    <i class="login__icon fas fa-user"></i>
                     <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">
                 </div>
                 <div class="login__field">
@@ -56,5 +67,42 @@
     </div>
 </div>
 @section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Lấy danh sách tên nhân viên và giá trị EmployeeId
+            var employees = [];
+        @foreach (var employee in Model)
+        {
+            @:employees.push({ id: @employee.EmployeeId, name: "@employee.Firstname @employee.Lastname" });
+        }
+
+                // Xử lý sự kiện nhập giá trị vào ô tìm kiếm
+                $("#searchEmployee").on("input", function () {
+                    var searchValue = $(this).val().toLowerCase();
+                    var dropdown = $("#employeeId");
+
+                    // Xóa tất cả các tùy chọn hiện có
+                    dropdown.empty();
+
+                    // Thêm tùy chọn dựa trên tên nhân viên gợi ý
+                    for (var i = 0; i < employees.length; i++) {
+                        if (employees[i].name.toLowerCase().includes(searchValue)) {
+                            dropdown.append($("<option></option>").attr("value", employees[i].id).text(employees[i].name));
+                        }
+                    }
+
+                    // Nếu không có gợi ý, thêm một tùy chọn "Select Employee"
+                    if (dropdown.find("option").length === 0) {
+                        dropdown.append($("<option></option>").attr("value", "").text("Select Employee"));
+                    }
+                });
+
+            // Mặc định, hiển thị tất cả tên nhân viên
+            for (var i = 0; i < employees.length; i++) {
+                $("#employeeId").append($("<option></option>").attr("value", employees[i].id).text(employees[i].name));
+            }
+        });
+    </script>
+
     @*<script src="~/js/signup/HandleSubmit.js" defer></script>*@
 }
