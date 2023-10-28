@@ -1,4 +1,4 @@
-﻿,@{
+﻿@{
     Layout = "~/Views/Shared/_LoginLayout.cshtml";
     ViewData["Title"] = "SingUp";
 }
@@ -7,24 +7,28 @@
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/all.css'>
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/fontawesome.css'>
     <link rel="stylesheet" href="~/css/login/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 }
 
 <div class="container">
     <div class="screen">
         <div class="screen__content">
-            <form class="signup" asp-controller="Accounts" asp-action="SignUp">
+            <form class="signup" asp-controller="Accounts" asp-action="SignUp" onsubmit="HandleSubmit(event)">
                 <h1 class="fw-bold" style="color: rgb(0, 0, 150)">SignUp</h1>
                 <div class="login__field">
                     <i class="login__icon fas fa-user"></i>
                     <select id="employeeId" name="employeeId" class="login__input">
                         <option value="">Select Employee</option>
-                        @foreach (var employee in Model)
+                        @if (Model != null)
                         {
-                            <option value="@employee.EmployeeId">@employee.Firstname @employee.Lastname</option>
+                            @foreach (var employee in Model)
+                            {
+                                <option value="@employee.EmployeeId">@employee.Firstname @employee.Lastname</option>
+                            }
                         }
                     </select>
-                    <input type="text" id="searchEmployee" class="search-employee" placeholder="Search Employee">
-                </div>
+                    <input type="hidden" id="employeeIdHidden" name="employeeHiddenId" /> <!-- Sử dụng trường ẩn để lưu giá trị employeeId -->
+                    </div>
                 <div class="login__field">
                     <i class="login__icon fas fa-user"></i>
                     <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">
@@ -37,7 +41,11 @@
                     <i class="login__icon fas fa-lock"></i>
                     <input type="password" id="confirmPassword" name="confirmPassword" class="login__input" placeholder="Confirm Password">
                 </div>
-
+                <div class="admin__checkbox__field">
+                    <input type="checkbox" id="isAdmin" name="isAdmin" class="admin_checkbox" value="true">
+                    <label for="isAdmin">Sign up as Admin</label>
+                </div>
+                
                 <p class="form-helper text-danger" style="font-size: 12px">
                     @if (ViewBag.ValidateMessage != null)
                     {
@@ -66,43 +74,80 @@
         </div>
     </div>
 </div>
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            // Lấy danh sách tên nhân viên và giá trị EmployeeId
-            var employees = [];
-        @foreach (var employee in Model)
-        {
-            @:employees.push({ id: @employee.EmployeeId, name: "@employee.Firstname @employee.Lastname" });
+
+
+
+<script>
+
+    //$("#employeeId").select2({
+    //    tags: true
+    //});
+
+    function searchEmployeeFunction() {
+        var searchValue = document.querySelector(".searchEmployee").value.toLowerCase();
+        var dropdown = document.querySelector("#employeeId");
+
+        // Xóa tất cả các tùy chọn hiện có
+        while (dropdown.options.length > 0) {
+            dropdown.remove(0);
         }
 
-                // Xử lý sự kiện nhập giá trị vào ô tìm kiếm
-                $("#searchEmployee").on("input", function () {
-                    var searchValue = $(this).val().toLowerCase();
-                    var dropdown = $("#employeeId");
-
-                    // Xóa tất cả các tùy chọn hiện có
-                    dropdown.empty();
-
-                    // Thêm tùy chọn dựa trên tên nhân viên gợi ý
-                    for (var i = 0; i < employees.length; i++) {
-                        if (employees[i].name.toLowerCase().includes(searchValue)) {
-                            dropdown.append($("<option></option>").attr("value", employees[i].id).text(employees[i].name));
-                        }
-                    }
-
-                    // Nếu không có gợi ý, thêm một tùy chọn "Select Employee"
-                    if (dropdown.find("option").length === 0) {
-                        dropdown.append($("<option></option>").attr("value", "").text("Select Employee"));
-                    }
-                });
-
-            // Mặc định, hiển thị tất cả tên nhân viên
-            for (var i = 0; i < employees.length; i++) {
-                $("#employeeId").append($("<option></option>").attr("value", employees[i].id).text(employees[i].name));
+        // Thêm tùy chọn dựa trên tên nhân viên gợi ý
+        for (var i = 0; i < employees.length; i++) {
+            if (employees[i].name.toLowerCase().includes(searchValue)) {
+                var option = document.createElement("option");
+                option.value = employees[i].id;
+                option.text = employees[i].name;
+                dropdown.add(option);
             }
-        });
-    </script>
+        }
 
-    @*<script src="~/js/signup/HandleSubmit.js" defer></script>*@
-}
+        // Nếu không có gợi ý, thêm một tùy chọn "Select Employee"
+        if (dropdown.options.length === 0) {
+            var option = document.createElement("option");
+            option.value = "";
+            option.text = "Select Employee";
+            dropdown.add(option);
+        }
+    }
+
+    async function HandleSubmit(event) {
+        event.preventDefault();
+
+        if (!confirm("Bạn muốn đăng ký?")) return;
+
+        var username = document.querySelector(`form input[name="username"]`).value;
+        var password = document.querySelector(`form input[name="password"]`).value;
+        var confirmPassword = document.querySelector(`form input[name="confirmPassword"]`).value;
+
+        if (username && username.length < 3) {
+            alert("Tên đăng nhập quá ngắn.");
+            return;
+        }
+        if (password && password.length < 6) {
+            alert("Mật khẩu phải trên 6 ký tự.");
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert("Mật khẩu và xác nhận mật khẩu không khớp.");
+            return;
+        }
+        // Nếu không có lỗi, tiến hành gửi form
+        var form = document.querySelector('form');
+        form.submit();
+    }
+
+    document.getElementById("employeeId").addEventListener("change", function () {
+        var selectedEmployeeName = this.value;
+        if (employeeId !== null) {
+            document.getElementById("employeeIdHidden").value = selectedEmployeeName;
+        }
+    });
+
+</script>
+
+
+
+@*@section Scripts {
+    <script src="~/js/signup/HandleSubmit.js" defer></script>
+}*@

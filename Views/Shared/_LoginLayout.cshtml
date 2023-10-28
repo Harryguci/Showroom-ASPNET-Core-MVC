@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ShowroomManagement.styles.css" asp-append-version="true" />
-
+    @*<!-- Select2 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Select2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    *@
     @* [Customed Dialog] *@
     <link rel="stylesheet" href="~/lib/duDialog/duDialog.css" />
     <link rel="stylesheet" href="~/lib/duDialog/duDialog.min.css" />
@@ -28,9 +33,8 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-
     @RenderBody()
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

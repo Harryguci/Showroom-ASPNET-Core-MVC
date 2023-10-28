@@ -325,7 +325,7 @@ namespace ShowroomManagement.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> SignUp([FromForm] string username, [FromForm] string password)
+        public async Task<IActionResult> SignUp([FromForm] string employeeHiddenId, [FromForm] string username, [FromForm] string password)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -335,63 +335,31 @@ namespace ShowroomManagement.Controllers
                 if (registrationResult.Success)
                 {
                     // Nếu đăng ký thành công, thực hiện thêm dữ liệu tài khoản vào cơ sở dữ liệu bằng SQL.
-                    bool insertionResult = InsertAccountIntoDatabase(username, password);
+                    bool insertionResult = InsertAccountIntoDatabase(employeeHiddenId, username, password);
 
                     if (insertionResult)
                     {
-                        await _context.SaveChangesAsync();
-                        // Nếu thêm dữ liệu thành công, hiển thị thông báo tạo tài khoản thành công.
-                        ViewBag.ValidateMessage = "Account created successfully.";
-
-                        // Sau đó, chuyển hướng người dùng đến trang đăng nhập.
-                        return RedirectToAction("Login");
+                        return RedirectToAction("Login", "Accounts");
                     }
                     else
                     {
-                        // Nếu có lỗi trong quá trình thêm dữ liệu, hiển thị thông báo lỗi và giữ người dùng ở trang đăng ký.
-                        ViewBag.ValidateMessage = "An error occurred while creating the account.";
+                        return View();
                     }
                 }
                 else
                 {
                     // Nếu đăng ký không thành công, hiển thị thông báo lỗi và giữ người dùng ở trang đăng ký.
                     ViewBag.ValidateMessage = registrationResult.ErrorMessage;
+                    return View();
                 }
-
-                // Nếu có lỗi hoặc đăng ký không thành công, hiển thị lại trang đăng ký.
-                return View();
             }
         }
 
-        private string GetEmployeeId()
-        {
-            //Lấy employeeId
-            var selectEmployeeIdQueryResult = _context.Employees.OrderByDescending(p => p.EmployeeId).FirstOrDefault().EmployeeId;
-            //string employeeId = selectEmployeeIdQueryResult;
-            string numericPart = selectEmployeeIdQueryResult.Substring(1);
 
-            // Chuyển phần số sang kiểu int
-            int.TryParse(numericPart, out int numericValue);
-            // Tăng giá trị số lên 1
-            numericValue++;
-            // Tạo chuỗi mới bằng cách ghép chữ "E" và giá trị số đã tăng
-            string newEmployeeId = numericValue.ToString();
-
-            for (int i =1; i <= 3- numericValue.ToString().Length; i++)
-            {
-                newEmployeeId = "0" + newEmployeeId;
-            }
-
-            newEmployeeId = "E" + newEmployeeId;
-            
-            return newEmployeeId;
-        }
-
-        private bool InsertAccountIntoDatabase(string username, string password)
+        private bool InsertAccountIntoDatabase(string employeeId, string username, string password)
         {   
-            string newEmployeeId = GetEmployeeId();
             // Tạo các tham số SqlParameter cho giá trị cần chèn
-            var parameter1 = new SqlParameter("@EmployeeId", newEmployeeId);
+            var parameter1 = new SqlParameter("@EmployeeId", employeeId);
             var parameter2 = new SqlParameter("@Username", username);
             // Chuyển đổi mật khẩu (password) thành kiểu varbinary
             var passwordBytes = Encoding.Unicode.GetBytes(password);
@@ -403,20 +371,21 @@ namespace ShowroomManagement.Controllers
 
             //Insert dữ liệu
             string insertQuery = "INSERT INTO Account (EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt) " +
-                "VALUES (@EmployeeId, @Username, @Password , 1 , 0, @CreateAt)";
+                "VALUES ('E010', @Username, @Password , 1 , 0, @CreateAt)";
             
             
             // Thực thi câu lệnh SQL sử dụng ExecuteSqlRaw và truyền các tham số
             _context.Database.ExecuteSqlRaw(insertQuery, parameter1, parameter2, parameter3, parameter4);
 
             //Kiểm tra 
-            string checkUsernameQuery = "SELECT COUNT(*) FROM Account WHERE Username = @Username";
-            int existingUserCount = _context.Database.ExecuteSqlRaw(checkUsernameQuery, parameter2);
+            bool Exist = _context.Accounts.Any(a => a.Username == username);
 
-            if (existingUserCount > 0)
+
+            if (Exist)
             {
                 return true;
-            }else
+            }
+            else
             {
                 return false;
             }
