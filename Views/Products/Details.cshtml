@@ -4,44 +4,85 @@
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+<style>
+    .thumbnail {
+        position: relative;
+        width: 100%;
+        height: max-content;
+        transition: 0.3s all ease-in-out;
+    }
 
-<h1>Details</h1>
+        .thumbnail img {
+            width: 100%;
+            min-width: 20rem;
+            height: 100%;
+            max-height: 20rem;
+            object-fit: cover;
+            filter: brightness(70%);
+        }
 
-<div>
-    <h4>Products</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PurchasePrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PurchasePrice)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SalePrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SalePrice)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-    </dl>
+        .thumbnail:hover {
+            z-index: 100;
+            transform-origin: center;
+            transform: scale(1.05);
+        }
+
+            .thumbnail:hover img {
+                filter: brightness(100%);
+            }
+</style>
+
+
+<h1>Chi tiết</h1>
+
+<div class="d-flex content-wrap">
+    <div class="col-md-6" style="padding-right: 1rem">
+        <h4>Sản phẩm</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ProductName)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ProductName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.PurchasePrice)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.PurchasePrice)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.SalePrice)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.SalePrice)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Quantity)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Quantity)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Status)
+            </dd>
+        </dl>
+    </div>
+    @if (Model.ImageUrls != null && Model.ImageUrls.Count > 0)
+    {
+        <div class="d-flex" style="width: 100%; flex-wrap: wrap; padding: 1rem 2rem; row-gap: 0.5rem">
+            @foreach (var x in Model.ImageUrls)
+            {
+                <div class="thumbnail">
+                    <img src="@x.Url_image" alt="@Model.ProductName" />
+                </div>
+            }
+        </div>
+    }
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Serial">Edit</a> |

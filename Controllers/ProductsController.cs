@@ -51,8 +51,6 @@ namespace ShowroomManagement.Controllers
             .Skip((page - 1) * listLimits)
             .Take(listLimits);
 
-
-            var list = await query.Skip((page - 1) * listLimits).Take(listLimits).ToListAsync();
             var total = _context.Products.Count();
 
             ViewBag.nextPage = true;
@@ -60,7 +58,7 @@ namespace ShowroomManagement.Controllers
             ViewBag.totalPage = (int)Math.Ceiling(total * 1.0 / listLimits);
             ViewBag.currentPage = page;
 
-            return View(list);
+            return View(query);
         }
 
         // GET: Show
@@ -69,8 +67,7 @@ namespace ShowroomManagement.Controllers
             if (page == null) page = 1;
 
             List<Products> query = await _context.Products
-                .Skip((page.Value - 1) * listLimits)
-                .Take(listLimits)
+                .OrderByDescending(p => p.Serial)
                 .ToListAsync();
 
             for (int i = 0; i < query.Count(); i++)
@@ -115,10 +112,21 @@ namespace ShowroomManagement.Controllers
 
             var products = await _context.Products
                 .FirstOrDefaultAsync(m => m.Serial == id);
+
             if (products == null)
             {
                 return NotFound();
             }
+
+            var imageUrls = await _context.ProductImages.Select(p => new ProductImages()
+            {
+                Id = p.Id,
+                Serial = p.Serial,
+                Url_image = p.Url_image
+            }).Where(p => p.Serial == products.Serial)
+               .ToListAsync();
+
+            products.ImageUrls = imageUrls;
 
             return View(products);
         }
@@ -149,6 +157,7 @@ namespace ShowroomManagement.Controllers
         {
             if (ModelState.IsValid)
             {
+                products.Deleted = false;
                 _context.Add(products);
 
                 await _context.SaveChangesAsync();
@@ -161,7 +170,8 @@ namespace ShowroomManagement.Controllers
                     var id = 0;
                     if (_context.ProductImages.Count() > 0)
                     {
-                        id = _context.ProductImages.OrderByDescending(p => p.Id)
+                        id = _context.ProductImages
+                            .OrderByDescending(p => p.Id)
                             .FirstOrDefault().Id + 1;
                     }
                     else id = 1;
@@ -191,9 +201,15 @@ namespace ShowroomManagement.Controllers
                                         Serial = products.Serial,
                                     };
 
+                                    //INSERT Product_Images(id, Serial, Url_image) VALUES(1,N'P001',N'/images/uploaded/1')
+
                                     id++;
 
-                                    _context.Add(newProductImage);
+                                    //_context.Add(newProductImage);
+                                    _context.Database.ExecuteSqlRaw(string.Format("INSERT Product_Images(id, Serial, Url_image) VALUES({0},N'{1}',N'{2}')",
+                                        newProductImage.Id,
+                                        newProductImage.Serial,
+                                        newProductImage.Url_image));
 
                                     //_context.Products.Find(products.Serial);
                                 }
@@ -206,7 +222,7 @@ namespace ShowroomManagement.Controllers
                     Debug.WriteLine($"\n\n[UPLOAD IMAGES ERROR]{ex.Message}\n\n");
                 }
 
-                await _context.SaveChangesAsync();
+                // await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(products);

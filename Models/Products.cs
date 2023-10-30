@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
@@ -30,6 +31,10 @@ namespace ShowroomManagement.Models
         [Display(Name = "Trạng thái")]
         [JsonPropertyName("Status")]
         public string Status { get; set; }
+
+        [Column("Deleted")]
+        [JsonPropertyName("Deleted")]
+        public bool? Deleted { get; set; } = false;
 
         public List<ProductImages> ImageUrls { get; set; }
 
