@@ -305,7 +305,7 @@ namespace ShowroomManagement.Controllers
         #region Sign up
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize(Roles = "2")]
         public IActionResult SignUp()
         {
             if (_context.Employees == null) return BadRequest();
@@ -324,8 +324,8 @@ namespace ShowroomManagement.Controllers
 
 
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> SignUp([FromForm] string employeeHiddenId, [FromForm] string username, [FromForm] string password)
+        [Authorize(Roles = "2")]
+        public async Task<IActionResult> SignUp([FromForm] string employeeHiddenId, [FromForm] string username, [FromForm] string password, [FromForm] string isAdmin)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -335,7 +335,7 @@ namespace ShowroomManagement.Controllers
                 if (registrationResult.Success)
                 {
                     // Nếu đăng ký thành công, thực hiện thêm dữ liệu tài khoản vào cơ sở dữ liệu bằng SQL.
-                    bool insertionResult = InsertAccountIntoDatabase(employeeHiddenId, username, password);
+                    bool insertionResult = InsertAccountIntoDatabase(employeeHiddenId, username, password, isAdmin);
 
                     if (insertionResult)
                     {
@@ -356,8 +356,11 @@ namespace ShowroomManagement.Controllers
         }
 
 
-        private bool InsertAccountIntoDatabase(string employeeId, string username, string password)
-        {   
+        private bool InsertAccountIntoDatabase(string employeeId, string username, string password, string isAdmin)
+        {
+            int role = 1;
+            if (isAdmin == "true")
+                role = 2;
             // Tạo các tham số SqlParameter cho giá trị cần chèn
             var parameter1 = new SqlParameter("@EmployeeId", employeeId);
             var parameter2 = new SqlParameter("@Username", username);
@@ -367,15 +370,16 @@ namespace ShowroomManagement.Controllers
             {
                 Value = passwordBytes
             };
-            var parameter4 = new SqlParameter("@CreateAt", Convert.ToString(DateTime.Now));
+            var parameter4 = new SqlParameter("@Level", role);
+            var parameter5 = new SqlParameter("@CreateAt", Convert.ToString(DateTime.Now));
 
             //Insert dữ liệu
             string insertQuery = "INSERT INTO Account (EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt) " +
-                "VALUES ('E010', @Username, @Password , 1 , 0, @CreateAt)";
+                "VALUES ('E010', @Username, @Password , @Level , 0, @CreateAt)";
             
             
             // Thực thi câu lệnh SQL sử dụng ExecuteSqlRaw và truyền các tham số
-            _context.Database.ExecuteSqlRaw(insertQuery, parameter1, parameter2, parameter3, parameter4);
+            _context.Database.ExecuteSqlRaw(insertQuery, parameter1, parameter2, parameter3, parameter4, parameter5);
 
             //Kiểm tra 
             bool Exist = _context.Accounts.Any(a => a.Username == username);

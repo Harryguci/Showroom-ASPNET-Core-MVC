@@ -42,7 +42,7 @@
                     <input type="password" id="confirmPassword" name="confirmPassword" class="login__input" placeholder="Confirm Password">
                 </div>
                 <div class="admin__checkbox__field">
-                    <input type="checkbox" id="isAdmin" name="isAdmin" class="admin_checkbox" value="true">
+                    <input type="checkbox" id="isAdmin" name="isAdmin" class="admin_checkbox" value="" onchange="updateCheckboxValue(this)">
                     <label for="isAdmin">Sign up as Admin</label>
                 </div>
                 
@@ -82,6 +82,13 @@
     //$("#employeeId").select2({
     //    tags: true
     //});
+    function updateCheckboxValue(checkbox) {
+        if (checkbox.checked) {
+            checkbox.value = "true";
+        } else {
+            checkbox.value = "false";
+        }
+    }
 
     function searchEmployeeFunction() {
         var searchValue = document.querySelector(".searchEmployee").value.toLowerCase();
