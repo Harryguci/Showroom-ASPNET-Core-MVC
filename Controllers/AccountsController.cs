@@ -8,7 +8,9 @@ using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Data;
+using System.Text;
+using System.Collections.Generic;
 
 namespace ShowroomManagement.Controllers
 {
@@ -192,6 +194,7 @@ namespace ShowroomManagement.Controllers
             return View();
         }
 
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromForm] Account account)
@@ -279,38 +282,38 @@ namespace ShowroomManagement.Controllers
         [Authorize]
         public async Task<IActionResult> Person(string id = null)
         {
+            Account curr = null;
+
             if (id == null)
             {
-                var curr = GetCurrentAccount();
-
-                Employee currEmployee = _context.Employees
-                       .Where(p => p.EmployeeId == curr.EmployeeId)
-                       .FirstOrDefault();
-                ViewBag.currEmployee = currEmployee;
-
-                if (curr.Level_account == 1) // EMPLOYEE
-                {
-                    List<SalesTarget> currSales = await _context.SalesTargets
-                        .Where(p => p.SaleId == currEmployee.SaleId)
-                        .ToListAsync();
-
-                    ViewBag.employeeSalesTargets = currSales;
-
-                }
-                else if (curr.Level_account == 2) // MANAGER
-                {
-                    //TODO: Handle manager information
-                }
-
-                return View(curr);
+                curr = GetCurrentAccount();
             }
             else
             {
-                var account = _context.Accounts.Find(id);
-                return View(account);
+                curr = _context.Accounts.Where(p => p.EmployeeId == id).FirstOrDefault();
             }
-        }
 
+
+            Employee currEmployee = _context.Employees
+                   .Where(p => p.EmployeeId == curr.EmployeeId)
+                   .FirstOrDefault();
+            ViewBag.currEmployee = currEmployee;
+
+            if (curr.Level_account == 1) // EMPLOYEE
+            {
+                List<SalesTarget> currSales = await _context.SalesTargets
+                    .Where(p => p.SaleId == currEmployee.SaleId)
+                    .ToListAsync();
+
+                ViewBag.employeeSalesTargets = currSales;
+            }
+            else if (curr.Level_account == 2) // MANAGER
+            {
+                //TODO: Handle manager information
+            }
+
+            return View(curr);
+        }
 
         [Authorize]
         [HttpPost]
@@ -341,5 +344,137 @@ namespace ShowroomManagement.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Person");
         }
+
+        #region Sign up
+
+        [HttpGet]
+        [Authorize(Roles = "2")]
+        public IActionResult SignUp()
+        {
+            if (_context.Employees == null) return BadRequest();
+            var employees = _context.Employees
+            .Where(p => !p.Deleted)
+            .Select(p => new Employee
+            {
+                EmployeeId = p.EmployeeId,
+                Firstname = p.Firstname,
+                Lastname = p.Lastname,
+            })
+            .ToList();
+
+            return View(employees);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "2")]
+        public IActionResult SignUp([FromForm] string employeeHiddenId, [FromForm] string username, [FromForm] string password, [FromForm] bool isAdmin)
+        {
+            // Thực hiện quá trình đăng ký và kiểm tra xác thực của người dùng ở đây.
+            var registrationResult = RegisterUser(username, password);
+
+            if (registrationResult.Success)
+            {
+                // Nếu đăng ký thành công, thực hiện thêm dữ liệu tài khoản vào cơ sở dữ liệu bằng SQL.
+                bool insertionResult = InsertAccountIntoDatabase(employeeHiddenId, username, password, isAdmin);
+
+                if (insertionResult)
+                {
+                    return RedirectToAction("Login", "Accounts");
+                }
+                else
+                {
+                    return View();
+                }
+            }
+            else
+            {
+                // Nếu đăng ký không thành công, hiển thị thông báo lỗi và giữ người dùng ở trang đăng ký.
+                ViewBag.ValidateMessage = registrationResult.ErrorMessage;
+                return View();
+            }
+        }
+
+
+        private bool InsertAccountIntoDatabase(string employeeId, string username, string password, bool isAdmin)
+        {
+            // Tạo các tham số SqlParameter cho giá trị cần chèn
+            //var parameter1 = new SqlParameter("@EmployeeId", value: employeeId);
+            //var parameter2 = new SqlParameter("@Username", value: username);
+            //// Chuyển đổi mật khẩu (password) thành kiểu varbinary
+            //var passwordBytes = Encoding.Unicode.GetBytes(password);
+            //var parameter3 = new SqlParameter("@Password", SqlDbType.VarBinary, 500)
+            //{
+            //    Value = passwordBytes
+            //};
+            //var parameter4 = new SqlParameter("@CreateAt", DateTime.Now.ToString());
+
+            ////Insert dữ liệu
+            //string insertQuery = "INSERT INTO Account (EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt) " +
+            //    "VALUES ('E010', @Username, @Password , 1 , 0, @CreateAt)";
+
+
+            //// Thực thi câu lệnh SQL sử dụng ExecuteSqlRaw và truyền các tham số
+            //_context.Database.ExecuteSqlRaw(insertQuery, parameter1, parameter2, parameter3, parameter4);
+            ////INSERT INTO Account(EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt, DeleteAt) VALUES (N'E001', 'john_doe2', CONVERT(VARBINARY(500), 'password1'), 2, 0, GETDATE(), NULL),
+
+            int level_account = isAdmin ? 2 : 1;
+
+            _context.Database.ExecuteSqlRaw("INSERT INTO Account(EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt, DeleteAt) " +
+                string.Format("VALUES (N'{0}', '{1}', CONVERT(VARBINARY(500), '{2}'), {3}, 0, GETDATE(), NULL)", employeeId, username, password, level_account));
+
+            //Kiểm tra 
+            bool Exist = _context.Accounts.Any(a => a.Username == username);
+
+
+            if (Exist)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public RegistrationResult RegisterUser(string username, string password)
+        {
+            // Kiểm tra xem tên đăng nhập đã tồn tại trong cơ sở dữ liệu chưa
+            string checkUsernameQuery = "SELECT COUNT(*) FROM Account WHERE Username = @Username";
+            var usernameParameter = new SqlParameter("@Username", username);
+            int existingUserCount = _context.Database.ExecuteSqlRaw(checkUsernameQuery, usernameParameter);
+
+            if (existingUserCount > 0)
+            {
+                return new RegistrationResult
+                {
+                    Success = false,
+                    ErrorMessage = "Tên đăng nhập đã tồn tại. Vui lòng chọn tên đăng nhập khác."
+                };
+            }
+
+            // Tiếp tục kiểm tra các điều kiện khác và thực hiện lưu thông tin người dùng vào cơ sở dữ liệu (nếu hợp lệ)
+
+            return new RegistrationResult
+            {
+                Success = true
+            };
+        }
+
+
+        #endregion
     }
+
+    #region Tạo class RegistrationResult (vì ko biết đặt đâu)
+    public class RegistrationResult
+    {
+        public RegistrationResult()
+        {
+            Success = true;
+            ErrorMessage = string.Empty;
+        }
+        public bool Success { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+    #endregion
 }

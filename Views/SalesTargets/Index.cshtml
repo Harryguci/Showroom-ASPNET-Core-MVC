@@ -5,11 +5,16 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Doanh số</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div class="d-flex">
+    <a class="btn btn-outline-primary d-flex align-items-center gap-2" asp-action="Create">
+        <span class="material-symbols-outlined" style="font-size: 1rem">
+            add_circle
+        </span>
+        Tạo mới
+    </a>
+</div>
 <table class="table">
     <thead>
         <tr>

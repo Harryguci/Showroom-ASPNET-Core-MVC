@@ -13,10 +13,15 @@
     bool hasNext = ViewBag.nextPage;
 }
 
-<h1>Index</h1>
+<h1>Hóa đơn bán</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">
+        <span class="material-symbols-outlined" style="font-size: 1rem">
+            add_circle
+        </span>
+        Tạo mới
+    </a>
 </p>
 <table class="table">
     <thead>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
+﻿@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
 
 * {
 	box-sizing: border-box;
@@ -21,7 +21,7 @@ body {
 .screen {		
 	background: linear-gradient(90deg, #5D54A4, #7C78B8);		
 	position: relative;	
-	height: 600px;
+	height: max-content;
 	width: 360px;	
 	box-shadow: 0px 0px 24px #5C5696;
 }
@@ -90,10 +90,31 @@ body {
 	padding-top: 156px;
 }
 
+.signup {
+	width: 100%;
+	padding-left: 30px;
+	padding-top: 30px;
+}
+
 .login__field {
 	padding: 20px 0px;	
 	position: relative;	
 }
+
+.admin__checkbox__field {
+	display: flex;
+	align-items: center;
+}
+
+.admin_checkbox {
+	width: 20px;
+	height: 20px;
+}
+
+.admin__checkbox__field label {
+	margin-left: 15px;
+}
+
 
 .login__icon {
 	position: absolute;
@@ -160,6 +181,16 @@ body {
 	color: #fff;
 }
 
+.social-signup {
+	position: absolute;
+	height: 50px;
+	width: 160px;
+	text-align: center;
+	bottom: 0px;
+	right: 0px;
+	color: #fff;
+}
+
 .social-icons {
 	display: flex;
 	align-items: center;
@@ -175,4 +206,13 @@ body {
 
 .social-login__icon:hover {
 	transform: scale(1.5);	
+}
+
+.searchEmployee {
+	width:220px;
+	margin-top: 5px;
+}
+
+#employeeId {
+	padding-bottom:10px;
 }

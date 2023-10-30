@@ -73,6 +73,9 @@ namespace ShowroomManagement.Controllers
                 return NotFound();
             }
 
+            var employeeAcc = _context.Accounts.Where(p => p.EmployeeId == id).FirstOrDefault();
+            ViewBag.employeeAccount = employeeAcc;
+
             return View(employee);
         }
 

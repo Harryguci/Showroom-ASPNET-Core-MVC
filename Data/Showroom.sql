@@ -446,3 +446,26 @@ REFERENCES Source (SourceId);
 -------------------
 -------------------
 
+-- Trigger for product deleting
+Go
+
+CREATE or ALTER TRIGGER Product_DeleteTrigger
+ON Products
+INSTEAD OF DELETE
+AS
+BEGIN
+    -- SET NOCOUNT ON;
+
+    -- Xoá các giá trị trong bảng PurchaseInvoices có ProductId tương ứng với serial bị xoá
+    DELETE FROM SalesInvoices
+    WHERE ProductId IN (SELECT DELETED.Serial FROM DELETED);
+    
+    DELETE FROM PurchaseInvoices
+    WHERE ProductId IN (SELECT DELETED.Serial FROM DELETED);
+
+    -- Xoá giá trị trong bảng Products
+    DELETE FROM Products
+    WHERE Serial IN (SELECT DELETED.Serial FROM DELETED);
+END;
+
+Go

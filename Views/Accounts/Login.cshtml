@@ -1,4 +1,4 @@
-﻿@{
+﻿,@{
     Layout = "~/Views/Shared/_LoginLayout.cshtml";
     ViewData["Title"] = "Login";
 }
@@ -12,9 +12,9 @@
 <div class="container">
     <div class="screen">
         <div class="screen__content">
-            @* <form class="login" asp-controller="Auth" asp-action="LoginForm" onsubmit="HandleSubmit(event)"> *@
-            <form class="login" asp-controller="Accounts" asp-action="Login">
+            <form class="login" asp-controller="Accounts" asp-action="Login" style="padding-top: 5rem; padding-bottom: 5rem;">
                 <h1 class="fw-bold" style="color: rgb(0, 0, 150)">Login</h1>
+                <a asp-action="SignUp" class="btn btn-outline-primary" style="font-size: 0.7rem">Sign Up</a>
                 <div class="login__field">
                     <i class="login__icon fas fa-user"></i>
                     <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">

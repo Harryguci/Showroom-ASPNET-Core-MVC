@@ -38,10 +38,13 @@
 {
     <p><small><a asp-action="Trash">Thùng rác</a></small></p>
 }
-<p>
+<div class="d-flex">
     @if (currentAccount.Level_account >= 2)
     {
-        <a asp-action="Create" class="btn btn-outline-primary">
+        <a asp-action="Create" class="btn btn-outline-primary d-flex align-items-center gap-2">
+            <span class="material-symbols-outlined" style="font-size: 1rem">
+                add_circle
+            </span>
             Tạo mới
         </a>
     }
@@ -51,7 +54,7 @@
             Đăng ký lịch
         </a>
     }
-</p>
+</div>
 <table class="table">
     <thead>
         <tr>
