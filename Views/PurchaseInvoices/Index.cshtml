@@ -5,6 +5,13 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+@{
+    int page = ViewBag.currentPage;
+    int total = ViewBag.totalPage;
+    // Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
+    bool hasNext = ViewBag.nextPage;
+}
+
 <h1>Danh sách hóa đơn nhập</h1>
 
 <p>
@@ -53,11 +60,43 @@
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.InEnterId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.InEnterId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.InEnterId">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.InEnterId">
+                        <span class="material-symbols-outlined">
+                            edit
+                        </span>
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.InEnterId">
+                        <span class="material-symbols-outlined">
+                            info
+                        </span>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.InEnterId">
+                        <span class="material-symbols-outlined">
+                            delete
+                        </span>
+                    </a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+<div class="pagination-container d-flex gap-1 justify-content-center">
+    @for (int i = 0; i < total; i++)
+    {
+        @if (i + 1 == page)
+        {
+            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
+        }
+        else if (total > 10 && i > 5 && i < 8)
+        {
+            <span>.</span>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary"
+               asp-action="Index" asp-route-page="@(i + 1)">
+                @(i + 1)
+            </a>
+        }
+    }
+</div>

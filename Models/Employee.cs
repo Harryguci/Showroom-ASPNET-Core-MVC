@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace ShowroomManagement.Models
@@ -53,7 +54,8 @@ namespace ShowroomManagement.Models
 
         [Display(Name = "Doanh số")]
         [JsonPropertyName("SaleId")]
-        public string SaleId { get; set; }
+        [AllowNull]
+        public string SaleId { get; set; } = string.Empty;
 
         [Display(Name = "Giới tính")]
         [JsonPropertyName("Gender")]
@@ -63,6 +65,7 @@ namespace ShowroomManagement.Models
 
         [Display(Name = "Ảnh")]
         [JsonPropertyName("Url_image")]
-        public string Url_image { get; set; }
+        [AllowNull]
+        public string Url_image { get; set; } = string.Empty;
     }
 }

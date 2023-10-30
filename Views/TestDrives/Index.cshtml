@@ -4,10 +4,6 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    int page = ViewBag.currentPage;
-    int total = ViewBag.totalPage;
-    Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
-    bool hasNext = ViewBag.nextPage;
 }
 <h1>Danh sách lịch lái thử</h1>
 <p>
@@ -63,12 +59,22 @@
         }
     </tbody>
 </table>
-<div class="pagination-container d-flex gap-1">
+@{
+    int page = ViewBag.currentPage;
+    int total = ViewBag.totalPage;
+    // Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
+    bool hasNext = ViewBag.nextPage;
+}
+<div class="pagination-container d-flex gap-1 justify-content-center">
     @for (int i = 0; i < total; i++)
     {
         @if (i + 1 == page)
         {
-            <button class="btn btn-outline-primary" disabled>@(i + 1)</button>
+            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
+        }
+        else if (total > 10 && i > 5 && i < 8)
+        {
+            <span>.</span>
         }
         else
         {

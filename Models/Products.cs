@@ -31,7 +31,7 @@ namespace ShowroomManagement.Models
         [JsonPropertyName("Status")]
         public string Status { get; set; }
 
-        public List<Product_Images> ImageUrls { get; set; }
+        public List<ProductImages> ImageUrls { get; set; }
 
         public Products()
         {

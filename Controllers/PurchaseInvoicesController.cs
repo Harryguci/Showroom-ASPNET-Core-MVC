@@ -15,6 +15,7 @@ namespace ShowroomManagement.Controllers
     public class PurchaseInvoicesController : Controller
     {
         private readonly ShowroomContext _context;
+        private int listLimits = 10;
 
         public PurchaseInvoicesController(ShowroomContext context)
         {
@@ -22,11 +23,24 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: PurchaseInvoices
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return _context.PurchaseInvoices != null ?
-                        View(await _context.PurchaseInvoices.ToListAsync()) :
-                        Problem("Entity set 'ShowroomContext.PurchaseInvoices'  is null.");
+            if (_context.PurchaseInvoices == null) 
+                return Problem("Entity set 'ShowroomContext.PurchaseInvoices'  is null.");
+
+            var query = await _context.PurchaseInvoices
+            .Skip((page - 1) * listLimits)
+            .Take(listLimits)
+            .Skip((page - 1) * listLimits).Take(listLimits).ToListAsync();
+
+            var total = _context.PurchaseInvoices.Count();
+
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = (int)Math.Ceiling(total * 1.0 / listLimits);
+            ViewBag.currentPage = page;
+
+            return View(query);
         }
 
         // GET: PurchaseInvoices/Details/5
@@ -54,8 +68,6 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: PurchaseInvoices/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("InEnterId,Source,EnteredDate,QuantityPurchase,Status")] PurchaseInvoice purchaseInvoice)
@@ -86,8 +98,6 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: PurchaseInvoices/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("InEnterId,Source,EnteredDate,QuantityPurchase,Status")] PurchaseInvoice purchaseInvoice)
@@ -174,7 +184,7 @@ namespace ShowroomManagement.Controllers
             return await _context.PurchaseInvoices
                 .Skip((page - 1).Value * limits.Value)
                 .Take(limits.Value)
-                .ToListAsync();
+                .Skip((page.Value - 1) * listLimits).Take(listLimits).ToListAsync();
         }
     }
 }

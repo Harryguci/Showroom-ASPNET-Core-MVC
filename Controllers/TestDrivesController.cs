@@ -10,7 +10,7 @@ namespace ShowroomManagement.Controllers
     public class TestDrivesController : Controller
     {
         private readonly ShowroomContext _context;
-        public static int LIST_LIMITS = 5;
+        public static int listLimits = 5;
 
         public TestDrivesController(ShowroomContext context)
         {
@@ -18,7 +18,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: TestDrives
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string asc, string desc, int page = 1)
         {
             if (_context.TestDrives == null)
                 return Problem("Entity set 'ShowroomContext.TestDrives'  is null.");
@@ -30,15 +30,16 @@ namespace ShowroomManagement.Controllers
                 BookDate = p.BookDate,
                 Note = p.Note,
                 Status = p.Status,
-            }).Skip(LIST_LIMITS * (page - 1))
-            .Take(LIST_LIMITS).OrderByDescending(p => p.BookDate);
+            }).Skip(listLimits * (page - 1))
+            .Take(listLimits)
+            .OrderByDescending(p => p.BookDate);
 
             var total = _context.TestDrives.Count();
-
             ViewBag.nextPage = true;
             ViewBag.totalRecord = total;
-            ViewBag.totalPage = total / LIST_LIMITS;
-            ViewBag.currentPage = page;
+            ViewBag.totalPage = total / listLimits;
+            ViewBag.currentPage = page; 
+
             return View(await query.ToListAsync());
         }
 

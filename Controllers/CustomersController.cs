@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,20 +12,29 @@ using ShowroomManagement.Models;
 
 namespace ShowroomManagement.Controllers
 {
+    [Authorize]
     public class CustomersController : Controller
     {
         private readonly ShowroomContext _context;
+        private int listLimits = 10;
 
         public CustomersController(ShowroomContext context)
         {
             _context = context;
         }
 
+        [Authorize(Roles = "1, 2")]
         // GET: Customers
-        public async Task<IActionResult> Index(string asc, string desc)
+        public async Task<IActionResult> Index(string asc, string desc, int page = 1)
         {
             ViewBag.asc = asc;
             ViewBag.desc = desc;
+
+            var total = _context.Customer.Count();
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = (int)Math.Ceiling((total - 1) * 1.0 / listLimits);
+            ViewBag.currentPage = page;
 
             if (asc != null)
             {
@@ -32,7 +42,7 @@ namespace ShowroomManagement.Controllers
                 {
                     case "clientname":
                         return _context.Customer != null ?
-                        View(await _context.Customer.OrderBy(p => p.ClientId).ToListAsync()) :
+                        View(await _context.Customer.OrderBy(p => p.ClientId).Skip((page - 1) * listLimits).Take(listLimits).ToListAsync()) :
                         Problem("Entity set 'ShowroomContext.Customer'  is null.");
                     case "firstname":
                         return _context.Customer != null ?
@@ -109,10 +119,11 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Customers/Search
+        [Authorize(Roles = "1, 2")]
         public async Task<List<Customer>> Search(string q)
         {
             if (_context.Customer == null) return new List<Customer>();
-            
+
             var query = _context.Customer.Where(p => !p.Deleted
                 && (p.ClientId.ToLower().Contains(q)
                 || p.Firstname.ToLower().Contains(q)
@@ -123,6 +134,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Customers/Details/5
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.Customer == null)
@@ -141,6 +153,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Customers/Create
+        [Authorize(Roles = "1, 2")]
         public IActionResult Create()
         {
             return View();
@@ -151,11 +164,18 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,Firstname,Lastname,DateBirth,Cccd,Email,Address,Gender")] Customer customer)
+        [Authorize(Roles = "1, 2")]
+        public async Task<IActionResult> Create([Bind("Firstname,Lastname,DateBirth,Cccd,Email,Address,Gender")] Customer customer)
         {
             if (ModelState.IsValid)
             {
+                var id = Convert.ToInt32(_context.Customer
+                    .OrderByDescending(p => p.ClientId)
+                    .FirstOrDefault().ClientId.Substring(1)) + 1;
+
+                customer.ClientId = "C" + Convert.ToInt32(id);
                 _context.Add(customer);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -163,6 +183,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Customers/Edit/5
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Customer == null)
@@ -183,6 +204,7 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Edit(string id, [Bind("ClientId,Firstname,Lastname,DateBirth,Cccd,Email,Address,Gender")] Customer customer)
         {
             if (id != customer.ClientId)
@@ -214,6 +236,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Customers/Delete/5
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Customer == null)
@@ -234,6 +257,7 @@ namespace ShowroomManagement.Controllers
         // POST: Customers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Customer == null)
@@ -250,6 +274,7 @@ namespace ShowroomManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "1, 2")]
         private bool CustomerExists(string id)
         {
             return (_context.Customer?.Any(e => e.ClientId == id)).GetValueOrDefault();

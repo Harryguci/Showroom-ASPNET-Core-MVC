@@ -8,12 +8,15 @@ using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ShowroomManagement.Controllers
 {
     public class AccountsController : Controller
     {
         private readonly ShowroomContext _context;
+        private int listLimits = 10;
+
 
         public AccountsController(ShowroomContext context)
         {
@@ -22,10 +25,22 @@ namespace ShowroomManagement.Controllers
 
         // GET: Accounts
         [Authorize(Roles = "2")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string asc, string desc, int page = 1)
         {
+            ViewBag.asc = asc;
+            ViewBag.desc = desc;
+
+            var total = _context.Customer.Count();
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = (int)Math.Ceiling((total - 1) * 1.0 / listLimits);
+            ViewBag.currentPage = page;
+
             return _context.Accounts != null ?
-                        View(await _context.Accounts.ToListAsync()) :
+                        View(await _context.Accounts
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits)
+                        .ToListAsync()) :
                         Problem("Entity set 'ShowroomContext.Accounts'  is null.");
         }
 
@@ -181,20 +196,18 @@ namespace ShowroomManagement.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromForm] Account account)
         {
-            using (HttpClient client = new HttpClient())
+            string serialized = JsonConvert.SerializeObject(account);
+
+            StringContent stringContent = new StringContent(serialized);
+            stringContent.Headers.Remove("Content-Type");
+            stringContent.Headers.Add("Content-Type", "application/json");
+
+            //var res = await client.PostAsync(@"https://localhost:3000/api/Login", stringContent);
+            var res = Authenticate(account);
+
+            if (res != null)
             {
-                string serialized = JsonConvert.SerializeObject(account);
-
-                StringContent stringContent = new StringContent(serialized);
-                stringContent.Headers.Remove("Content-Type");
-                stringContent.Headers.Add("Content-Type", "application/json");
-
-                //var res = await client.PostAsync(@"https://localhost:3000/api/Login", stringContent);
-                var res = Authenticate(account);
-
-                if (res != null)
-                {
-                    List<Claim> claims = new List<Claim>()
+                List<Claim> claims = new List<Claim>()
                     {
                         new Claim(ClaimTypes.NameIdentifier, account.Username),
                         new Claim(ClaimTypes.Role, res.Level_account.ToString()),
@@ -202,25 +215,24 @@ namespace ShowroomManagement.Controllers
                         new Claim("EmployeeId", res.EmployeeId.ToString())
                     };
 
-                    ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,
-                        CookieAuthenticationDefaults.AuthenticationScheme);
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,
+                    CookieAuthenticationDefaults.AuthenticationScheme);
 
-                    AuthenticationProperties properties = new AuthenticationProperties()
-                    {
-                        AllowRefresh = true,
-                        IsPersistent = account.KeepLoggined
-                    };
-
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity), properties);
-
-                    return RedirectToAction("Index", "Home");
-                }
-                else
+                AuthenticationProperties properties = new AuthenticationProperties()
                 {
-                    ViewBag.ValidateMessage = "User not found.";
-                    return View();
-                }
+                    AllowRefresh = true,
+                    IsPersistent = true
+                };
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity), properties);
+
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ViewBag.ValidateMessage = "User not found.";
+                return View();
             }
         }
 

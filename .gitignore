@@ -32,3 +32,11 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+
+# Disable IMG
+*.png
+*.jpg
+*.PNG
+*.JPG
+*.jpeg

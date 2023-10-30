@@ -10,6 +10,7 @@ namespace ShowroomManagement.Controllers
     public class SalesInvoicesController : Controller
     {
         private readonly ShowroomContext _context;
+        private int listLimits = 10;
 
         public SalesInvoicesController(ShowroomContext context)
         {
@@ -17,11 +18,24 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: SalesInvoices
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return _context.SalesInvoices != null ?
-                        View(await _context.SalesInvoices.ToListAsync()) :
-                        Problem("Entity set 'ShowroomContext.SalesInvoices'  is null.");
+            if (_context.SalesInvoices == null)
+                return Problem("Entity set 'ShowroomContext.SalesInvoices'  is null.");
+
+            var query = await _context.SalesInvoices
+                .Skip((page - 1) * listLimits)
+                .Take(listLimits)
+                .Skip((page - 1) * listLimits).Take(listLimits).ToListAsync();
+
+            var total = _context.SalesInvoices.Count();
+
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = (int)Math.Ceiling(total * 1.0 / listLimits);
+            ViewBag.currentPage = page;
+
+            return View(query);
         }
 
         // GET: SalesInvoices/Details/5
@@ -167,7 +181,7 @@ namespace ShowroomManagement.Controllers
             return await _context.SalesInvoices
                 .Skip((page.Value - 1) * limits.Value)
                 .Take(limits.Value)
-                .ToListAsync();
+                .Skip((page.Value - 1) * listLimits).Take(listLimits).ToListAsync();
         }
     }
 }

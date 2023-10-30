@@ -13,6 +13,7 @@ namespace ShowroomManagement.Controllers
     public class SalesTargetsController : Controller
     {
         private readonly ShowroomContext _context;
+        private int listLimits = 10;
 
         public SalesTargetsController(ShowroomContext context)
         {
@@ -20,10 +21,22 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: SalesTargets
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string asc, string desc, int page = 1)
         {
-              return _context.SalesTargets != null ? 
-                          View(await _context.SalesTargets.ToListAsync()) :
+            ViewBag.asc = asc;
+            ViewBag.desc = desc;
+
+            var total = _context.SalesTargets.Count();
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = (int)Math.Ceiling((total - 1) * 1.0 / listLimits);
+            ViewBag.currentPage = page;
+
+            return _context.SalesTargets != null ?
+                          View(await _context.SalesTargets
+                          .Skip((page - 1) * listLimits)
+                          .Take(listLimits)
+                          .ToListAsync()) :
                           Problem("Entity set 'ShowroomContext.SalesTargets'  is null.");
         }
 
@@ -150,14 +163,14 @@ namespace ShowroomManagement.Controllers
             {
                 _context.SalesTargets.Remove(salesTarget);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool SalesTargetExists(string id)
         {
-          return (_context.SalesTargets?.Any(e => e.SaleId == id)).GetValueOrDefault();
+            return (_context.SalesTargets?.Any(e => e.SaleId == id)).GetValueOrDefault();
         }
     }
 }

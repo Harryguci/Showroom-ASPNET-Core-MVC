@@ -18,7 +18,7 @@ namespace ShowroomManagement.Data
         public DbSet<TestDrive> TestDrives { get; set; }
 
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<Product_Images> Product_Images { get; set; }
+        public DbSet<ProductImages> ProductImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,7 +31,7 @@ namespace ShowroomManagement.Data
             modelBuilder.Entity<SalesTarget>().ToTable("SalesTargets");
             modelBuilder.Entity<TestDrive>().ToTable("TestDrive");
             modelBuilder.Entity<Account>().ToTable("Account");
-            modelBuilder.Entity<Product_Images>().ToTable("Product_Images");
+            modelBuilder.Entity<ProductImages>().ToTable("Product_Images");
         }
 
         public ShowroomContext(DbContextOptions<ShowroomContext> options)

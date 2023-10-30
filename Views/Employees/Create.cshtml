@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var errors = ViewBag.error;
 }
 
 <h1>Tạo mới</h1>
@@ -13,9 +14,9 @@
 <div class="d-flex">
     <form asp-action="Create" class="col-12 col-md-6">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group">
+        <div class="form-group d-none">
             <label asp-for="EmployeeId" class="control-label"></label>
-            <input asp-for="EmployeeId" class="form-control" />
+            <input asp-for="EmployeeId" class="form-control" value="E" />
             <span asp-validation-for="EmployeeId" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -40,12 +41,15 @@
         </div>
         <div class="form-group">
             <label asp-for="Position" class="control-label"></label>
-            <input asp-for="Position" class="form-control" />
+            <select name="Position" class="form-control">
+                <option value="manager">Quản lý</option>
+                <option value="employee">Nhân viên</option>
+            </select>
             <span asp-validation-for="Position" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="StartDate" class="control-label"></label>
-            <input asp-for="StartDate" class="form-control" />
+            <input type="date" type="date" asp-for="StartDate" class="form-control" />
             <span asp-validation-for="StartDate" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -63,15 +67,31 @@
             <input asp-for="SaleId" class="form-control" />
             <span asp-validation-for="SaleId" class="text-danger"></span>
         </div>
-        <div class="form-group form-check">
-            <label class="form-check-label">
-                <input class="form-check-input" asp-for="Gender" /> @Html.DisplayNameFor(model => model.Gender)
+        <div class="form-group">
+            <label class="form-check-label d-none">
+                <input class="form-check-input" type="hidden" asp-for="Gender" value="true" />
+                @Html.DisplayNameFor(model => model.Gender)
             </label>
+            <select class="form-control" onchange="HandleChangeGender(event)">
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+            </select>
         </div>
         <div class="form-group">
             <input type="submit" value="Create" class="btn btn-primary" />
         </div>
     </form>
+    <script>
+        function HandleChangeGender(event) {
+            console.log(event.target.value);
+            var value = event.target.value;
+            if (value == "Nam") {
+                document.querySelector(`input[name="Gender"]`).value = "true";
+            } else {
+                document.querySelector(`input[name="Gender"]`).value = "false";
+            }
+        }
+    </script>
     <div class="thumbnail">
         <img src="https://img.freepik.com/premium-vector/boy-girl-using-their-laptops_118167-2346.jpg?w=2000" />
     </div>
@@ -80,6 +100,13 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+@if (errors != null)
+{
+    <script>
+        alert(JSON.stringify(errors)
+    </script>
+}
 
 @section Scripts {
     @{

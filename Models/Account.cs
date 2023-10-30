@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace ShowroomManagement.Models
@@ -33,7 +34,8 @@ namespace ShowroomManagement.Models
         public DateTime? CreateAt { get; set; }
         [JsonPropertyName("deleteAt")]
         public DateTime? DeleteAt { get; set; }
-        [JsonPropertyName("keepLoggined")]
-        public bool KeepLoggined { get; set; } = true;
+
+        //[JsonPropertyName("keepLoggined")]
+        //public bool KeepLoggined { get; set; } = true;
     }
 }

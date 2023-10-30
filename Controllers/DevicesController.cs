@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 
@@ -13,6 +15,7 @@ namespace ShowroomManagement.Controllers
     public class DevicesController : Controller
     {
         private readonly ShowroomContext _context;
+        private int listLimits = 10;
 
         public DevicesController(ShowroomContext context)
         {
@@ -20,9 +23,18 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Devices
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string asc, string desc, int page = 1)
         {
-              return _context.Devices != null ? 
+            ViewBag.asc = asc;
+            ViewBag.desc = desc;
+
+            var total = _context.Customer.Count();
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = (int)Math.Ceiling((total - 1) * 1.0 / listLimits);
+            ViewBag.currentPage = page;
+
+            return _context.Devices != null ? 
                           View(await _context.Devices.ToListAsync()) :
                           Problem("Entity set 'ShowroomContext.Devices'  is null.");
         }

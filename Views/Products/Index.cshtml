@@ -1,21 +1,50 @@
-﻿@model IEnumerable<ShowroomManagement.Models.Products>
+﻿@using System.Security.Claims;
+@model IEnumerable<ShowroomManagement.Models.Products>
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     //   var orders = ViewBag.OrderBy;
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
+
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+    }
+}
+
+@{
+    int page = ViewBag.currentPage;
+    int total = ViewBag.totalPage;
+    // Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
+    bool hasNext = ViewBag.nextPage;
 }
 
 
 <h1>Sản phẩm</h1>
 
 <div class="d-flex">
-    <a asp-action="Create" class="btn btn-outline-primary d-flex justify-content-center gap-2" style="align-items: center">
-        <span class="material-symbols-outlined">
-            add_circle
-        </span>
-        Tạo mới
-    </a>
+    @if (currentAccount != null && currentAccount.Level_account >= 1)
+    {
+        <a asp-action="Create" class="btn btn-outline-primary d-flex justify-content-center gap-2" style="align-items: center">
+            <span class="material-symbols-outlined">
+                add_circle
+            </span>
+            Tạo mới
+        </a>
+    }
     <a asp-action="Show" class="btn btn-outline-primary">
         <span class="material-symbols-outlined">
             grid_view
@@ -68,11 +97,43 @@
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Serial">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Serial">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Serial">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Serial">
+                        <span class="material-symbols-outlined">
+                            edit
+                        </span>
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Serial">
+                        <span class="material-symbols-outlined">
+                            info
+                        </span>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Serial">
+                        <span class="material-symbols-outlined">
+                            delete
+                        </span>
+                    </a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+<div class="pagination-container d-flex gap-1 justify-content-center">
+    @for (int i = 0; i < total; i++)
+    {
+        @if (i + 1 == page)
+        {
+            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
+        }
+        else if (total > 10 && i > 5 && i < 8)
+        {
+            <span>.</span>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary"
+               asp-action="Index" asp-route-page="@(i + 1)">
+                @(i + 1)
+            </a>
+        }
+    }
+</div>

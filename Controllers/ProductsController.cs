@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
@@ -17,6 +19,7 @@ namespace ShowroomManagement.Controllers
     public class ProductsController : Controller
     {
         private readonly ShowroomContext _context;
+        private int listLimits = 10;
 
         public ProductsController(ShowroomContext context)
         {
@@ -24,7 +27,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index(string orderby, string orderbydesc)
+        public async Task<IActionResult> Index(string orderby, string orderbydesc, int page = 1)
         {
             ViewBag.orderby = orderby;
             ViewBag.orderbydesc = orderbydesc;
@@ -33,6 +36,7 @@ namespace ShowroomManagement.Controllers
             {
                 error = "Can not find the table in the Database."
             });
+
             PropertyInfo propertyInfo = typeof(Products).GetProperty("Name");
 
             var query = _context.Products.Select(p => new Products()
@@ -43,10 +47,18 @@ namespace ShowroomManagement.Controllers
                 SalePrice = p.SalePrice,
                 Quantity = p.Quantity,
                 Status = p.Status,
-            });
+            })
+            .Skip((page - 1) * listLimits)
+            .Take(listLimits);
 
 
-            var list = await query.ToListAsync();
+            var list = await query.Skip((page - 1) * listLimits).Take(listLimits).ToListAsync();
+            var total = _context.Products.Count();
+
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = (int)Math.Ceiling(total * 1.0 / listLimits);
+            ViewBag.currentPage = page;
 
             return View(list);
         }
@@ -55,20 +67,20 @@ namespace ShowroomManagement.Controllers
         public async Task<IActionResult> Show(int? page)
         {
             if (page == null) page = 1;
-            int limits = 9;
 
             List<Products> query = await _context.Products
-                .Skip((int)((page - 1) * limits))
-                .Take(limits).ToListAsync();
+                .Skip((page.Value - 1) * listLimits)
+                .Take(listLimits)
+                .ToListAsync();
 
             for (int i = 0; i < query.Count(); i++)
             {
-                var imageUrls = await _context.Product_Images.Select(p => new Product_Images()
+                var imageUrls = await _context.ProductImages.Select(p => new ProductImages()
                 {
                     Id = p.Id,
-                    ProductSerial = p.ProductSerial,
+                    Serial = p.Serial,
                     Url_image = p.Url_image
-                }).Where(p => p.ProductSerial == query[i].Serial)
+                }).Where(p => p.Serial == query[i].Serial)
                 .ToListAsync();
                 query[i].ImageUrls = imageUrls;
             }
@@ -112,21 +124,88 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Products/Create
+        [Authorize(Roles = "1, 2")]
         public IActionResult Create()
         {
+            var query = _context.Products.Take(1).OrderByDescending(p => p.Serial).FirstOrDefault();
+            var seriral = Convert.ToInt32(query?.Serial.Substring(1)) + 1;
+            var seriralText = "";
+
+            for (int i = 1; i <= 3 - seriral.ToString().Length; i++)
+            {
+                seriralText = "0" + seriral;
+            }
+            seriralText = "P" + seriralText;
+            ViewBag.serial = seriralText;
+
             return View();
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "1, 2")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Serial,Name,PurchasePrice,SalePrice,Quantity,SourceId,Status")] Products products)
+        public async Task<IActionResult> Create([Bind("Serial,ProductName,PurchasePrice,SalePrice,Quantity,SourceId,Status")] Products products)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(products);
+
+                await _context.SaveChangesAsync();
+
+
+                // Save files
+                try
+                {
+                    var files = HttpContext.Request.Form.Files;
+                    var id = 0;
+                    if (_context.ProductImages.Count() > 0)
+                    {
+                        id = _context.ProductImages.OrderByDescending(p => p.Id)
+                            .FirstOrDefault().Id + 1;
+                    }
+                    else id = 1;
+
+                    foreach (var image in files)
+                    {
+                        if (image != null && image.Length > 0)
+                        {
+                            var file = image;
+                            //There is an error here
+                            var uploads = Path.Combine("wwwroot", "images", "uploaded");
+                            if (file.Length > 0)
+                            {
+                                //var fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(file.FileName);
+                                var fileName = file.FileName;
+                                using (var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create))
+                                {
+                                    await file.CopyToAsync(fileStream);
+                                    //var employee = _context.Employees.Where(p => p.EmployeeId == employeeId).FirstOrDefault();
+                                    // employee.Url_image = "/" + Path.Combine("images", "uploaded", fileName);
+                                    // _context.Update(employee);                                    
+
+                                    var newProductImage = new ProductImages()
+                                    {
+                                        Id = id,
+                                        Url_image = "/" + Path.Combine("images", "uploaded", fileName),
+                                        Serial = products.Serial,
+                                    };
+
+                                    id++;
+
+                                    _context.Add(newProductImage);
+
+                                    //_context.Products.Find(products.Serial);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"\n\n[UPLOAD IMAGES ERROR]{ex.Message}\n\n");
+                }
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -134,6 +213,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Products/Edit/5
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Products == null)
@@ -150,10 +230,9 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Edit(string id,
             [Bind("Serial,Name,PurchasePrice,SalePrice,Quantity,SourceId,Status")] Products products)
         {
@@ -186,6 +265,7 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Products/Delete/5
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Products == null)
@@ -206,6 +286,7 @@ namespace ShowroomManagement.Controllers
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Products == null)

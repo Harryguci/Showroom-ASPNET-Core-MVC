@@ -12,11 +12,11 @@
 <div class="d-flex">
     <form asp-action="Create" class="col-12 col-md-6">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group">
-            <label asp-for="ClientId" class="control-label"></label>
-            <input asp-for="ClientId" class="form-control" />
-            <span asp-validation-for="ClientId" class="text-danger"></span>
-        </div>
+        @* <div class="form-group">
+        <label asp-for="ClientId" class="control-label"></label>
+        <input asp-for="ClientId" class="form-control" />
+        <span asp-validation-for="ClientId" class="text-danger"></span>
+        </div> *@
         <div class="form-group">
             <label asp-for="Firstname" class="control-label"></label>
             <input asp-for="Firstname" class="form-control" />
@@ -47,15 +47,30 @@
             <input asp-for="Address" class="form-control" />
             <span asp-validation-for="Address" class="text-danger"></span>
         </div>
-        <div class="form-group form-check">
-            <label class="form-check-label">
-                <input class="form-check-input" asp-for="Gender" /> @Html.DisplayNameFor(model => model.Gender)
+        <div class="form-group">
+            <label class="form-check-label d-none">
+                <input class="form-check-input" type="hidden" asp-for="Gender" /> @Html.DisplayNameFor(model => model.Gender)
             </label>
+            <select class="form-control" onchange="HandleChangeGender(event)">
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+            </select>
         </div>
         <div class="form-group">
             <input type="submit" value="Create" class="btn btn-primary" />
         </div>
     </form>
+    <script>
+        function HandleChangeGender(event) {
+            console.log(event.target.value);
+            var value = event.target.value;
+            if (value == "Nam") {
+                document.querySelector(`input[name="Gender"]`).value = "true";
+            } else {
+                document.querySelector(`input[name="Gender"]`).value = "false";
+            }
+        }
+    </script>
     <div class="thumbnail">
         <img src="https://thumbs.dreamstime.com/b/successful-cooperation-two-businessmen-flat-d-vector-illustration-web-design-successful-cooperation-two-199663450.jpg" />
     </div>

@@ -15,7 +15,7 @@ namespace ShowroomManagement.Controllers
     public class EmployeesController : Controller
     {
         private readonly ShowroomContext _context;
-        private static int LIST_LIMITS = 5;
+        private static int listLimits = 10;
 
         public EmployeesController(ShowroomContext context)
         {
@@ -27,7 +27,7 @@ namespace ShowroomManagement.Controllers
         public async Task<IActionResult> Index(int? page = 1)
         {
             if (_context.Employees == null) return BadRequest();
-            var skip = (page - 1) * LIST_LIMITS;
+            var skip = (page - 1) * listLimits;
             skip = skip != null ? skip : 0;
 
             var query = _context.Employees.Select(p => new Employee()
@@ -46,16 +46,16 @@ namespace ShowroomManagement.Controllers
                 Deleted = p.Deleted,
             })
             .Where(p => !p.Deleted)
-            .Skip((int)skip).Take(LIST_LIMITS);
+            .Skip((int)skip).Take(listLimits);
 
             var total = _context.Employees.Count();
 
             ViewBag.nextPage = true;
             ViewBag.totalRecord = total;
-            ViewBag.totalPage = total / LIST_LIMITS;
+            ViewBag.totalPage = (int)Math.Ceiling((total - 1) * 1.0 / listLimits);
             ViewBag.currentPage = page;
 
-            return View(await query.ToListAsync());
+            return View(await query.Skip((page.Value - 1) * listLimits).Take(listLimits).ToListAsync());
         }
 
         // GET: Employees/Details/5
@@ -89,13 +89,27 @@ namespace ShowroomManagement.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "2")]
-        public async Task<IActionResult> Create([Bind("EmployeeId,Firstname,Lastname,DateBirth,Cccd,Postion,StartDate,Salary,Email,SaleId,Gender")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Firstname,Lastname,DateBirth,Cccd,Position,StartDate,Salary,Email,SaleId,Gender")] Employee employee)
         {
             if (ModelState.IsValid)
             {
+                var id = Convert.ToInt32(_context.Employees.OrderByDescending(p => p.EmployeeId).FirstOrDefault().EmployeeId.Substring(1)) + 1;
+                var idStr = id.ToString();
+                for (int i = 1; i <= 3 - id.ToString().Length; i++)
+                {
+                    idStr = "0" + idStr;
+                }
+
+                idStr = "E" + idStr;
+                employee.EmployeeId = idStr;
+
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            } else
+            {
+                var errors = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.Exception));
+                ViewBag.errors = errors;
             }
             return View(employee);
         }
@@ -179,7 +193,7 @@ namespace ShowroomManagement.Controllers
             .Skip((page - 1).Value * limits.Value)
             .Take(limits.Value);
 
-            return View(await query.ToListAsync());
+            return View(await query.Skip((page.Value - 1) * listLimits).Take(listLimits).ToListAsync());
         }
 
         // GET: Employees/Delete/5
@@ -212,12 +226,36 @@ namespace ShowroomManagement.Controllers
                 return Problem("Entity set 'ShowroomContext.Employees'  is null.");
             }
             var employee = await _context.Employees.FindAsync(id);
+            var testDrives = await _context.TestDrives.Where(p => p.EmployeeId == id).ToListAsync();
+            var accounts = await _context.Accounts.Where(p => p.EmployeeId == id).ToListAsync();
+
+            if (accounts != null && accounts.Count > 0)
+            {
+                for (int i = 0; i < accounts.Count; i++)
+                {
+                    _context.Accounts.Remove(accounts[i]);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (testDrives != null && testDrives.Count > 0)
+            {
+                for (int i = 0; i < testDrives.Count; i++)
+                {
+                    _context.TestDrives.Remove(testDrives[i]);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
             if (employee != null)
             {
                 _context.Employees.Remove(employee);
             }
-
+           
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 

@@ -35,32 +35,71 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Total)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Target)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Reward)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SaleId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SaleId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SaleId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Total)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Target)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reward)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.SaleId">
+                        <span class="material-symbols-outlined">
+                            edit
+                        </span>
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.SaleId">
+                        <span class="material-symbols-outlined">
+                            info
+                        </span>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.SaleId">
+                        <span class="material-symbols-outlined">
+                            delete
+                        </span>
+                    </a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+@{
+    int page = ViewBag.currentPage;
+    int total = ViewBag.totalPage;
+    // Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
+    bool hasNext = ViewBag.nextPage;
+}
+<div class="pagination-container d-flex gap-1 justify-content-center">
+    @for (int i = 0; i < total; i++)
+    {
+        @if (i + 1 == page)
+        {
+            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
+        }
+        else if (total > 10 && i > 5 && i < 8)
+        {
+            <span>.</span>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary"
+               asp-action="Index" asp-route-page="@(i + 1)">
+                @(i + 1)
+            </a>
+        }
+    }
+</div>

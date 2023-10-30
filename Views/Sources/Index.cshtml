@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Nhà cung cấp</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -34,3 +34,29 @@
 }
     </tbody>
 </table>
+@{
+    int page = ViewBag.currentPage;
+    int total = ViewBag.totalPage;
+    // Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
+    bool hasNext = ViewBag.nextPage;
+}
+<div class="pagination-container d-flex gap-1 justify-content-center">
+    @for (int i = 0; i < total; i++)
+    {
+        @if (i + 1 == page)
+        {
+            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
+        }
+        else if (total > 10 && i > 5 && i < 8)
+        {
+            <span>.</span>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary"
+               asp-action="Index" asp-route-page="@(i + 1)">
+                @(i + 1)
+            </a>
+        }
+    }
+</div>
