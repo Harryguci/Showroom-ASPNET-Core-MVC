@@ -34,6 +34,12 @@
 
 
 <h1>Sản phẩm</h1>
+@*
+@if (currentAccount.Level_account >= 2)
+{
+    <p><small><a asp-action="Trash">Thùng rác</a></small></p>
+}*@
+<p><small><a asp-controller="Products" asp-action="Trash">Thùng rác</a></small></p>
 
 <div class="d-flex">
     @if (currentAccount != null && currentAccount.Level_account >= 1)

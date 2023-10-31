@@ -19,6 +19,10 @@ namespace ShowroomManagement.Models
         [JsonPropertyName("SourceId")]
         public string SourceId { get; set; }
 
+        [Display(Name = "Mã sản phẩm")]
+        [JsonPropertyName("ProductId")]
+        public string ProductId { get; set; }
+
         [Column("Date")]
         [Display(Name = "Ngày nhập")]
         [JsonPropertyName("EnteredDate")]
