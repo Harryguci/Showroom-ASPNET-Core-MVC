@@ -30,9 +30,9 @@ namespace ShowroomManagement.Models
 
         [Display(Name = "Ghi chú")]
         [StringLength(maximumLength: 200)]
-        public string? Note { get; set; }
+        public string Note { get; set; }
 
         [Display(Name = "Trạng thái")]
-        public string? Status { get; set; }
+        public string Status { get; set; }
     }
 }

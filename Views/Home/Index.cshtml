@@ -1,10 +1,268 @@
-﻿@{
+﻿@using System.Security.Claims;
+@{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    IEnumerable<Customer> customers = ViewBag.customers;
+    IEnumerable<Employee> employees = ViewBag.employees;
+    IEnumerable<Products> products = ViewBag.products;
 }
 
-<div class="text-center welcome-wrap">
-    <h1 class="display-4">Welcome</h1>
+@{
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
+
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+    }
+}
+
+<style>
+    table {
+        margin: 1rem auto;
+    }
+
+    .content-section {
+        margin: 2rem 0;
+    }
+</style>
+
+<div class="text-center welcome-wrap mt-3">
+    <h1 class="display-4">Showroom RollRoyces</h1>
     <p>Hơn cả một giải pháp quản lý. Làm việc mọi lúc mọi nơi.</p>
     <p>Detail: <a target="_blank" href="https://github.com/Harryguci/Showroom-ASPNET-Core-MVC">Showroom ASP.NET Core MVC</a>.</p>
 </div>
+<div class="dashboard-container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6" style="max-width: 800px;">
+            <h2>Sản lượng bán theo năm</h2>
+            <canvas id="acquisitions"></canvas>
+        </div>
+        <div class="col-12 col-md-6" style="max-width: 500px; max-height: 500px">
+            <h2>Nhân sự và khách hàng</h2>
+            <canvas id="personnel"></canvas>
+        </div>
+        <div class="col-12" style="max-width: 1000px;">
+            <h2>Tăng trưởng doanh thu</h2>
+            <canvas id="stock"></canvas>
+        </div>
+    </div>
+</div>
+<div class="container-md">
+    <button class="btn btn-outline-primary" onclick="HandlePrintList(event)">In danh sách</button>
+</div>
+<div class="container-md information-container">
+    @if (customers != null && customers.Count() > 0)
+    {
+        <div class="content-section customer-section">
+            <div class="d-flex" style="justify-content: space-between">
+                <h2>Danh sách Khách hàng</h2>
+                <a class="link" asp-controller="Customers" asp-action="Index">Tất cả</a>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Họ tên</th>
+                        <th>Ngày sinh</th>
+                        <th>Giới tính</th>
+                        <th>CCCD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var customer in customers)
+                    {
+                        <tr>
+                            <td>@customer.Firstname @customer.Lastname</td>
+                            <td>@customer.DateBirth.ToString("dd/MM/yyyy")</td>
+                            <td>@(customer.Gender ? "Nam" : "Nữ")</td>
+                            <td>@customer.Cccd</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    @if (employees != null && employees.Count() > 0)
+    {
+        <div class="content-section employees-section">
+            <div class="d-flex" style="justify-content: space-between">
+                <h2>Danh sách Nhân viên</h2>
+                <a class="link" asp-controller="Employees" asp-action="Index">Tất cả</a>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Họ tên</th>
+                        <th>Ngày sinh</th>
+                        <th>Giới tính</th>
+                        <th>CCCD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var employee in employees)
+                    {
+                        <tr>
+                            <td>@employee.Firstname @employee.Lastname</td>
+                            <td>@employee.DateBirth.ToString("dd/MM/yyyy")</td>
+                            <td>@(employee.Gender ? "Nam" : "Nữ")</td>
+                            <td>@employee.Cccd</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    @if (products != null && products.Count() > 0)
+    {
+        <div class="content-section products-section">
+            <div class="d-flex" style="justify-content: space-between">
+                <h2>Danh sách Sản phẩm</h2>
+                <a class="link" asp-controller="Products" asp-action="Index">Tất cả</a>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Mã sản phẩm</th>
+                        <th>Tên</th>
+                        <th>Giá bán</th>
+                        <th>Số lượng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in products)
+                    {
+                        <tr>
+                            <td>@product.Serial</td>
+                            <td>@product.ProductName</td>
+                            <td>@product.SalePrice</td>
+                            <td>@product.Quantity</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js" integrity="sha512-7U4rRB8aGAHGVad3u2jiC7GA5/1YhQcQjxKeaVms/bT66i3LVBMRcBI9KwABNWnxOSwulkuSXxZLGuyfvo7V1A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.js" integrity="sha512-6LKCH7i2+zMNczKuCT9ciXgFCKFp3MevWTZUXDlk7azIYZ2wF5LRsrwZqO7Flt00enUI+HwzzT5uhOvy6MNPiA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js" integrity="sha512-6HrPqAvK+lZElIZ4mZ64fyxIBTsaX5zAFZg2V/2WT+iKPrFzTzvx6QAsLW2OaLwobhMYBog/+bvmIEEGXi0p1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" integrity="sha512-SIMGYRUjwY8+gKg7nn9EItdD8LCADSDfJNutF9TPrvEo86sQmFMh6MyralfIyhADlajSxqc7G0gs7+MwWF/ogQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/helpers.js" integrity="sha512-mP+Y3bimvz/biDjFiXeGMPnLCKXV+VuYXv86wAZ+llI6Gq0Ip3xjo6hx2AueB59sjk/bF66Y2K2vcvSLf/b+LQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/helpers.min.js" integrity="sha512-JG3S/EICkp8Lx9YhtIpzAVJ55WGnxT3T6bfiXYbjPRUoN9yu+ZM+wVLDsI/L2BWRiKjw/67d+/APw/CDn+Lm0Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        (async function () {
+            const data = [
+                { year: 2010, count: 10 },
+                { year: 2011, count: 20 },
+                { year: 2012, count: 15 },
+                { year: 2013, count: 25 },
+                { year: 2014, count: 22 },
+                { year: 2015, count: 30 },
+                { year: 2016, count: 28 },
+            ];
+
+            new Chart(
+                document.getElementById('acquisitions'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(row => row.year),
+                        datasets: [
+                            {
+                                label: 'Sản lượng bán',
+                                data: data.map(row => row.count)
+                            }
+                        ]
+                    }
+                }
+            );
+        })();
+
+        (async function () {
+            var customerNum = @(ViewBag.customerNum);
+            var employeeNum = @(ViewBag.employeeNum);
+            var managerNum = @(ViewBag.managerNum);
+
+            const data = {
+                labels: [
+                    'Nhân viên',
+                    'Quản lý',
+                    'Khách hàng'
+                ],
+                datasets: [{
+                    label: 'My First Dataset',
+                    data: [employeeNum, managerNum, customerNum],
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)'
+                    ],
+                    hoverOffset: 4
+                }]
+            };
+
+            new Chart(
+                document.getElementById('personnel'),
+                {
+                    type: 'doughnut',
+                    data: data
+                }
+            );
+        })();
+
+        (async function () {
+            const labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu',
+                    data: [65, 59, 80, 81, 56, 55, 40, 50, 60, 55, 70, 80],
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            };
+
+            const config = {
+                type: 'line',
+                data: data,
+            };
+
+            var chart = new Chart(
+                document.getElementById('stock'),
+                config
+            );
+            console.log(chart)
+
+        })();
+    </script>
+    <script>
+        function printContent(el) {
+            var restorepage = $('body').html();
+            var printcontent = $(el).clone();
+            $('body').empty().html(printcontent);
+            window.print();
+            $('body').html(restorepage);
+        }
+        function HandlePrintList(event) {
+            var elem = document.querySelector('.information-container');
+            printContent('.information-container')
+        }
+    </script>
+    }

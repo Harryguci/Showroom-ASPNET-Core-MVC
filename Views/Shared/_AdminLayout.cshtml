@@ -173,24 +173,24 @@
                             </a>
                         </li>
                         @* <li class="nav-small-cap">
-                            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                            <span class="hide-menu">EXTRA</span>
+                        <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                        <span class="hide-menu">EXTRA</span>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="./icon-tabler.html" aria-expanded="false">
-                                <span>
-                                    <i class="ti ti-mood-happy"></i>
-                                </span>
-                                <span class="hide-menu">Icons</span>
-                            </a>
+                        <a class="sidebar-link" href="./icon-tabler.html" aria-expanded="false">
+                        <span>
+                        <i class="ti ti-mood-happy"></i>
+                        </span>
+                        <span class="hide-menu">Icons</span>
+                        </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="./sample-page.html" aria-expanded="false">
-                                <span>
-                                    <i class="ti ti-aperture"></i>
-                                </span>
-                                <span class="hide-menu">Sample Page</span>
-                            </a>
+                        <a class="sidebar-link" href="./sample-page.html" aria-expanded="false">
+                        <span>
+                        <i class="ti ti-aperture"></i>
+                        </span>
+                        <span class="hide-menu">Sample Page</span>
+                        </a>
                         </li> *@
                     </ul>
                     <div class="unlimited-access hide-menu bg-light-primary position-relative mb-7 mt-5 rounded">
@@ -242,9 +242,28 @@
                                         search
                                     </span>
                                 </button>
-                                <input id="search-input" class="form-control" type="text" name="q" placeholder="Search..."
-                                       style="border-bottom-left-radius: 0;border-top-left-radius: 0;" />
-
+                                <div style="position: relative">
+                                    <input id="search-input" class="form-control h-100" type="text" name="q" placeholder="Search..."
+                                           style="border-bottom-left-radius: 0;border-top-left-radius: 0;"
+                                           onchange="handleChange(event)"
+                                           onkeypress="handleChange(event)" />
+                                    <div id="search-result" class="d-none">
+                                        @* <ul class="list">
+                                        <li class="list-item">
+                                        <h4>Result 1</h4>
+                                        <p>Content 1</p>
+                                        </li>
+                                        <li class="list-item">
+                                        <h4>Result 2</h4>
+                                        <p>Content 2</p>
+                                        </li>
+                                        <li class="list-item">
+                                        <h4>Result 3</h4>
+                                        <p>Content 3</p>
+                                        </li>
+                                        </ul> *@
+                                    </div>
+                                </div>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
@@ -293,6 +312,8 @@
     <script src="~/adminLayout/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="~/adminLayout/libs/simplebar/dist/simplebar.js"></script>
     <script src="~/adminLayout/js/dashboard.js"></script>
+    <script src="~/js/home/search.js" defer></script>
+
     <script type="text/javascript">
         function handleSearch() {
             var q = document.getElementById('search-input').value;

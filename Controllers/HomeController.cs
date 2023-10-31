@@ -7,6 +7,11 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using NuGet.Protocol;
+using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+
+//using Newtonsoft.Json;
 
 namespace ShowroomManagement.Controllers
 {
@@ -20,10 +25,32 @@ namespace ShowroomManagement.Controllers
             _logger = logger;
             _context = context;
         }
-
-        public IActionResult Index()
+        
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var user = GetCurrentAccount();
+            if (user.Level_account == 2)
+            {
+                var employeeNum = _context.Employees.Where(p => p.Position.ToLower() == "sales").Count();
+                var managerNum = _context.Employees.Where(p => p.Position.ToLower() == "sales manager").Count();
+                var customerNum = _context.Customer.Count();
+
+                var listLimits = 10;
+                var employees = await _context.Employees.Take(listLimits).OrderByDescending(p => p.EmployeeId).ToListAsync();
+                var products = await _context.Products.Take(listLimits).OrderByDescending(p => p.Serial).ToListAsync();
+                var customers = await _context.Customer.Take(listLimits).OrderByDescending(p => p.ClientId).ToListAsync();
+
+                ViewBag.customers = customers;
+                ViewBag.employees = employees;
+                ViewBag.products = products;
+
+                ViewBag.employeeNum = employeeNum;
+                ViewBag.managerNum = managerNum;
+                ViewBag.customerNum = customerNum;
+
+                return View();
+            }
+            return Redirect("/ClientHome/Index");
         }
 
         public IActionResult Privacy()
@@ -42,48 +69,94 @@ namespace ShowroomManagement.Controllers
         public IActionResult Search(string q)
         {
             ViewBag.q = q;
+
             q = q.ToLower();
 
-            using (HttpClient client = new HttpClient())
+            var customersResponse = _context.Customer.Take(10)
+                    .Where(p => (p.Firstname.ToLower().Contains(q) || p.Lastname.ToLower().Contains(q))).ToJson();
+
+            var productsResponse = _context.Products.Take(10)
+                .Where(p => (p.Serial.ToLower().Contains(q) || p.ProductName.ToLower().Contains(q))).ToJson();
+
+            var employeesResponse = _context.Employees.Take(10)
+                .Where(p => (p.Firstname.ToLower().Contains(q) || p.Lastname.ToLower().Contains(q))).ToJson();
+
+            customersResponse = customersResponse != null ? customersResponse : "[]";
+            productsResponse = productsResponse != null ? productsResponse : "[]";
+            employeesResponse = employeesResponse != null ? employeesResponse : "[]";
+
+            try
             {
-                var customersResponse = _context.Customer.Take(10)
-                    .Where(p => (p.Firstname.ToLower().Contains(q) || p.Lastname.ToLower().Contains(q))).ToJson();
+                IEnumerable<Customer> customers = JsonSerializer.Deserialize<List<Customer>>(customersResponse);
+                IEnumerable<Products> products = JsonSerializer.Deserialize<List<Products>>(productsResponse);
+                IEnumerable<Employee> employees = JsonSerializer.Deserialize<List<Employee>>(employeesResponse);
+                ViewBag.customers = customers;
+                ViewBag.products = products;
+                ViewBag.employees = employees;
 
-                var productsResponse = _context.Products.Take(10)
-                    .Where(p => (p.Serial.ToLower().Contains(q) || p.ProductName.ToLower().Contains(q))).ToJson();
-
-                var employeesResponse = _context.Employees.Take(10)
-                    .Where(p => (p.Firstname.ToLower().Contains(q) || p.Lastname.ToLower().Contains(q))).ToJson();
-
-                customersResponse = customersResponse != null ? customersResponse : "[]";
-                productsResponse = productsResponse != null ? productsResponse : "[]";
-                employeesResponse = employeesResponse != null ? employeesResponse : "[]";
-
-                try
-                {
-                    IEnumerable<Customer> customers = JsonSerializer.Deserialize<List<Customer>>(customersResponse);
-                    IEnumerable<Products> products = JsonSerializer.Deserialize<List<Products>>(productsResponse);
-                    IEnumerable<Employee> employees = JsonSerializer.Deserialize<List<Employee>>(employeesResponse);
-                    ViewBag.customers = customers;
-                    ViewBag.products = products;
-                    ViewBag.employees = employees;
-
-                    return View();
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                return View();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
-        public static async Task<Account> GetCurrentAccount()
+        [HttpGet]
+        public string SearchApi(string q)
         {
-            using (HttpClient client = new HttpClient())
+            q = q.ToLower();
+
+            var customersResponse = _context.Customer.Take(10)
+                    .Where(p => (p.Firstname.ToLower().Contains(q) || p.Lastname.ToLower().Contains(q))).ToJson();
+
+            var productsResponse = _context.Products.Take(10)
+                .Where(p => (p.Serial.ToLower().Contains(q) || p.ProductName.ToLower().Contains(q))).ToJson();
+
+            var employeesResponse = _context.Employees.Take(10)
+                .Where(p => (p.Firstname.ToLower().Contains(q) || p.Lastname.ToLower().Contains(q))).ToJson();
+
+            customersResponse = customersResponse != null ? customersResponse : "[]";
+            productsResponse = productsResponse != null ? productsResponse : "[]";
+            employeesResponse = employeesResponse != null ? employeesResponse : "[]";
+
+            try
             {
-                var currentAcc = await client.GetAsync("https://localhost:3000/Accounts/GetCurrentAccount");
-                return JsonSerializer.Deserialize<Account>(await currentAcc.Content.ReadAsStringAsync());
+                IEnumerable<Customer> customers = JsonSerializer.Deserialize<List<Customer>>(customersResponse);
+                IEnumerable<Products> products = JsonSerializer.Deserialize<List<Products>>(productsResponse);
+                IEnumerable<Employee> employees = JsonSerializer.Deserialize<List<Employee>>(employeesResponse);
+
+                return JsonSerializer.Serialize(new
+                {
+                    customers = customers,
+                    products = products,
+                    employees = employees
+                });
             }
+            catch (Exception ex)
+            {
+                return JsonSerializer.Serialize(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        public Account GetCurrentAccount()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var accountClaim = identity.Claims;
+                //if (accountClaim == null) return null;
+
+                return new Account()
+                {
+                    Username = accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value),
+                    EmployeeId = accountClaim.FirstOrDefault(p => p.Type == "EmployeeId")?.Value
+                };
+            }
+            return null;
         }
 
 
