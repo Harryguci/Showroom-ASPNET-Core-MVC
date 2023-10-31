@@ -47,7 +47,9 @@ namespace ShowroomManagement.Controllers
                 SalePrice = p.SalePrice,
                 Quantity = p.Quantity,
                 Status = p.Status,
+                Deleted = p.Deleted
             })
+            .Where(p => !(bool)p.Deleted )
             .Skip((page - 1) * listLimits)
             .Take(listLimits);
 
@@ -280,8 +282,39 @@ namespace ShowroomManagement.Controllers
             return View(products);
         }
 
+        private bool ProductsExists(string id)
+        {
+            return (_context.Products?.Any(e => e.Serial == id)).GetValueOrDefault();
+        }
+
+
+        #region Delete product
+        [HttpPost]
+        //[Authorize(Roles = "2")]
+        public async Task<IActionResult> DeleteSoft(string id)
+        {
+            // TODO: Move the product which has
+            // ProductId equals id to Bin trash (Set Deteted Prop to TRUE).
+
+            if (_context.Products == null)
+            {
+                return Problem("Entity set 'ShowroomContext.Products'  is null.");
+            }
+            var product = await _context.Products.FindAsync(id);
+            if (product != null)
+            {
+                product.Deleted = true;
+                _context.Products.Update(product);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
         // GET: Products/Delete/5
-        [Authorize(Roles = "1, 2")]
+        //[Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Products == null)
@@ -299,29 +332,85 @@ namespace ShowroomManagement.Controllers
             return View(products);
         }
 
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
+        //[Authorize(Roles = "2")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Products == null)
             {
                 return Problem("Entity set 'ShowroomContext.Products'  is null.");
             }
+
             var products = await _context.Products.FindAsync(id);
+            var productImages = await _context.ProductImages.Where(p => p.Serial == id).ToListAsync();
+            var purchaseInvoices = await _context.PurchaseInvoices.Where(p => p.ProductId == id).ToListAsync();
+            var salesInvoices = await _context.SalesInvoices.Where(p => p.ProductId == id).ToListAsync();
+
+            if (productImages != null && productImages.Count > 0)
+            {
+                for (int i = 0; i < productImages.Count; i++)
+                {
+                    _context.ProductImages.Remove(productImages[i]);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (purchaseInvoices != null && purchaseInvoices.Count > 0)
+            {
+                for (int i = 0; i < purchaseInvoices.Count; i++)
+                {
+                    _context.PurchaseInvoices.Remove(purchaseInvoices[i]);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (salesInvoices != null && salesInvoices.Count > 0)
+            {
+                for (int i = 0; i < salesInvoices.Count; i++)
+                {
+                    _context.SalesInvoices.Remove(salesInvoices[i]);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
             if (products != null)
             {
                 _context.Products.Remove(products);
             }
 
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductsExists(string id)
+
+        [HttpGet]
+        //[Authorize(Roles = "2")]
+        public async Task<IActionResult> Trash(int? page, int? limits)
         {
-            return (_context.Products?.Any(e => e.Serial == id)).GetValueOrDefault();
+            if (_context.Products == null) return BadRequest();
+            if (page == null) page = 1;
+            if (limits == null) limits = 10;
+
+            var query = _context.Products.Select(p => new Products()
+            {
+                Serial = p.Serial,
+                ProductName = p.ProductName,
+                PurchasePrice = p.PurchasePrice,
+                SalePrice = p.SalePrice,
+                Quantity = p.Quantity,
+                Status = p.Status,
+                Deleted = p.Deleted,
+            }).Where(p => (bool)p.Deleted)
+            .Skip((page - 1).Value * limits.Value)
+            .Take(limits.Value);
+
+            return View(await query.Skip((page.Value - 1) * listLimits).Take(listLimits).ToListAsync());
         }
+        #endregion
     }
 }
