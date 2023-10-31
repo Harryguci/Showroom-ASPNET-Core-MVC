@@ -399,7 +399,7 @@ namespace ShowroomManagement.Controllers
         private bool InsertAccountIntoDatabase(string employeeId, string username, string password, bool isAdmin)
         {
             // Tạo các tham số SqlParameter cho giá trị cần chèn
-            //var parameter1 = new SqlParameter("@EmployeeId", value: employeeId);
+            //var parameter1 = new SqlParameter("@EmployeeId", value: employeeId); 
             //var parameter2 = new SqlParameter("@Username", value: username);
             //// Chuyển đổi mật khẩu (password) thành kiểu varbinary
             //var passwordBytes = Encoding.Unicode.GetBytes(password);

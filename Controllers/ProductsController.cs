@@ -39,7 +39,7 @@ namespace ShowroomManagement.Controllers
 
             PropertyInfo propertyInfo = typeof(Products).GetProperty("Name");
 
-            var query = _context.Products.Select(p => new Products()
+            var query = await _context.Products.Select(p => new Products()
             {
                 Serial = p.Serial,
                 ProductName = p.ProductName,
@@ -49,7 +49,7 @@ namespace ShowroomManagement.Controllers
                 Status = p.Status,
             })
             .Skip((page - 1) * listLimits)
-            .Take(listLimits);
+            .Take(listLimits).ToListAsync();
 
             var total = _context.Products.Count();
 
@@ -170,7 +170,12 @@ namespace ShowroomManagement.Controllers
                     var id = 0;
                     if (_context.ProductImages.Count() > 0)
                     {
-                        id = _context.ProductImages
+                        id = _context.ProductImages.Select(p => new ProductImages()
+                        {
+                            Id = p.Id,
+                            Serial = p.Serial,
+                            Url_image = p.Url_image
+                        })
                             .OrderByDescending(p => p.Id)
                             .FirstOrDefault().Id + 1;
                     }
