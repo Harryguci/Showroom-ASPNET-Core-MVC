@@ -22,6 +22,10 @@
         {
             currentAccount = null;
         }
+        if (currentAccount == null || currentAccount.Level_account == 0)
+        {
+            Layout = "~/Views/Shared/_ClientHomeLayout.cshtml";
+        }
     }
 }
 
@@ -39,7 +43,10 @@
 {
     <p><small><a asp-action="Trash">Thùng rác</a></small></p>
 }*@
-<p><small><a asp-controller="Products" asp-action="Trash">Thùng rác</a></small></p>
+@if (currentAccount != null && currentAccount.Level_account >= 1)
+{
+    <p><small><a asp-controller="Products" asp-action="Trash">Thùng rác</a></small></p>
+}
 
 <div class="d-flex">
     @if (currentAccount != null && currentAccount.Level_account >= 1)
@@ -103,21 +110,27 @@
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Serial">
-                        <span class="material-symbols-outlined">
-                            edit
-                        </span>
-                    </a>
+                    @if (currentAccount != null && currentAccount.Level_account >= 1)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Serial">
+                            <span class="material-symbols-outlined">
+                                edit
+                            </span>
+                        </a>
+                    }
                     <a asp-action="Details" asp-route-id="@item.Serial">
                         <span class="material-symbols-outlined">
                             info
                         </span>
                     </a>
-                    <a asp-action="Delete" asp-route-id="@item.Serial">
-                        <span class="material-symbols-outlined">
-                            delete
-                        </span>
-                    </a>
+                    @if (currentAccount != null && currentAccount.Level_account >= 1)
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Serial">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </a>
+                    }
                 </td>
             </tr>
         }

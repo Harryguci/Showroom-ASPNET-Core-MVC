@@ -1,1 +1,91 @@
-﻿<h1>Product Search</h1>
+﻿@using ShowroomManagement.Models;
+@using System.Security.Claims;
+@model IEnumerable<Products>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@{
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
+
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+        if (currentAccount == null || currentAccount.Level_account == 0)
+        {
+            Layout = "~/Views/Shared/_ClientHomeLayout.cshtml";
+        }
+    }
+}
+
+<style>
+    .card {
+        margin: 0;
+    }
+
+    .card-content {
+        color: white;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        line-height: 0.7rem;
+    }
+
+    .card img {
+        filter: brightness(70%);
+        padding: 0;
+    }
+
+    .card:hover img {
+        filter: brightness(100%);
+    }
+</style>
+<h1>Sản phẩm @(ViewBag.q != null ? $": {ViewBag.q}" : "")</h1>
+<div class="row my-3">
+    <a class="btn btn-outline-primary" asp-action="Index"
+       style="width: max-content;">
+        <span class="material-symbols-outlined">
+            format_list_bulleted
+        </span>
+    </a>
+</div>
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-6 col-md-4 m-0 p-0">
+            <div class="card rounded-0">
+                <div class="thumbnail">
+                    @if (@item.ImageUrls.Count > 0 && @item.ImageUrls.FirstOrDefault().Url_image != null
+                   && @item.ImageUrls.FirstOrDefault().Url_image != string.Empty)
+                    {
+                        <img src="@item.ImageUrls.FirstOrDefault().Url_image" />
+                    }
+                    else
+                    {
+                        <img src="~/images//uploaded//noimage.jpg" />
+                    }
+                </div>
+                <div class="card-content p-3">
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Serial">
+                        <p style="font-size: 1.5rem; font-weight: bold; color: white">
+                            @item.ProductName
+                        </p>
+                    </a>
+                    <p>Giá bán: <b>@item.SalePrice</b> TR Đồng</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

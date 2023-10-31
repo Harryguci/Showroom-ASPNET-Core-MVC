@@ -1,9 +1,35 @@
-﻿@model ShowroomManagement.Models.Products
+﻿@using System.Security.Claims;
+@model ShowroomManagement.Models.Products
 
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+@{
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
+
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+        if (currentAccount == null || currentAccount.Level_account == 0)
+        {
+            Layout = "~/Views/Shared/_ClientHomeLayout.cshtml";
+        }
+    }
+}
+
 <style>
     .thumbnail {
         position: relative;
@@ -85,6 +111,9 @@
     }
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Serial">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (currentAccount != null && currentAccount.Level_account >= 1)
+    {
+        <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model?.Serial">Sửa</a>
+    }
+    <a class="btn btn-outline-primary" asp-action="Index">Quay lại danh sách</a>
 </div>

@@ -88,11 +88,11 @@ namespace ShowroomManagement.Controllers
         }
 
         // GET: Products
-        public async Task<List<Products>> Search(string q)
+        public async Task<IActionResult> Search(string q)
         {
-            if (_context.Products == null) return new List<Products>();
+            if (_context.Products == null) return View(new List<Products>());
 
-            var query = _context.Products.Select(p => new Products()
+            var query = await _context.Products.Select(p => new Products()
             {
                 Serial = p.Serial,
                 ProductName = p.ProductName,
@@ -100,9 +100,22 @@ namespace ShowroomManagement.Controllers
                 SalePrice = p.SalePrice,
                 Quantity = p.Quantity,
                 Status = p.Status
-            }).Where(p => p.ProductName.Contains(q.ToLower()));
+            }).Where(p => p.ProductName.Contains(q.ToLower())).ToListAsync();
 
-            return await query.ToListAsync();
+            for (int i = 0; i < query.Count(); i++)
+            {
+                var imageUrls = await _context.ProductImages.Select(p => new ProductImages()
+                {
+                    Id = p.Id,
+                    Serial = p.Serial,
+                    Url_image = p.Url_image
+                }).Where(p => p.Serial == query[i].Serial)
+                .ToListAsync();
+                query[i].ImageUrls = imageUrls;
+            }
+
+            ViewBag.q = q;
+            return View(query);
         }
         // GET: Products/Details/5
         public async Task<IActionResult> Details(string id)
@@ -394,7 +407,7 @@ namespace ShowroomManagement.Controllers
 
 
         [HttpGet]
-        //[Authorize(Roles = "2")]
+        [Authorize(Roles = "1,2")]
         public async Task<IActionResult> Trash(int? page, int? limits)
         {
             if (_context.Products == null) return BadRequest();
