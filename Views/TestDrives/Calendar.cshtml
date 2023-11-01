@@ -13,7 +13,7 @@
     <div class="calendar-header d-flex gap-2" style="justify-content: center">
         <div class="d-flex my-auto" style="max-width: 200px; gap: 1rem">
             <label class="d-block my-auto">Tháng</label>
-            <select class="form-control" name="month" id="month" onchange="handleChange()">
+            <select class="form-control" name="month" id="month" onchange="handleMonthChange()">
                 @for (int m = 1; m <= 12; m++)
                 {
                     @if (m == DateTime.Now.Month)
@@ -100,9 +100,9 @@
 </div>
 
 @section Scripts {
-    <script src="~/js//RenderCalendar.js" defer></script>
-    <script type="text/javascript">
-        async function handleChange() {
+    <script src="~/js/RenderCalendar.js" defer></script>
+    <script>
+        async function handleMonthChange() {
             var month = document.getElementById('month').value;
             var year = document.getElementById('year').value;
 
@@ -115,6 +115,6 @@
         }
         
         // Render the data after the Html content is Loaded.
-        window.onload = () => handleChange();
+        window.onload = () => handleMonthChange();
     </script>
 }

@@ -1,20 +1,22 @@
-﻿,@{
+﻿@{
     Layout = "~/Views/Shared/_LoginLayout.cshtml";
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "SingUp";
 }
 
 @section Styles {
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/all.css'>
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/fontawesome.css'>
     <link rel="stylesheet" href="~/css/login/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 }
 
 <div class="container">
     <div class="screen">
         <div class="screen__content">
-            <form class="login" asp-controller="Accounts" asp-action="Login" style="padding-top: 5rem; padding-bottom: 5rem;">
-                <h1 class="fw-bold" style="color: rgb(0, 0, 150)">Login</h1>
-                <a asp-action="SignUpClient" class="btn btn-outline-primary" style="font-size: 0.7rem">Sign Up</a>
+            <form class="signup" asp-controller="Accounts" asp-action="SignUpClient" onsubmit="HandleSubmit(event)" style="padding: 5rem;">
+                <h1 class="fw-bold" style="color: rgb(0, 0, 150)">SignUp</h1>
+                <a asp-action="Login" class="btn btn-outline-primary">Login</a>
+                <a asp-action="SignUp" class="btn btn-outline-priamry">Dành cho quản lý</a>
                 <div class="login__field">
                     <i class="login__icon fas fa-user"></i>
                     <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">
@@ -23,6 +25,11 @@
                     <i class="login__icon fas fa-lock"></i>
                     <input type="password" id="password" name="password" class="login__input" placeholder="Password">
                 </div>
+                <div class="login__field">
+                    <i class="login__icon fas fa-lock"></i>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="login__input" placeholder="Confirm Password">
+                </div>
+             
                 <p class="form-helper text-danger" style="font-size: 12px">
                     @if (ViewBag.ValidateMessage != null)
                     {
@@ -30,13 +37,12 @@
                     }
                 </p>
                 <button class="button login__submit" type="submit">
-                    <span class="button__text">Log In Now</span>
+                    <span class="button__text">Sign Up Now</span>
                     <i class="button__icon fas fa-chevron-right"></i>
                 </button>
             </form>
 
-            <div class="social-login" style="padding-top: 10px">
-                @* <h3>log in via</h3> *@
+            <div class="social-signup" style="padding-top: 10px">
                 <div class="social-icons">
                     <a href="#" class="social-login__icon fab fa-instagram"></a>
                     <a href="#" class="social-login__icon fab fa-facebook"></a>
@@ -52,7 +58,34 @@
         </div>
     </div>
 </div>
-@section Scripts {
-    <script src="~/js/login/HandleSubmit.js" defer></script>
-}
 
+
+
+<script>
+
+    async function HandleSubmit(event) {
+        event.preventDefault();
+
+        if (!confirm("Bạn muốn đăng ký?")) return;
+
+        var username = document.querySelector(`form input[name="username"]`).value;
+        var password = document.querySelector(`form input[name="password"]`).value;
+        var confirmPassword = document.querySelector(`form input[name="confirmPassword"]`).value;
+
+        if (username && username.length < 3) {
+            alert("Tên đăng nhập quá ngắn.");
+            return;
+        }
+        if (password && password.length < 6) {
+            alert("Mật khẩu phải trên 6 ký tự.");
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert("Mật khẩu và xác nhận mật khẩu không khớp.");
+            return;
+        }
+        // Nếu không có lỗi, tiến hành gửi form
+        var form = document.querySelector('form');
+        form.submit();
+    }
+</script>

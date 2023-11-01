@@ -49,7 +49,7 @@ namespace ShowroomManagement.Controllers
                 Status = p.Status,
                 Deleted = p.Deleted
             })
-            .Where(p => !(bool)p.Deleted )
+            .Where(p => !(bool)p.Deleted)
             .Skip((page - 1) * listLimits)
             .Take(listLimits).ToListAsync();
 
@@ -308,7 +308,7 @@ namespace ShowroomManagement.Controllers
 
         #region Delete product
         [HttpPost]
-        //[Authorize(Roles = "2")]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> DeleteSoft(string id)
         {
             // TODO: Move the product which has
@@ -332,7 +332,7 @@ namespace ShowroomManagement.Controllers
 
 
         // GET: Products/Delete/5
-        //[Authorize(Roles = "1, 2")]
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Products == null)
@@ -351,7 +351,7 @@ namespace ShowroomManagement.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "2")]
+        [Authorize(Roles = "2")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
@@ -361,7 +361,12 @@ namespace ShowroomManagement.Controllers
             }
 
             var products = await _context.Products.FindAsync(id);
-            var productImages = await _context.ProductImages.Where(p => p.Serial == id).ToListAsync();
+            var productImages = await _context.ProductImages.Select(p => new ProductImages()
+            {
+                Id = p.Id,
+                Serial = p.Serial,
+                Url_image = p.Url_image
+            }).Where(p => p.Serial == id).ToListAsync();
             var purchaseInvoices = await _context.PurchaseInvoices.Where(p => p.ProductId == id).ToListAsync();
             var salesInvoices = await _context.SalesInvoices.Where(p => p.ProductId == id).ToListAsync();
 
@@ -379,7 +384,8 @@ namespace ShowroomManagement.Controllers
             {
                 for (int i = 0; i < purchaseInvoices.Count; i++)
                 {
-                    _context.PurchaseInvoices.Remove(purchaseInvoices[i]);
+                    purchaseInvoices[i].ProductId = null;
+                    _context.Update(purchaseInvoices[i]);
                 }
             }
 
@@ -389,7 +395,8 @@ namespace ShowroomManagement.Controllers
             {
                 for (int i = 0; i < salesInvoices.Count; i++)
                 {
-                    _context.SalesInvoices.Remove(salesInvoices[i]);
+                    salesInvoices[i].ProductId = null;
+                    _context.Update(salesInvoices[i]);
                 }
             }
 
@@ -428,6 +435,38 @@ namespace ShowroomManagement.Controllers
             .Take(limits.Value);
 
             return View(await query.Skip((page.Value - 1) * listLimits).Take(listLimits).ToListAsync());
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UndoFromTrash(string id)
+        {
+            var products = _context
+                .Products
+                .Where(p => p.Serial == id).FirstOrDefault();
+            if (ModelState.IsValid)
+            {
+                products.Deleted = false;
+
+                try
+                {
+                    _context.Update(products);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ProductsExists(products.Serial))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(products);
         }
         #endregion
     }

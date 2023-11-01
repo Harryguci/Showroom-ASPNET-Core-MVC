@@ -1,0 +1,80 @@
+﻿@using System.Security.Claims;
+@model Customer
+@{
+    Layout = "~/Views/Shared/_ClientHomeLayout.cshtml";
+
+    // GET the current customer account
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
+
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == string.Empty || currentAccount.Username == null))
+        {
+            currentAccount = null;
+        }
+    }
+}
+
+<style>
+
+    h2 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: rgb(50,50, 150);
+    }
+
+    h2, h3 {
+        margin: 1rem 0;
+    }
+</style>
+
+<div class="row my-4" style="position: relative; flex-wrap: nowrap; min-height: 50vh;">
+    <div class="col-12 col-md-4">
+        <h2>Thông tin tài khoản</h2>
+        <form class="d-block">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>Username</td>
+                        <td>
+                            <input class="form-control" type="text" value="@currentAccount.Username" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mã khách hàng</td>
+                        <td>
+                            <a target="_blank" asp-controller="Employees"
+                               asp-action="Details" asp-route-id="@Model.ClientId">
+                                @Model.ClientId
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Họ tên</td>
+                        <td>@Model.Firstname @Model.Lastname</td>
+                    </tr>
+                    <tr>
+                        <td>Giới tính</td>
+                        <td>@(Model.Gender ? "Nam" : "Nữ")</td>
+                    </tr>
+                    <tr>
+                        <td>Ngày sinh</td>
+                        <td>@Model.DateBirth.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div class="col-12 col-md-8">
+        <h2>Lịch tư vấn đã đặt</h2>
+    </div>
+</div>

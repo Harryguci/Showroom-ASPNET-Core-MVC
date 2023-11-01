@@ -12,17 +12,6 @@ namespace ShowroomManagement.Models
             Username = Password = string.Empty;    
         }
 
-        public Account(string username, string password, string employeeId, int? level_account, bool? deleted, DateTime? createAt)
-        {
-            Username = username;
-            Password = password;
-            EmployeeId = employeeId;
-            Level_account = level_account;
-            Deleted = deleted;
-            CreateAt = createAt;
-            DeleteAt = null;
-        }
-
         [Key]
         [JsonPropertyName("username")]
         public string Username { get; set; }
@@ -34,6 +23,10 @@ namespace ShowroomManagement.Models
         [JsonPropertyName("employeeId")]
         [Column("EmployeeId")]
         public string EmployeeId { get; set; }
+
+        [JsonPropertyName("customerId")]
+        [Column("CustomerId")]
+        public string CustomerId { get; set; }
 
         [JsonPropertyName("level_account")]
         public int? Level_account { get; set; } = 0;

@@ -1,0 +1,53 @@
+﻿@using System.Security.Claims;
+@model TestDrive
+@{
+    Layout = "~/Views/Shared/_ClientHomeLayout.cshtml";
+}
+
+@{
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
+
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+    }
+}
+
+<div style="min-height: 50vh;">
+    <h1>Đặt lịch tư vấn</h1>
+    <div class="d-flex justify-content-center my-5">
+        <form asp-action="Booking" class="col-md-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group d-none">
+                <label asp-for="ClientId" class="control-label"></label>
+                <input asp-for="ClientId" class="form-control" value="@currentAccount.Username" />
+                <span asp-validation-for="ClientId" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="BookDate" class="control-label"></label>
+                <input type="date" asp-for="BookDate" class="form-control" />
+                <span asp-validation-for="BookDate" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="Note" class="control-label"></label>
+                <input asp-for="Note" class="form-control" />
+                <span asp-validation-for="Note" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

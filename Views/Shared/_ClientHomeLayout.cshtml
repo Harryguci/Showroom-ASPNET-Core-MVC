@@ -1,4 +1,26 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims;
+@{
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
+
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == string.Empty || currentAccount.Username == null))
+        {
+            currentAccount = null;
+        }
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -117,9 +139,28 @@
                         <a asp-controller="Products" asp-action="Index" class="dropdown-item">Xem thêm</a>
                     </div>
                 </div>
-                <a asp-action="Contact" class="nav-item nav-link">Liên hệ</a>
+                <a asp-controller="ClientHome" asp-action="Contact" class="nav-item nav-link">Liên hệ</a>
+                @if (currentAccount == null)
+                {
+                    <a asp-controller="Accounts" asp-action="Login" class="nav-item nav-link">Đăng nhập</a>
+                } else
+                {
+                    <div class="nav-item dropdown">
+                        <a asp-controller="Accounts" asp-action="ClientAccount" class="nav-item nav-link">@currentAccount.Username</a>
+                        <div class="dropdown-menu fade-up m-0">
+                            <a asp-controller="Accounts" asp-action="Logout" class="nav-item nav-link">Logout</a>
+                        </div>
+                    </div>
+                }
             </div>
-            <a href="" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Đặt lịch tư vấn<i class="fa fa-arrow-right ms-3"></i></a>
+            @if (currentAccount != null)
+            {
+                <a asp-controller="ClientHome" asp-action="Booking" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Đặt lịch tư vấn<i class="fa fa-arrow-right ms-3"></i></a>
+            }
+            else
+            {
+                <a asp-controller="Accounts" asp-action="Login" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Đặt lịch tư vấn<i class="fa fa-arrow-right ms-3"></i></a>
+            }
         </div>
     </nav>
     <!-- Navbar End -->

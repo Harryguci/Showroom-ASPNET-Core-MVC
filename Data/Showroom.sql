@@ -182,7 +182,7 @@ END
 -------------------- FUNCTION LOGIN -----------------
 
 GO
-CREATE FUNCTION Login_check (@username VARCHAR(30),@password VARCHAR(30))
+CREATE OR ALTER FUNCTION Login_check (@username VARCHAR(30),@password VARCHAR(30))
 RETURNS TABLE
 AS 
 RETURN(

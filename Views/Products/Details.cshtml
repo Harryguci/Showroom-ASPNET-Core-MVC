@@ -2,7 +2,7 @@
 @model ShowroomManagement.Models.Products
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 @{
@@ -10,6 +10,8 @@
     Account currentAccount = null;
 
     if (identity != null)
+
+
     {
         var accountClaims = identity.Claims;
 

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Data;
 using System.Text;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ShowroomManagement.Controllers
 {
@@ -194,6 +195,13 @@ namespace ShowroomManagement.Controllers
             return View();
         }
 
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Accounts");
+        }
 
         [HttpPost]
         [AllowAnonymous]
@@ -208,15 +216,30 @@ namespace ShowroomManagement.Controllers
             //var res = await client.PostAsync(@"https://localhost:3000/api/Login", stringContent);
             var res = Authenticate(account);
 
+            List<Claim> claims;
+
             if (res != null)
             {
-                List<Claim> claims = new List<Claim>()
+                if (res.EmployeeId != null)
+                {
+                    claims = new List<Claim>()
                     {
                         new Claim(ClaimTypes.NameIdentifier, account.Username),
                         new Claim(ClaimTypes.Role, res.Level_account.ToString()),
                         new Claim("CreateAt", res.CreateAt.ToString()),
                         new Claim("EmployeeId", res.EmployeeId.ToString())
                     };
+                }
+                else
+                {
+                    claims = new List<Claim>()
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, account.Username),
+                        new Claim(ClaimTypes.Role, res.Level_account.ToString()),
+                        new Claim("CreateAt", res.CreateAt.ToString()),
+                        new Claim("CustomerId", res.CustomerId.ToString())
+                    };
+                }
 
                 ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,
                     CookieAuthenticationDefaults.AuthenticationScheme);
@@ -253,7 +276,8 @@ namespace ShowroomManagement.Controllers
                 {
                     Username = accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
                     Level_account = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value),
-                    EmployeeId = accountClaim.FirstOrDefault(p => p.Type == "EmployeeId")?.Value
+                    EmployeeId = accountClaim.FirstOrDefault(p => p.Type == "EmployeeId")?.Value,
+                    CustomerId = accountClaim.FirstOrDefault(p => p.Type == "CustomerId")?.Value
                 };
             }
             return null;
@@ -267,13 +291,7 @@ namespace ShowroomManagement.Controllers
             var query = _context.Accounts.FromSqlRaw("SELECT * FROM DBO.LOGIN_CHECK(@username, @password)",
                  new SqlParameter("@username", account.Username),
                  new SqlParameter("@password", account.Password))
-                .Select(p => new Account()
-                {
-                    Username = p.Username,
-                    Password = p.Password,
-                    EmployeeId = p.EmployeeId,
-                    Level_account = p.Level_account,
-                }).FirstOrDefault();
+                .FirstOrDefault();
 
             return query;
         }
@@ -313,6 +331,20 @@ namespace ShowroomManagement.Controllers
             }
 
             return View(curr);
+        }
+
+        // [Authorize]
+        public IActionResult ClientAccount()
+        {
+            var current = GetCurrentAccount();
+
+            if (current.CustomerId == null) return RedirectToAction("Login");
+
+            var customer = _context.Customer
+                .Where(p => p.ClientId == current.CustomerId)
+                .FirstOrDefault();
+
+            return View(customer);
         }
 
         [Authorize]
@@ -437,6 +469,26 @@ namespace ShowroomManagement.Controllers
             }
         }
 
+        private bool InsertClientAccountIntoDatabase(string username, string password)
+        {
+            int level_account = 0;
+
+            _context.Database.ExecuteSqlRaw("INSERT INTO Account(EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt, DeleteAt) " +
+                string.Format("VALUES (NULL, '{0}', CONVERT(VARBINARY(500), '{1}'), {2}, 0, GETDATE(), NULL)", username, password, level_account));
+
+            //Kiểm tra 
+            bool Exist = _context.Accounts.Any(a => a.Username == username);
+
+            if (Exist)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public RegistrationResult RegisterUser(string username, string password)
         {
             // Kiểm tra xem tên đăng nhập đã tồn tại trong cơ sở dữ liệu chưa
@@ -462,6 +514,26 @@ namespace ShowroomManagement.Controllers
         }
 
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult SignUpClient()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public IActionResult SignUpClient([Bind("username,password")] Account account)
+        {
+            if (account == null)
+            {
+                return View();
+            }
+
+            InsertClientAccountIntoDatabase(account.Username, account.Password);
+
+            return RedirectToAction("Login");
+        }
         #endregion
     }
 
