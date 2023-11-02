@@ -29,7 +29,7 @@
                         @ViewBag.ValidateMessage
                     }
                 </p>
-                <button class="button login__submit" type="submit">
+                <button class="button login__submit" type="button" onclick="LoginValid(event)">
                     <span class="button__text">Log In Now</span>
                     <i class="button__icon fas fa-chevron-right"></i>
                 </button>
@@ -54,5 +54,20 @@
 </div>
 @section Scripts {
     <script src="~/js/login/HandleSubmit.js" defer></script>
+    <script>
+        function LoginValid(event) {
+            event.preventDefault();
+
+            var username = document.querySelector('#username').value;
+            var password = document.querySelector('#password').value;
+
+            if (!username) return alert('Username không được để trống')
+            if (!password) return alert('Password không được để trống')
+            if (username.length < 6) return alert('Username phải tối thiểu 6 ký tự')
+            if (password.length < 6) return alert('Password phải tối thiểu 6 ký tự')
+
+            document.querySelector('form.login').submit();
+        }
+    </script>
 }
 

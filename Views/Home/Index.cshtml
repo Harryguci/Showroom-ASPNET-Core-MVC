@@ -67,10 +67,17 @@
     {
         <div class="content-section customer-section">
             <div class="d-flex" style="justify-content: space-between">
-                <h2>Danh sách Khách hàng</h2>
+                <h2>
+                    Danh sách Khách hàng
+                    <button class="btn" onclick="HideCustomerTb(event)">
+                        <span class="material-symbols-outlined">
+                            expand_less
+                        </span>
+                    </button>
+                </h2>
                 <a class="link" asp-controller="Customers" asp-action="Index">Tất cả</a>
             </div>
-            <table class="table">
+            <table class="table customer-table">
                 <thead>
                     <tr>
                         <th>Họ tên</th>
@@ -97,10 +104,17 @@
     {
         <div class="content-section employees-section">
             <div class="d-flex" style="justify-content: space-between">
-                <h2>Danh sách Nhân viên</h2>
+                <h2>
+                    Danh sách Nhân viên
+                    <button class="btn" onclick="HideEmployeeTb(event)">
+                        <span class="material-symbols-outlined">
+                            expand_less
+                        </span>
+                    </button>
+                </h2>
                 <a class="link" asp-controller="Employees" asp-action="Index">Tất cả</a>
             </div>
-            <table class="table">
+            <table class="table employee-table">
                 <thead>
                     <tr>
                         <th>Họ tên</th>
@@ -127,10 +141,17 @@
     {
         <div class="content-section products-section">
             <div class="d-flex" style="justify-content: space-between">
-                <h2>Danh sách Sản phẩm</h2>
+                <h2>
+                    Danh sách Sản phẩm
+                    <button class="btn" onclick="HideProductTb(event)">
+                        <span class="material-symbols-outlined">
+                            expand_less
+                        </span>
+                    </button>
+                </h2>
                 <a class="link" asp-controller="Products" asp-action="Index">Tất cả</a>
             </div>
-            <table class="table">
+            <table class="table product-table">
                 <thead>
                     <tr>
                         <th>Mã sản phẩm</th>
@@ -184,7 +205,7 @@
                 data[i] = { year: currYear - yearData.length + i + 1, count: yearData[i] }
             }
 
-            
+
             new Chart(
                 document.getElementById('acquisitions'),
                 {
@@ -285,6 +306,22 @@
         function HandlePrintList(event) {
             var elem = document.querySelector('.information-container');
             printContent('.information-container')
+        }
+    </script>
+    <script>
+        function HideCustomerTb(event) {
+            document.querySelector('.customer-table').classList.toggle('d-none');
+            console.log(event.target.innerHTML)
+
+            event.target.innerHTML = document.querySelector('.customer-table').classList.contains('d-none') ? '<span class="material-symbols-outlined">expand_more</span>' : '<span class="material-symbols-outlined">expand_less</span>';
+        }
+        function HideEmployeeTb(event) {
+            document.querySelector('.employee-table').classList.toggle('d-none');
+            event.target.innerHTML = document.querySelector('.customer-table').classList.contains('d-none') ? '<span class="material-symbols-outlined">expand_more</span>' : '<span class="material-symbols-outlined">expand_less</span>';
+        }
+        function HideProductTb(event) {
+            document.querySelector('.product-table').classList.toggle('d-none');
+            event.target.innerHTML = document.querySelector('.customer-table').classList.contains('d-none') ? '<span class="material-symbols-outlined">expand_more</span>' : '<span class="material-symbols-outlined">expand_less</span>';
         }
     </script>
     }
