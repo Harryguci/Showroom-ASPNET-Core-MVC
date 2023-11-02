@@ -54,6 +54,8 @@
             Đăng ký lịch
         </a>
     }
+    <button class="btn btn-outline-primary" onclick="HandlePrintList(event)">In Danh Sách</button>
+
 </div>
 <table class="table">
     <thead>
@@ -166,3 +168,19 @@
         }
     }
 </div>
+
+@section Scripts{
+    <script>
+        function printContent(el) {
+            var restorepage = $('body').html();
+            var printcontent = $(el).clone();
+            $('body').empty().html(printcontent);
+            window.print();
+            $('body').html(restorepage);
+        }
+        function HandlePrintList(event) {
+            var elem = document.querySelector('table');
+            printContent('table')
+        }
+    </script>
+}

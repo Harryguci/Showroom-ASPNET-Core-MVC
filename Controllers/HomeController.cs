@@ -10,6 +10,10 @@ using NuGet.Protocol;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.Data.SqlClient;
+using System.Security.Principal;
+using System.Data;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 //using Newtonsoft.Json;
 
@@ -25,7 +29,7 @@ namespace ShowroomManagement.Controllers
             _logger = logger;
             _context = context;
         }
-        
+
         public async Task<IActionResult> Index()
         {
             var user = GetCurrentAccount();
@@ -159,6 +163,49 @@ namespace ShowroomManagement.Controllers
             return null;
         }
 
+
+        [HttpGet]
+        public async Task<string> GetToTalQuantity(string year)
+        {
+            var result = new List<int>();
+            for (var month = 1; month <= 12; month++)
+            {
+                var query = await _context.SalesInvoices
+                    .Where(p => p.SaleDate.Month == month)
+                    .GroupBy(p => 1)
+                    .Select(p => new { total = p.Sum(e => e.QuantitySale) })
+                    .ToListAsync();
+
+                if (query != null && query.Count > 0)
+                    result.Add(query[0].total);
+                else result.Add(0);
+            }
+
+            return JsonSerializer.Serialize(result);
+        }
+
+        [HttpGet]
+        public async Task<string> GetToTalQuantityEachYear(string year)
+        {
+            var result = new List<int>();
+
+            for (int y = DateTime.Now.Year; y >= DateTime.Now.Year - 5; y--)
+            {
+                var query = await _context.SalesInvoices
+                    .Where(p => p.SaleDate.Year == y)
+                    .GroupBy(p => 1)
+                    .Select(p => new { total = p.Sum(e => e.QuantitySale) })
+                    .ToListAsync();
+
+                if (query != null && query.Count > 0)
+                    result.Add(query[0].total);
+                else result.Add(0);
+            }
+
+            result.Reverse();
+
+            return JsonSerializer.Serialize(result);
+        }
 
         [HttpGet]
         [Authorize]

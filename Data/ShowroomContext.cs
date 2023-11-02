@@ -48,5 +48,6 @@ namespace ShowroomManagement.Data
         public static bool CheckLogin(string username,
             string password)
             => throw new Exception();
+        
     }
 }

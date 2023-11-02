@@ -74,12 +74,13 @@ namespace ShowroomManagement.Controllers
 
             for (int i = 0; i < query.Count(); i++)
             {
-                var imageUrls = await _context.ProductImages.Select(p => new ProductImages()
-                {
-                    Id = p.Id,
-                    Serial = p.Serial,
-                    Url_image = p.Url_image
-                }).Where(p => p.Serial == query[i].Serial)
+                var imageUrls = await _context.ProductImages
+                    .Select(p => new ProductImages()
+                    {
+                        Id = p.Id,
+                        Serial = p.Serial,
+                        Url_image = p.Url_image
+                    }).Where(p => p.Serial == query[i].Serial)
                 .ToListAsync();
                 query[i].ImageUrls = imageUrls;
             }

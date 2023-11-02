@@ -15,8 +15,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddCors();
 
 // Add the Database context
+//builder.Services.AddDbContext<ShowroomContext>(
+//    options => options.UseSqlServer(builder.Configuration.GetConnectionString("ShowroomAutoContext")));
+
+// Add the Database context
 builder.Services.AddDbContext<ShowroomContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("ShowroomAutoContext")));
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("ShowroomContext")));
 
 // Add the authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
