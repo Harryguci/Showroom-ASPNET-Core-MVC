@@ -69,6 +69,7 @@ namespace ShowroomManagement.Controllers
             if (page == null) page = 1;
 
             List<Products> query = await _context.Products
+                .Where(p => !(bool)p.Deleted)
                 .OrderByDescending(p => p.Serial)
                 .ToListAsync();
 

@@ -334,16 +334,37 @@ namespace ShowroomManagement.Controllers
         }
 
         // [Authorize]
-        public IActionResult ClientAccount()
+        public async Task<IActionResult> ClientAccount()
         {
             var current = GetCurrentAccount();
-
             if (current.CustomerId == null) return RedirectToAction("Login");
-
             var customer = _context.Customer
                 .Where(p => p.ClientId == current.CustomerId)
                 .FirstOrDefault();
 
+            var invoices = await _context.SalesInvoices.Where(p => p.ClientId == current.CustomerId).ToListAsync();
+            var products = new List<Products>();
+
+            foreach (var invoice in invoices)
+            {
+                var pro = _context.Products.Find(invoice.ProductId);
+
+                pro.ImageUrls = await _context.ProductImages
+                    .Where(p => p.Serial == invoice.ProductId)
+                   .Select(p => new ProductImages()
+                   {
+                       Id = p.Id,
+                       Serial = p.Serial,
+                       Url_image = p.Url_image,
+                   }).ToListAsync();
+
+                if (pro != null)
+                {
+                    products.Add(pro);
+                }
+            }
+            ViewBag.products = products;
+            ViewBag.invoices = invoices;
             return View(customer);
         }
 
@@ -469,12 +490,12 @@ namespace ShowroomManagement.Controllers
             }
         }
 
-        private bool InsertClientAccountIntoDatabase(string username, string password)
+        private bool InsertClientAccountIntoDatabase(string customerId, string username, string password)
         {
             int level_account = 0;
 
-            _context.Database.ExecuteSqlRaw("INSERT INTO Account(EmployeeId, Username, Password_foruser, Level_account, Deleted, CreateAt, DeleteAt) " +
-                string.Format("VALUES (NULL, '{0}', CONVERT(VARBINARY(500), '{1}'), {2}, 0, GETDATE(), NULL)", username, password, level_account));
+            _context.Database.ExecuteSqlRaw("INSERT INTO Account(CustomerId, Username, Password_foruser, Level_account, Deleted, CreateAt, DeleteAt) " +
+                string.Format("VALUES ('{0}', '{1}', CONVERT(VARBINARY(500), '{2}'), {3}, 0, GETDATE(), NULL)", customerId, username, password, level_account));
 
             //Kiểm tra 
             bool Exist = _context.Accounts.Any(a => a.Username == username);
@@ -523,14 +544,38 @@ namespace ShowroomManagement.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult SignUpClient([Bind("username,password")] Account account)
+        public async Task<IActionResult> SignUpClient(string Firstname, string Lastname,
+            string Cccd, bool Gender, string DateBirth,
+            string username, string password)
         {
-            if (account == null)
+            if (username == null || password == null || Firstname == null || Lastname == null
+                || Firstname == string.Empty || Lastname == string.Empty || DateBirth == null)
             {
                 return View();
             }
+            var id = _context.Customer.Select(p => p.ClientId).OrderByDescending(p => p).FirstOrDefault().Substring(1);
+            id = (Convert.ToInt32(id) + 1).ToString();
 
-            InsertClientAccountIntoDatabase(account.Username, account.Password);
+            for (int i = 0; i < 3 - id.ToString().Length; i++)
+            {
+                id = "0" + id;
+            }
+            id = "C" + id;
+
+            Customer customer = new Customer()
+            {
+                ClientId = id,
+                Firstname = Firstname,
+                Lastname = Lastname,
+                Cccd = Cccd,
+                Gender = Gender,
+                DateBirth = DateTime.Parse(DateBirth),
+            };
+
+            _context.Add(customer);
+            await _context.SaveChangesAsync();
+
+            InsertClientAccountIntoDatabase(customer.ClientId, username, password);
 
             return RedirectToAction("Login");
         }

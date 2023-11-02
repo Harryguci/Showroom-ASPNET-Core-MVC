@@ -26,7 +26,7 @@ namespace ShowroomManagement.Controllers
             var query = await _context.SalesInvoices
                 .Skip((page - 1) * listLimits)
                 .Take(listLimits)
-                .Skip((page - 1) * listLimits).Take(listLimits).ToListAsync();
+                .ToListAsync();
 
             var total = _context.SalesInvoices.Count();
 
@@ -67,10 +67,22 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("InSalesId,ClientId,SaleDate,Status,QuantitySale")] SalesInvoice salesInvoice)
+        public async Task<IActionResult> Create([Bind("ClientId,SaleDate,ProductId,Status,QuantitySale")] SalesInvoice salesInvoice)
         {
             if (ModelState.IsValid)
             {
+                var id = _context.SalesInvoices.Select(p => p.InSaleId).OrderByDescending(p => p).FirstOrDefault();
+                id = id.Substring(2);
+                id = (Convert.ToInt32(id) + 1).ToString();
+
+                for (int i = 0; i < 3 - Convert.ToInt32(id).ToString().Length; i++)
+                {
+                    id = "0" + id;
+                }
+
+                id = "SI" + id;
+                salesInvoice.InSaleId = id;
+
                 _context.Add(salesInvoice);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

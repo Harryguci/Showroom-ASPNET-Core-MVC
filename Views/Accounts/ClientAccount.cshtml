@@ -24,6 +24,11 @@
     }
 }
 
+@{
+    IEnumerable<Products> products = ViewBag.products;
+    IEnumerable<SalesInvoice> invoices = ViewBag.invoices;
+}
+
 <style>
 
     h2 {
@@ -75,6 +80,33 @@
         </form>
     </div>
     <div class="col-12 col-md-8">
-        <h2>Lịch tư vấn đã đặt</h2>
+        <div style="min-height: 300px">
+            <h2>Lịch tư vấn đã đặt</h2>
+        </div>
+        <div style="min-height: 300px">
+            <h2>Sản phẩm đã mua</h2>
+            @if (products != null && products.Count() > 0)
+            {
+                <div class="" style="list-style: none">
+                    @foreach (var x in products)
+                    {
+                        <div class="d-flex rounded-2 my-2" style="justify-content: space-between; border: none; background: rgb(245, 245, 245)">
+                            <a asp-controller="Products"
+                               asp-action="Details" asp-route-id="@x.Serial"
+                               class="p-3" style="font-size: 1.5rem">
+                                @x.ProductName
+                            </a>
+                            @if (x.ImageUrls.Count > 0)
+                            {
+                                <img class="rounded-1" src="@x.ImageUrls[0].Url_image" width="300" />
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
     </div>
 </div>
+@section Scripts{
+    <script src="/js/AutoScrollDown.js" defer></script>
+}

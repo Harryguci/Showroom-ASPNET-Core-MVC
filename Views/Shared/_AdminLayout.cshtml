@@ -157,7 +157,7 @@
                         {
                             <li class="sidebar-item">
                                 <a class="sidebar-link" asp-controller="Home" asp-action="Logout" aria-expanded="false"
-                                    onclick="localStorage.removeItem('access_token')">
+                                   onclick="localStorage.removeItem('access_token')">
                                     <span>
                                         <i class="ti ti-logout"></i>
                                     </span>
@@ -236,19 +236,23 @@
                     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                         <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
                             <li class="nav-item d-flex">
-                                <button type="submit" class="btn btn-outline-primary"
-                                        style="border-bottom-right-radius: 0;border-top-right-radius: 0;"
-                                        onclick="handleSearch()">
+                                <button id="layout-search-btn" type="button" class="btn btn-outline-primary"
+                                        style="border-bottom-right-radius: 0; border-top-right-radius: 0;"
+                                        onclick="handleSearch(event)"
+                                        disabled>
                                     <span class="material-symbols-outlined">
                                         search
                                     </span>
                                 </button>
                                 <div style="position: relative">
-                                    <input id="search-input" class="form-control h-100" type="text" name="q" placeholder="Search..."
+                                    <input id="search-input"
+                                           class="form-control h-100" type="text" name="q"
+                                           placeholder="Search..."
                                            style="border-bottom-left-radius: 0;border-top-left-radius: 0;"
                                            onchange="handleChange(event)"
-                                           onkeypress="handleChange(event)" />
-                                    <div id="search-result" class="d-none">
+                                           onkeypress="handleChange(event)"
+                                           onfocus="handleChange(event)" />
+                                    <div id="search-result" class="position-absolute d-none" style="z-index: 100">
                                         @* <ul class="list">
                                         <li class="list-item">
                                         <h4>Result 1</h4>
@@ -316,8 +320,11 @@
     <script src="~/js/home/search.js" defer></script>
 
     <script type="text/javascript">
-        function handleSearch() {
+        function handleSearch(event) {
             var q = document.getElementById('search-input').value;
+
+            if (!q) return;
+
             console.log(q);
             window.location = `/Home/Search?q=${q}`;
         }

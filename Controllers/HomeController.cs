@@ -33,7 +33,7 @@ namespace ShowroomManagement.Controllers
         public async Task<IActionResult> Index()
         {
             var user = GetCurrentAccount();
-            if (user.Level_account == 2)
+            if (user.Level_account >= 1)
             {
                 var employeeNum = _context.Employees.Where(p => p.Position.ToLower() == "sales").Count();
                 var managerNum = _context.Employees.Where(p => p.Position.ToLower() == "sales manager").Count();
@@ -109,6 +109,7 @@ namespace ShowroomManagement.Controllers
         [HttpGet]
         public string SearchApi(string q)
         {
+            if (q == null) return "[]";
             q = q.ToLower();
 
             var customersResponse = _context.Customer.Take(10)

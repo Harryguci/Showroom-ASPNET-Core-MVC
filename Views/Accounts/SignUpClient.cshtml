@@ -8,28 +8,58 @@
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/fontawesome.css'>
     <link rel="stylesheet" href="~/css/login/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+        input {
+            min-width: 200px;
+        }
+    </style>
 }
 
 <div class="container">
-    <div class="screen">
+    <div class="screen" style="width: max-content !important">
         <div class="screen__content">
             <form class="signup" asp-controller="Accounts" asp-action="SignUpClient" onsubmit="HandleSubmit(event)" style="padding: 5rem;">
                 <h1 class="fw-bold" style="color: rgb(0, 0, 150)">SignUp</h1>
                 <a asp-action="Login" class="btn btn-outline-primary">Login</a>
                 <a asp-action="SignUp" class="btn btn-outline-priamry">Dành cho quản lý</a>
-                <div class="login__field">
-                    <i class="login__icon fas fa-user"></i>
-                    <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">
+                <div class="d-flex gap-3">
+                    <div>
+                        <div class="login__field">
+                            <i class="login__icon fas fa-user"></i>
+                            <input type="text" id="username" name="username" class="login__input" placeholder="User name / Email">
+                        </div>
+                        <div class="login__field">
+                            <i class="login__icon fas fa-lock"></i>
+                            <input type="password" id="password" name="password" class="login__input" placeholder="Password">
+                        </div>
+                        <div class="login__field">
+                            <i class="login__icon fas fa-lock"></i>
+                            <input type="password" id="confirmPassword" name="confirmPassword" class="login__input" placeholder="Confirm Password">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="login__field">
+                            <i class="login__icon fas fa-lock"></i>
+                            <input type="text" id="firstname" name="firstname" class="login__input" placeholder="Họ">
+                        </div>
+                        <div class="login__field">
+                            <i class="login__icon fas fa-lock"></i>
+                            <input type="text" id="lastname" name="lastname" class="login__input" placeholder="Tên">
+                        </div>
+                        <div class="login__field">
+                            <i class="login__icon fas fa-lock"></i>
+                            <input type="text" id="cccd" name="cccd" class="login__input" placeholder="CCCD">
+                        </div>
+                    </div>
                 </div>
-                <div class="login__field">
-                    <i class="login__icon fas fa-lock"></i>
-                    <input type="password" id="password" name="password" class="login__input" placeholder="Password">
+                <div class="d-flex">
+                    <select class="form-control" name="Gender" style="max-width: 100px">
+                        <option value="true">Nam</option>
+                        <option value="false">Nữ</option>
+                    </select>
+                    <input type="date" class="form-control" id="DateBirth" name="DateBirth" />
                 </div>
-                <div class="login__field">
-                    <i class="login__icon fas fa-lock"></i>
-                    <input type="password" id="confirmPassword" name="confirmPassword" class="login__input" placeholder="Confirm Password">
-                </div>
-             
+
                 <p class="form-helper text-danger" style="font-size: 12px">
                     @if (ViewBag.ValidateMessage != null)
                     {
