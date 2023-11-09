@@ -19,6 +19,7 @@ namespace ShowroomManagement.Data
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<ProductImages> ProductImages { get; set; }
+        public DbSet<Tasks> Tasks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +33,7 @@ namespace ShowroomManagement.Data
             modelBuilder.Entity<TestDrive>().ToTable("TestDrive");
             modelBuilder.Entity<Account>().ToTable("Account");
             modelBuilder.Entity<ProductImages>().ToTable("Product_Images");
+            modelBuilder.Entity<Tasks>().ToTable("Tasks");
         }
 
         public ShowroomContext(DbContextOptions<ShowroomContext> options)

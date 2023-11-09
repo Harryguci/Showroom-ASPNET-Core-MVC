@@ -16,6 +16,14 @@
     h2, h3 {
         margin: 1rem 0;
     }
+
+    .tasks-list ul li {
+        padding: 1rem;
+        border-radius: 5px;
+        background: rgb(150, 150, 255);
+        color: white;
+        margin: 1rem 0;
+    }
 </style>
 
 <div class="row my-4" style="position: relative; flex-wrap: nowrap">
@@ -145,44 +153,50 @@
         <h2>Thông tin khác</h2>
         @if (Model.Level_account == 1)
         {
-            <h3>Doanh số</h3>
-            @if (ViewBag.employeeSalesTargets != null)
-            {
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Ngày bắt đầu</th>
-                            <th>Ngày kết thúc</th>
-                            <th>Tổng</th>
-                            <th>Mục tiêu</th>
-                            <th>Trạng thái</th>
-                            <th>Thưởng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var salesTarget in (IEnumerable<SalesTarget>)ViewBag.employeeSalesTargets)
-                        {
+            <section>
+                <h3>Doanh số</h3>
+                @if (ViewBag.employeeSalesTargets != null)
+                {
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>
-                                    @salesTarget.StartDate.ToString("dd/MM/yyyy")
-                                </td>
-                                <td>
-                                    @salesTarget.EndDate.ToString("dd/MM/yyyy")
-                                </td>
-                                <td>
-                                    @salesTarget.Total
-                                </td>
-                                <td>
-                                    @salesTarget.Target
-                                </td>
-                                <td>@salesTarget.Status</td>
-                                <td>@salesTarget.Reward</td>
+                                <th>Ngày bắt đầu</th>
+                                <th>Ngày kết thúc</th>
+                                <th>Tổng</th>
+                                <th>Mục tiêu</th>
+                                <th>Trạng thái</th>
+                                <th>Thưởng</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            }
+                        </thead>
+                        <tbody>
+                            @foreach (var salesTarget in (IEnumerable<SalesTarget>)ViewBag.employeeSalesTargets)
+                            {
+                                <tr>
+                                    <td>
+                                        @salesTarget.StartDate.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td>
+                                        @salesTarget.EndDate.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td>
+                                        @salesTarget.Total
+                                    </td>
+                                    <td>
+                                        @salesTarget.Target
+                                    </td>
+                                    <td>@salesTarget.Status</td>
+                                    <td>@salesTarget.Reward</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
         }
+        <section>
+            <h3>Việc cần làm</h3>
+            <div class="tasks-list"></div>
+        </section>
     </div>
 </div>
 
@@ -203,4 +217,29 @@
             image.src = URL.createObjectURL(event.target.files[0]);
         };
     </script>
+
+    @if (Model.EmployeeId != null)
+    {
+        <script>
+            (function () {
+                $.ajax({
+                    method: "GET",
+                    url: `/api/TasksApi/Employees/@(Model.EmployeeId)`,
+                    success: function(response) {
+                        console.log(response)
+                        // response = JSON.parse(response);
+                        var html = '<ul>';
+                        for(var x of response) {
+                            html += `<li class="d-flex gap-3"><p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p><p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p></li>`
+                        }
+
+                        html += '</ul>'
+
+                        document.querySelector('.tasks-list').innerHTML = html;
+                    }
+                })
+            })()
+        </script>
+    }
+
 }

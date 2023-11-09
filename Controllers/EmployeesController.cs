@@ -53,6 +53,7 @@ namespace ShowroomManagement.Controllers
             ViewBag.totalRecord = total;
             ViewBag.totalPage = (int)Math.Ceiling((total - 1) * 1.0 / listLimits);
             ViewBag.currentPage = page;
+            ViewBag.TrashTotal = _context.Employees.Select(p => p.Deleted).Where(p => p).Count();
 
             return View(await query.Skip((page.Value - 1) * listLimits).Take(listLimits).ToListAsync());
         }

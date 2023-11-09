@@ -505,7 +505,7 @@ namespace ShowroomManagement.Controllers
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Edit(string id,
-            [Bind("Serial,Name,PurchasePrice,SalePrice,Quantity,SourceId,Status")] Products products)
+            [Bind("Serial,ProductName,PurchasePrice,SalePrice,Quantity,SourceId,Status")] Products products)
         {
             if (id != products.Serial)
             {
