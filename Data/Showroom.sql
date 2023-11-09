@@ -423,9 +423,11 @@ ALTER TABLE SalesInvoices
 ADD CONSTRAINT FK_SalesInvoices_Products FOREIGN KEY (ProductId)
 REFERENCES Products (Serial);
 
+
 ALTER TABLE TestDrive
 ADD CONSTRAINT FK_TestDrive_Employees FOREIGN KEY (EmployeeId)
-REFERENCES Employees (EmployeeId);
+REFERENCES Employees (EmployeeId)
+ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE TestDrive
 ADD CONSTRAINT FK_TestDrive_Customers FOREIGN KEY (ClientId)

@@ -3,18 +3,13 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-}
-@{
+
     var orderby = ViewBag.asc;
     var orderbydesc = ViewBag.desc;
-    int page = ViewBag.currentPage;
-    int total = ViewBag.totalPage;
-    bool hasNext = ViewBag.nextPage;
-    int? trashTotal = ViewBag.TrashTotal;
 }
 
 <h1>Khách hàng</h1>
-<a asp-action="Trash" class="d-block my-2 mx-2">Thùng rác (@(trashTotal != null ? trashTotal : ""))</a>
+
 <div class="d-flex">
     <a asp-action="Create" class="btn btn-outline-primary d-flex align-items-center gap-2">
         <span class="material-symbols-outlined" style="font-size: 1rem">
@@ -22,9 +17,8 @@
         </span>
         Tạo mới
     </a>
-    <button class="btn btn-outline-primary" onclick="HandlePrintList(event)">In Danh Sách</button>
 </div>
-<table class="table">
+<table class="table table-responsesive">
     <thead>
         <tr>
             <th>
@@ -173,60 +167,23 @@
                     @(item.Gender ? "Nam" : "Nữ")
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ClientId">
-                        <span class="material-symbols-outlined">
-                            edit
-                        </span>
-                    </a>
-                    <a asp-action="Details" asp-route-id="@item.ClientId">
-                        <span class="material-symbols-outlined">
-                            info
-                        </span>
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@item.ClientId">
-                        <span class="material-symbols-outlined">
-                            delete
-                        </span>
-                    </a>
+                    <form id="undoForm" asp-action="UndoFromTrash" method="POST">
+                        <input type="hidden" name="id" value="@item.ClientId" />
+                        <button type="submit" class="btn btn-outline-primary">
+                            Hoàn tác
+                        </button>
+                    </form>
+                    <form id="deleteForm" asp-action="DeleteConfirmed" method="POST" onsubmit="HandleDelete(event)">
+                        <input type="hidden" name="id" value="@item.ClientId" />
+                        <button type="submit" class="btn btn-outline-primary">
+                            Xóa
+                        </button>
+                    </form>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
-<div class="pagination-container d-flex gap-1 justify-content-center">
-    @for (int i = 0; i < total; i++)
-    {
-        @if (i + 1 == page)
-        {
-            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
-        }
-        else if (total > 10 && i > 5 && i < 8)
-        {
-            <span>.</span>
-        }
-        else
-        {
-            <a class="btn btn-outline-primary"
-               asp-action="Index" asp-route-page="@(i + 1)">
-                @(i + 1)
-            </a>
-        }
-    }
-</div>
-
-@section Scripts{
-    <script>
-        function printContent(el) {
-            var restorepage = $('body').html();
-            var printcontent = $(el).clone();
-            $('body').empty().html(printcontent);
-            window.print();
-            $('body').html(restorepage);
-        }
-        function HandlePrintList(event) {
-            var elem = document.querySelector('table');
-            printContent('table')
-        }
-    </script>
+@section Scripts {
+    <script src="~/js/customers/Trash.js" defer></script>
 }

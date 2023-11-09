@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
 using System.Security.Claims;
@@ -36,13 +37,14 @@ namespace ShowroomManagement.Controllers
                     Username = accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
                     Level_account = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value),
                     EmployeeId = accountClaim.FirstOrDefault(p => p.Type == "EmployeeId")?.Value,
-                    CustomerId = accountClaim.FirstOrDefault(p => p.Type == "CustomerId")?.Value
+                    ClientId = accountClaim.FirstOrDefault(p => p.Type == "CustomerId")?.Value
                 };
             }
             return null;
         }
 
         [AllowAnonymous]
+        [Authorize]
         public IActionResult Booking()
         {
             return View();
@@ -55,7 +57,7 @@ namespace ShowroomManagement.Controllers
             // Handle booking
             var currentAccount = GetCurrentAccount();
             var id = _context.TestDrives
-                .Select(p => new TestDrive() { DriveId = p.DriveId})
+                .Select(p => new TestDrive() { DriveId = p.DriveId })
                 .OrderByDescending(p => p.DriveId)
                 .FirstOrDefault().DriveId;
 
@@ -67,13 +69,25 @@ namespace ShowroomManagement.Controllers
             }
             id = "TD" + id;
             testdrive.DriveId = id;
-            testdrive.ClientId = currentAccount.CustomerId;
+            testdrive.ClientId = currentAccount.ClientId;
             testdrive.EmployeeId = null;
 
             _context.Add(testdrive);
             await _context.SaveChangesAsync();
 
             return View();
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> BookingListAsync()
+        {
+            var currentAccount = GetCurrentAccount();
+            var query = await _context.TestDrives
+                .Where(p => p.ClientId == currentAccount.ClientId)
+                .ToListAsync();
+
+            return PartialView(query);
         }
     }
 }

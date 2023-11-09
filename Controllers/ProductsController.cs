@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Reflection;
-using System.Security.Principal;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using ShowroomManagement.Data;
 using ShowroomManagement.Models;
@@ -31,6 +24,7 @@ namespace ShowroomManagement.Controllers
         {
             ViewBag.orderby = orderby;
             ViewBag.orderbydesc = orderbydesc;
+            ViewBag.trashNumber = _context.Products.Where(p => p.Deleted.Value).Count();
 
             if (_context.Products == null) return BadRequest(new
             {
@@ -63,6 +57,235 @@ namespace ShowroomManagement.Controllers
             return View(query);
         }
 
+        // GET: Products/ListTable
+        public async Task<IActionResult> ProductListTable(string orderby, string orderbydesc, int page = 1)
+        {
+            ViewBag.orderby = orderby;
+            ViewBag.orderbydesc = orderbydesc;
+            List<Products> query = null;
+
+            if (orderby != null)
+            {
+                switch (orderby.ToLower())
+                {
+                    case "serial":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderBy(p => p.Serial)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "productname":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderBy(p => p.ProductName)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "purchaseprice":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderBy(p => p.PurchasePrice)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "saleprice":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderBy(p => p.SalePrice)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "quantity":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderBy(p => p.Quantity)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "Status":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderBy(p => p.Status)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                }
+            }
+            else if (orderbydesc != null)
+            {
+                switch (orderbydesc.ToLower())
+                {
+                    case "serial":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderByDescending(p => p.Serial)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "productname":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderByDescending(p => p.ProductName)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "purchaseprice":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderByDescending(p => p.PurchasePrice)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "saleprice":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderByDescending(p => p.SalePrice)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "quantity":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderByDescending(p => p.Quantity)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                    case "Status":
+                        query = await _context.Products.Select(p => new Products()
+                        {
+                            Serial = p.Serial,
+                            ProductName = p.ProductName,
+                            PurchasePrice = p.PurchasePrice,
+                            SalePrice = p.SalePrice,
+                            Quantity = p.Quantity,
+                            Status = p.Status,
+                            Deleted = p.Deleted
+                        })
+                        .Where(p => !(bool)p.Deleted)
+                        .OrderByDescending(p => p.Status)
+                        .Skip((page - 1) * listLimits)
+                        .Take(listLimits).ToListAsync();
+                        break;
+                }
+            }
+
+            if (query == null)
+                query = await _context.Products
+                .Where(p => !(bool)p.Deleted)
+                .OrderBy(p => p.Serial)
+                .Skip((page - 1) * listLimits)
+                .Take(listLimits).ToListAsync();
+
+            var total = _context.Products.Where(p => !p.Deleted.Value).Count();
+
+            ViewBag.nextPage = true;
+            ViewBag.totalRecord = total;
+            ViewBag.totalPage = (int)Math.Ceiling(total * 1.0 / listLimits);
+            ViewBag.currentPage = page;
+
+            return PartialView(query);
+        }
+
         // GET: Show
         public async Task<IActionResult> Show(int? page)
         {
@@ -86,11 +309,12 @@ namespace ShowroomManagement.Controllers
                 query[i].ImageUrls = imageUrls;
             }
 
+            ViewBag.trashNumber = _context.Products.Where(p => p.Deleted.Value).Count();
             return View(query);
         }
 
         // GET: Products
-        public async Task<IActionResult> Search(string q)
+        public async Task<IActionResult> Search(string q, string productId)
         {
             if (_context.Products == null) return View(new List<Products>());
 
@@ -118,6 +342,42 @@ namespace ShowroomManagement.Controllers
 
             ViewBag.q = q;
             return View(query);
+        }
+
+        public async Task<List<Products>> SearchJson(string q, string productId)
+        {
+            if (_context.Products == null) return new List<Products>();
+            if (productId != null)
+            {
+                var response = await _context.Products
+                    .Where(p => p.Serial.ToLower().StartsWith(productId.ToLower())
+                    || p.ProductName.ToLower().Contains(productId.ToLower())).ToListAsync();
+
+                return response;
+            }
+
+            var query = await _context.Products.Select(p => new Products()
+            {
+                Serial = p.Serial,
+                ProductName = p.ProductName,
+                PurchasePrice = p.PurchasePrice,
+                SalePrice = p.SalePrice,
+                Quantity = p.Quantity,
+                Status = p.Status
+            }).Where(p => p.ProductName.Contains(q.ToLower())).ToListAsync();
+
+            for (int i = 0; i < query.Count(); i++)
+            {
+                var imageUrls = await _context.ProductImages.Select(p => new ProductImages()
+                {
+                    Id = p.Id,
+                    Serial = p.Serial,
+                    Url_image = p.Url_image
+                }).Where(p => p.Serial == query[i].Serial)
+                .ToListAsync();
+                query[i].ImageUrls = imageUrls;
+            }
+            return query;
         }
         // GET: Products/Details/5
         public async Task<IActionResult> Details(string id)
@@ -184,56 +444,29 @@ namespace ShowroomManagement.Controllers
                 try
                 {
                     var files = HttpContext.Request.Form.Files;
-                    var id = 0;
-                    if (_context.ProductImages.Count() > 0)
-                    {
-                        id = _context.ProductImages.Select(p => new ProductImages()
-                        {
-                            Id = p.Id,
-                            Serial = p.Serial,
-                            Url_image = p.Url_image
-                        })
-                            .OrderByDescending(p => p.Id)
-                            .FirstOrDefault().Id + 1;
-                    }
-                    else id = 1;
 
                     foreach (var image in files)
                     {
                         if (image != null && image.Length > 0)
                         {
                             var file = image;
-                            //There is an error here
                             var uploads = Path.Combine("wwwroot", "images", "uploaded");
                             if (file.Length > 0)
                             {
-                                //var fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(file.FileName);
                                 var fileName = file.FileName;
                                 using (var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create))
                                 {
                                     await file.CopyToAsync(fileStream);
-                                    //var employee = _context.Employees.Where(p => p.EmployeeId == employeeId).FirstOrDefault();
-                                    // employee.Url_image = "/" + Path.Combine("images", "uploaded", fileName);
-                                    // _context.Update(employee);                                    
 
                                     var newProductImage = new ProductImages()
                                     {
-                                        Id = id,
                                         Url_image = "/" + Path.Combine("images", "uploaded", fileName),
                                         Serial = products.Serial,
                                     };
 
-                                    //INSERT Product_Images(id, Serial, Url_image) VALUES(1,N'P001',N'/images/uploaded/1')
-
-                                    id++;
-
-                                    //_context.Add(newProductImage);
-                                    _context.Database.ExecuteSqlRaw(string.Format("INSERT Product_Images(id, Serial, Url_image) VALUES({0},N'{1}',N'{2}')",
-                                        newProductImage.Id,
+                                    _context.Database.ExecuteSqlRaw(string.Format("INSERT Product_Images(Serial, Url_image) VALUES(N'{0}',N'{1}')",
                                         newProductImage.Serial,
                                         newProductImage.Url_image));
-
-                                    //_context.Products.Find(products.Serial);
                                 }
                             }
                         }
@@ -435,6 +668,8 @@ namespace ShowroomManagement.Controllers
             }).Where(p => (bool)p.Deleted)
             .Skip((page - 1).Value * limits.Value)
             .Take(limits.Value);
+
+            ViewBag.trashNumber = _context.Products.Where(p => p.Deleted.Value).Count();
 
             return View(await query.Skip((page.Value - 1) * listLimits).Take(listLimits).ToListAsync());
         }

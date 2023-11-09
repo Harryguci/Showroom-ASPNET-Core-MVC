@@ -52,11 +52,6 @@ namespace ShowroomManagement.Models
         [JsonPropertyName("Email")]
         public string Email { get; set; }
 
-        [Display(Name = "Doanh số")]
-        [JsonPropertyName("SaleId")]
-        [AllowNull]
-        public string SaleId { get; set; } = string.Empty;
-
         [Display(Name = "Giới tính")]
         [JsonPropertyName("Gender")]
         public bool Gender { get; set; }

@@ -4,34 +4,50 @@
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+<style>
+    #client-list, #product-list {
+        margin-left: 1rem;
+    }
 
-<h1>Create</h1>
+    #client-list li, #product-list li {
+        cursor: pointer;
+    }
 
-<h4>SalesInvoice</h4>
+    #client-list li:hover,
+    #client-list li.active,
+    #product-list li:hover,
+    #product-list li.active {
+        background: rgb(10, 10, 50);
+        color: white;
+    }
+</style>
+
+<h1>Tạo Mới</h1>
+
+<h4>Hóa Đơn Bán</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @* <div class="form-group">
-                <label asp-for="InSaleId" class="control-label"></label>
-                <input asp-for="InSaleId" class="form-control" />
-                <span asp-validation-for="InSaleId" class="text-danger"></span>
-            </div> *@
             <div class="form-group">
-                <label asp-for="ClientId" class="control-label"></label>
-                <input asp-for="ClientId" class="form-control" />
+                <label asp-for="ClientId" class="control-label">Khách hàng</label>
+                <input asp-for="ClientId" class="form-control" onchange="HandleChangeClientId(event)" onkeypress="HandleChangeClientId(event)" />
                 <span asp-validation-for="ClientId" class="text-danger"></span>
+                <div id="client-list" class="d-none" style="box-shadow: 3px 3px 20px rgba(0,0,0,0.1)"></div>
             </div>
+
             <div class="form-group">
                 <label asp-for="SaleDate" class="control-label"></label>
-                <input asp-for="SaleDate" class="form-control" />
+                <input type="date" asp-for="SaleDate" class="form-control" />
                 <span asp-validation-for="SaleDate" class="text-danger"></span>
+
             </div>
             <div class="form-group">
                 <label asp-for="ProductId" class="control-label"></label>
-                <input asp-for="ProductId" class="form-control" />
+                <input asp-for="ProductId" class="form-control" onchange="HandleChangeProductId(event)" onkeypress="HandleChangeProductId(event)"/>
                 <span asp-validation-for="ProductId" class="text-danger"></span>
+                <div id="product-list" class="d-none" style="box-shadow: 3px 3px 20px rgba(0,0,0,0.1)"></div>
             </div>
             <div class="form-group">
                 <label asp-for="Status" class="control-label"></label>
@@ -44,16 +60,83 @@
                 <span asp-validation-for="QuantitySale" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Tạo Mới" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Danh sách</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        async function HandleChangeClientId(event) {
+            console.log(event.target.value);
+
+            var clientId = event.target.value;
+            await $.ajax({
+                url: `/Customers/Search?clientId=${clientId}`,
+                type: 'GET',
+                dataType: 'json', // added data type
+                success: function (res) {
+                    // console.log(res);
+                    // alert(res);
+                    console.log(res[0].Firstname)
+                    // `<select class="form-control"><option>option</option></select>`
+                    var html = `<ul class="list-group">`;
+                    for (var i in res) {
+                        html += `<li class="list-group-item" value="${res[i].ClientId}">${res[i].Firstname} ${res[i].Lastname}</li>`
+                    }
+                    html += '</ul>';
+
+                    // $('#ClientId').val(res[0].ClientId)
+                    document.querySelector('#client-list').classList.remove('d-none');
+                    document.querySelector('#client-list').innerHTML = html
+                }
+            });
+
+            $('#client-list li').on('click', function () {
+                $('#ClientId').val($(this).attr('value'))
+                $('#client-list li').removeClass('active')
+                $(this).addClass('active');
+            })
+        }
+        async function HandleChangeProductId(event) {
+            console.log(event.target.value);
+
+            var productId = event.target.value;
+            await $.ajax({
+                url: `/Products/SearchJson?productId=${productId}`,
+                type: 'GET',
+                dataType: 'json', // added data type
+                success: function (res) {
+                    var html = `<ul class="list-group">`;
+                    for (var i in res) {
+                        html += `<li class="list-group-item" value="${res[i].Serial}">${res[i].ProductName}</li>`
+                    }
+                    html += '</ul>';
+
+                    document.querySelector('#product-list').classList.remove('d-none');
+                    document.querySelector('#product-list').innerHTML = html
+                }
+            });
+
+            $('#client-list li').on('click', function () {
+                $('#ClientId').val($(this).attr('value'))
+                $('#client-list li').removeClass('active')
+                $(this).addClass('active');
+            })
+
+            $('#product-list li').on('click', function () {
+                $('#ProductId').val($(this).attr('value'))
+                $('#product-list li').removeClass('active')
+                $(this).addClass('active');
+            })
+        }
+    </script>
 }

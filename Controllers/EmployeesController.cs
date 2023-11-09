@@ -41,7 +41,6 @@ namespace ShowroomManagement.Controllers
                 StartDate = p.StartDate,
                 Salary = p.Salary,
                 Email = p.Email,
-                SaleId = p.SaleId,
                 Gender = p.Gender,
                 Deleted = p.Deleted,
             })
@@ -87,12 +86,10 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: Employees/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "2")]
-        public async Task<IActionResult> Create([Bind("Firstname,Lastname,DateBirth,Cccd,Position,StartDate,Salary,Email,SaleId,Gender")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Firstname,Lastname,DateBirth,Cccd,Position,StartDate,Salary,Email,Gender")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -106,10 +103,38 @@ namespace ShowroomManagement.Controllers
                 idStr = "E" + idStr;
                 employee.EmployeeId = idStr;
 
+
+
+                // create a new SaleTarget
+
+                var stId = (Convert.ToInt32(_context.SalesTargets.Select(p => p.SaleId)
+                    .OrderByDescending(p => p).FirstOrDefault().Substring(1)) + 1).ToString();
+
+                for (int i = 1; i < 3 - stId.Length; i++)
+                {
+                    stId = "0" + stId;
+                }
+
+                stId = "S" + stId;
+
+                SalesTarget target = new SalesTarget()
+                {
+                    SaleId = stId,
+                    EmployeeId = employee.EmployeeId,
+                    StartDate = DateTime.Now,
+                    EndDate = new DateTime(DateTime.Now.Year,
+                                DateTime.Now.Month,
+                                DateTime.DaysInMonth(DateTime.Now.Year,
+                                DateTime.Now.Month)),
+                    Total = 0,
+                    Target = 10,
+                };
+
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            } else
+            }
+            else
             {
                 var errors = ModelState.SelectMany(x => x.Value.Errors.Select(z => z.Exception));
                 ViewBag.errors = errors;
@@ -189,7 +214,6 @@ namespace ShowroomManagement.Controllers
                 StartDate = p.StartDate,
                 Salary = p.Salary,
                 Email = p.Email,
-                SaleId = p.SaleId,
                 Gender = p.Gender,
                 Deleted = p.Deleted,
             }).Where(p => p.Deleted)
@@ -256,7 +280,7 @@ namespace ShowroomManagement.Controllers
             {
                 _context.Employees.Remove(employee);
             }
-           
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -282,6 +306,25 @@ namespace ShowroomManagement.Controllers
             }
 
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "2")]
+        public IActionResult UndoFromTrash(string id)
+        {
+            var query = _context.Employees.Find(id);
+
+            if (query == null)
+            {
+                return BadRequest("Can not find the employee");
+            }
+
+            query.Deleted = false;
+
+            _context.Employees.Update(query);
+            _context.SaveChanges();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -343,7 +386,6 @@ namespace ShowroomManagement.Controllers
                 StartDate = p.StartDate,
                 Salary = p.Salary,
                 Email = p.Email,
-                SaleId = p.SaleId,
                 Gender = p.Gender,
                 Deleted = p.Deleted,
             }).Where(p => !p.Deleted && (p.Firstname.ToLower().Contains(q)

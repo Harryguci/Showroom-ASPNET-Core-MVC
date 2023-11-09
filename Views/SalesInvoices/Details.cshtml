@@ -1,14 +1,40 @@
-﻿@model ShowroomManagement.Models.SalesInvoice
+﻿@using System.Security.Claims;
+@model ShowroomManagement.Models.SalesInvoice
 
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+@{
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
 
-<h1>Details</h1>
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == string.Empty || currentAccount.Username == null))
+        {
+            currentAccount = null;
+        }
+
+        if (currentAccount != null && currentAccount.Level_account == 0)
+        {
+            Layout = "~/Views/Shared/_ClientHomeLayout.cshtml";
+        }
+    }
+}
+
+<h1>Chi tiết</h1>
 
 <div>
-    <h4>SalesInvoice</h4>
+    <h4>Hóa đơn bán</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">

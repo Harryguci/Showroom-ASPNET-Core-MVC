@@ -25,8 +25,8 @@
 }
 
 @{
-    IEnumerable<Products> products = ViewBag.products;
-    IEnumerable<SalesInvoice> invoices = ViewBag.invoices;
+    List<Products> products = ViewBag.products;
+    List<SalesInvoice> invoices = ViewBag.invoices;
 }
 
 <style>
@@ -82,23 +82,31 @@
     <div class="col-12 col-md-8">
         <div style="min-height: 300px">
             <h2>Lịch tư vấn đã đặt</h2>
+            <div class="booking-list-container"></div>
         </div>
         <div style="min-height: 300px">
             <h2>Sản phẩm đã mua</h2>
             @if (products != null && products.Count() > 0)
             {
                 <div class="" style="list-style: none">
-                    @foreach (var x in products)
+                    @for (var i = 0; i < products.Count(); i++)
                     {
                         <div class="d-flex rounded-2 my-2" style="justify-content: space-between; border: none; background: rgb(245, 245, 245)">
-                            <a asp-controller="Products"
-                               asp-action="Details" asp-route-id="@x.Serial"
-                               class="p-3" style="font-size: 1.5rem">
-                                @x.ProductName
-                            </a>
-                            @if (x.ImageUrls.Count > 0)
+                            <div>
+                                <a asp-controller="Products"
+                                   asp-action="Details" asp-route-id="@products[i].Serial"
+                                   class="p-3" style="font-size: 1.5rem; font-weight: bold; color: black;">
+                                    @products[i].ProductName
+                                </a>
+                                <div class="mt-3" style="margin-left: 2rem">
+                                    <a asp-controller="SalesInvoices" asp-action="Details" asp-route-id="@invoices[i].InSaleId">
+                                        Chi tiết mua hàng
+                                    </a>
+                                </div>
+                            </div>
+                            @if (@products[i].ImageUrls.Count > 0)
                             {
-                                <img class="rounded-1" src="@x.ImageUrls[0].Url_image" width="300" />
+                                <img class="rounded-1" src="@products[i].ImageUrls[0].Url_image" width="300" />
                             }
                         </div>
                     }
@@ -109,4 +117,15 @@
 </div>
 @section Scripts{
     <script src="/js/AutoScrollDown.js" defer></script>
+    <script>
+        (function () {
+            $.ajax({
+                method: "GET",
+                url: "/ClientHome/BookingList",
+                success: function (response) {
+                    document.querySelector('.booking-list-container').innerHTML = response;
+                }
+            })
+        })()
+    </script>
 }

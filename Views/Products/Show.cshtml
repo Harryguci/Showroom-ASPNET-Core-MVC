@@ -4,6 +4,7 @@
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var trashNumber = ViewBag.trashNumber;
 }
 @{
     var identity = Context.User.Identity as ClaimsIdentity;
@@ -29,6 +30,7 @@
         }
     }
 }
+
 <style>
     .card {
         margin: 0;
@@ -51,7 +53,12 @@
         filter: brightness(100%);
     }
 </style>
+
 <h1>Sản phẩm</h1>
+@if (currentAccount != null && currentAccount.Level_account >= 1)
+{
+    <p><small><a asp-controller="Products" asp-action="Trash">Thùng rác (@trashNumber)</a></small></p>
+}
 <div class="row my-3">
     @if (currentAccount != null && currentAccount.Level_account >= 1)
     {

@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace ShowroomManagement.Models
 {
     public class SalesTarget
     {
-        public SalesTarget(string saleId)
+        public SalesTarget()
         {
-            SaleId = saleId;
+            SaleId = string.Empty;
         }
         [Key]
 
@@ -38,5 +39,10 @@ namespace ShowroomManagement.Models
         [Display(Name = "Tổng thưởng")]
         [JsonPropertyName("Reward")]
         public double Reward { get; set; }
+
+        [Display(Name = "Mã nhân viên")]
+        [JsonPropertyName("EmployeeId")]
+        [Column("EmployeeId")]
+        public string EmployeeId { get; set; }
     }
 }

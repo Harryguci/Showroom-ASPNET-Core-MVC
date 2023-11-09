@@ -1,0 +1,13 @@
+﻿@model IEnumerable<TestDrive>
+
+<div>
+    <ul class="list-group">
+        @foreach (TestDrive item in Model)
+        {
+            <li class="list-group-item">
+                <p class="my-1 fs-4 fw-bold text-primary">@item.BookDate.ToString("dd/MM/yyyy")</p>
+                <small>@item.Note</small>
+            </li>
+        }
+    </ul>
+</div>

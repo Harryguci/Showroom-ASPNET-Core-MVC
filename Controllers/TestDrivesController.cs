@@ -10,7 +10,7 @@ namespace ShowroomManagement.Controllers
     public class TestDrivesController : Controller
     {
         private readonly ShowroomContext _context;
-        public static int listLimits = 5;
+        public static int listLimits = 10;
 
         public TestDrivesController(ShowroomContext context)
         {
@@ -30,6 +30,7 @@ namespace ShowroomManagement.Controllers
                 BookDate = p.BookDate,
                 Note = p.Note,
                 Status = p.Status,
+                EmployeeId = p.EmployeeId
             }).Skip(listLimits * (page - 1))
             .Take(listLimits)
             .OrderByDescending(p => p.BookDate);
@@ -37,7 +38,7 @@ namespace ShowroomManagement.Controllers
             var total = _context.TestDrives.Count();
             ViewBag.nextPage = true;
             ViewBag.totalRecord = total;
-            ViewBag.totalPage = total / listLimits;
+            ViewBag.totalPage = (int)Math.Ceiling(total * 1.0 / listLimits);
             ViewBag.currentPage = page; 
 
             return View(await query.ToListAsync());
@@ -104,14 +105,26 @@ namespace ShowroomManagement.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DriveId,ClientId,BookDate,Note,Status")] TestDrive testDrive)
+        public async Task<IActionResult> Create([Bind("ClientId,EmployeeId,BookDate,Note,Status")] TestDrive testDrive)
         {
             if (ModelState.IsValid)
             {
+                var id = _context.TestDrives.Select(p => p.DriveId).Take(1).OrderByDescending(p => p).FirstOrDefault();
+                id = (Convert.ToInt32(id.Substring(2)) + 1).ToString();
+
+                for(int i = 1; i < 3 - id.Length; i++)
+                {
+                    id = "0" + id;
+                }
+                id = "TD" + id;
+                testDrive.DriveId = id;
+                //testDrive.EmployeeId = null;
+
                 _context.Add(testDrive);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            
             return View(testDrive);
         }
 
@@ -136,7 +149,7 @@ namespace ShowroomManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("DriveId,ClientId,BookDate,Note,Status")] TestDrive testDrive)
+        public async Task<IActionResult> Edit(string id, [Bind("DriveId,ClientId,EmployeeId,BookDate,Note,Status")] TestDrive testDrive)
         {
             if (id != testDrive.DriveId)
             {

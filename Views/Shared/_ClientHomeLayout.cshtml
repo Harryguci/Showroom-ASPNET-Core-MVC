@@ -148,12 +148,19 @@
                 @if (currentAccount == null)
                 {
                     <a asp-controller="Accounts" asp-action="Login" class="nav-item nav-link">Đăng nhập</a>
-                } else
+                }
+                else
                 {
                     <div class="nav-item dropdown">
-                        <a asp-controller="Accounts" asp-action="ClientAccount" class="nav-item nav-link">@currentAccount.Username</a>
+                        <a class="nav-link dropdown-toggle" asp-controller="Accounts" asp-action="ClientAccount">@currentAccount.Username</a>
                         <div class="dropdown-menu fade-up m-0 p-2">
-                            <a asp-controller="Accounts" asp-action="Logout" class="nav-item nav-link">Logout</a>
+
+                            <a asp-controller="Accounts" asp-action="Logout" class="nav-item nav-link d-flex gap-1">
+                                <span class="material-symbols-outlined my-auto">
+                                    logout
+                                </span>
+                                <span class="my-auto" style="font-size: 10px">Đăng xuất</span>
+                            </a>
                         </div>
                     </div>
                 }

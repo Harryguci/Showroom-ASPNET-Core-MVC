@@ -1,7 +1,7 @@
 CREATE DATABASE ShowroomAuto
 GO
-USE ShowroomAuto
-GO 
+use ShowroomAuto
+go 
 
 
 -- Tạo bảng Nhân viên
@@ -111,7 +111,9 @@ CREATE TABLE Account (
     Level_account INT,
     Deleted BIT,
     CreateAt DATETIME,
-    DeleteAt DATETIME
+    DeleteAt DATETIME,
+	ClientId NVARCHAR(10),
+	Serial NVARCHAR(100)
 )
 
 go
@@ -179,7 +181,7 @@ END
 -------------------- FUNCTION LOGIN -----------------
 
 GO
-CREATE FUNCTION Login_check (@username VARCHAR(30),@password VARCHAR(30))
+CREATE OR ALTER FUNCTION Login_check (@username VARCHAR(30),@password VARCHAR(30))
 RETURNS TABLE
 AS 
 RETURN(
@@ -260,6 +262,24 @@ ON DELETE CASCADE;
 ALTER TABLE PurchaseInvoices
 ADD CONSTRAINT FK_PurchaseInvoices_Source FOREIGN KEY (SourceId)
 REFERENCES Source (SourceId)
+ON DELETE CASCADE;
+GO
+-- New Foreign key
+ALTER TABLE Account
+ADD CONSTRAINT FK_Account_Customers FOREIGN KEY (ClientId)
+REFERENCES Customers (ClientId)
+ON DELETE CASCADE;
+GO
+
+ALTER TABLE Account
+ADD CONSTRAINT FK_Account_Products FOREIGN KEY (Serial)
+REFERENCES Products (Serial)
+ON DELETE CASCADE;
+GO
+
+ALTER TABLE Product_Images
+ADD CONSTRAINT FK_ProductsImages_Products FOREIGN KEY (Serial)
+REFERENCES Products (Serial)
 ON DELETE CASCADE;
 GO
 
@@ -561,7 +581,3 @@ RETURN(
     GROUP by [Date]
 )
 go
-
-use showroomauto;
-go
-SELECT * FROM Get_ToTal_Quantity(2023)

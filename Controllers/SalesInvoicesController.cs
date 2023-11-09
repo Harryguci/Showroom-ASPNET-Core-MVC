@@ -63,8 +63,6 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: SalesInvoices/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ClientId,SaleDate,ProductId,Status,QuantitySale")] SalesInvoice salesInvoice)
@@ -107,17 +105,10 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: SalesInvoices/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("InSalesId,ClientId,SaleDate,Status,QuantitySale")] SalesInvoice salesInvoice)
+        public async Task<IActionResult> Edit([Bind("InSaleId,ClientId,ProductId,SaleDate,Status,QuantitySale")] SalesInvoice salesInvoice)
         {
-            if (id != salesInvoice.InSaleId)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try

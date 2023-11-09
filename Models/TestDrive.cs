@@ -1,4 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace ShowroomManagement.Models
 {
@@ -11,8 +14,8 @@ namespace ShowroomManagement.Models
 
         [Key]
         [Display(Name = "ID")]
-        [StringLength(maximumLength: 10)]
-        [Required(ErrorMessage = "Bạn phải nhập Id")]
+        //[StringLength(maximumLength: 10)]
+        //[Required(ErrorMessage = "Bạn phải nhập Id")]
         public string DriveId { get; set; }
 
         [Display(Name = "Mã khách hàng")]
@@ -21,6 +24,8 @@ namespace ShowroomManagement.Models
         public string ClientId{ get; set; }
 
         [Display(Name = "Mã nhân viên")]
+        [Column(name: "EmployeeId")]
+        [JsonPropertyName("EmployeeId")]
         [StringLength(maximumLength: 10)]
         public string EmployeeId { get; set; }
 

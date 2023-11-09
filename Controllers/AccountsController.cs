@@ -237,7 +237,7 @@ namespace ShowroomManagement.Controllers
                         new Claim(ClaimTypes.NameIdentifier, account.Username),
                         new Claim(ClaimTypes.Role, res.Level_account.ToString()),
                         new Claim("CreateAt", res.CreateAt.ToString()),
-                        new Claim("CustomerId", res.CustomerId.ToString())
+                        new Claim("CustomerId", res.ClientId.ToString())
                     };
                 }
 
@@ -277,7 +277,7 @@ namespace ShowroomManagement.Controllers
                     Username = accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
                     Level_account = Convert.ToInt32(accountClaim.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value),
                     EmployeeId = accountClaim.FirstOrDefault(p => p.Type == "EmployeeId")?.Value,
-                    CustomerId = accountClaim.FirstOrDefault(p => p.Type == "CustomerId")?.Value
+                    ClientId = accountClaim.FirstOrDefault(p => p.Type == "CustomerId")?.Value
                 };
             }
             return null;
@@ -320,7 +320,7 @@ namespace ShowroomManagement.Controllers
             if (curr.Level_account == 1) // EMPLOYEE
             {
                 List<SalesTarget> currSales = await _context.SalesTargets
-                    .Where(p => p.SaleId == currEmployee.SaleId)
+                    .Where(p => p.EmployeeId == currEmployee.EmployeeId)
                     .ToListAsync();
 
                 ViewBag.employeeSalesTargets = currSales;
@@ -337,12 +337,13 @@ namespace ShowroomManagement.Controllers
         public async Task<IActionResult> ClientAccount()
         {
             var current = GetCurrentAccount();
-            if (current.CustomerId == null) return RedirectToAction("Login");
+            if (current.ClientId == null) return RedirectToAction("Login");
             var customer = _context.Customer
-                .Where(p => p.ClientId == current.CustomerId)
+                .Where(p => p.ClientId == current.ClientId)
                 .FirstOrDefault();
 
-            var invoices = await _context.SalesInvoices.Where(p => p.ClientId == current.CustomerId).ToListAsync();
+            var invoices = await _context.SalesInvoices
+                .Where(p => p.ClientId == current.ClientId).ToListAsync();
             var products = new List<Products>();
 
             foreach (var invoice in invoices)
@@ -494,7 +495,7 @@ namespace ShowroomManagement.Controllers
         {
             int level_account = 0;
 
-            _context.Database.ExecuteSqlRaw("INSERT INTO Account(CustomerId, Username, Password_foruser, Level_account, Deleted, CreateAt, DeleteAt) " +
+            _context.Database.ExecuteSqlRaw("INSERT INTO Account(ClientId, Username, Password_foruser, Level_account, Deleted, CreateAt, DeleteAt) " +
                 string.Format("VALUES ('{0}', '{1}', CONVERT(VARBINARY(500), '{2}'), {3}, 0, GETDATE(), NULL)", customerId, username, password, level_account));
 
             //Kiểm tra 

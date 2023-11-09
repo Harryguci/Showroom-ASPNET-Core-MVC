@@ -119,6 +119,7 @@ CREATE TABLE Product_Images(
     Serial NVARCHAR(100),
     Url_image NVARCHAR(500)
 )
+SET IDENTITY_INSERT Product_Images ON
 
 ------------------
 ------------------

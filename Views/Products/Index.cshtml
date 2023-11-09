@@ -2,9 +2,11 @@
 @model IEnumerable<ShowroomManagement.Models.Products>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Sản Phẩm";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    // var orders = ViewBag.OrderBy;
+}
+
+@{
     var identity = Context.User.Identity as ClaimsIdentity;
     Account currentAccount = null;
 
@@ -32,20 +34,21 @@
 @{
     int page = ViewBag.currentPage;
     int total = ViewBag.totalPage;
-    // Debug.WriteLine("\n\nPAGE = " + total + "\n\n");
     bool hasNext = ViewBag.nextPage;
+    int? trashNumber = ViewBag.trashNumber;
+}
+
+@{
+    var orders = ViewBag.OrderBy;
+    var ordersByDesc = ViewBag.OrderByDesc;
 }
 
 
 <h1>Sản phẩm</h1>
-@*
-@if (currentAccount.Level_account >= 2)
-{
-    <p><small><a asp-action="Trash">Thùng rác</a></small></p>
-}*@
+
 @if (currentAccount != null && currentAccount.Level_account >= 1)
 {
-    <p><small><a asp-controller="Products" asp-action="Trash">Thùng rác</a></small></p>
+    <p><small><a asp-controller="Products" asp-action="Trash">Thùng rác (@(trashNumber != null ? trashNumber : ""))</a></small></p>
 }
 
 <div class="d-flex">
@@ -64,95 +67,152 @@
         </span>
     </a>
 </div>
-<table class="table">
-    <thead>
-        <tr>
-            <th class="d-flex">
-                @Html.DisplayNameFor(model => model.ProductName)
-                <a action="Index" asp-route-orderby="name" class="btn p-0 m-0">
-                    <span class="material-symbols-outlined my-auto">
-                        expand_more
-                    </span>
-                </a>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PurchasePrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SalePrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div id="list-container">
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ProductName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PurchasePrice)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SalePrice)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Quantity)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status)
-                </td>
-                <td>
-                    @if (currentAccount != null && currentAccount.Level_account >= 1)
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.Serial">
-                            <span class="material-symbols-outlined">
-                                edit
-                            </span>
-                        </a>
-                    }
-                    <a asp-action="Details" asp-route-id="@item.Serial">
-                        <span class="material-symbols-outlined">
-                            info
+                <th class="d-flex">
+                    @Html.DisplayNameFor(model => model.ProductName)
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('ProductName')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
                         </span>
-                    </a>
-                    @if (currentAccount != null && currentAccount.Level_account >= 1)
-                    {
-                        <a asp-action="Delete" asp-route-id="@item.Serial">
+                    </button>
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PurchasePrice)
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('PurchasePrice')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.SalePrice)
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('SalePrice')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Quantity)
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('Quantity')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('Status')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PurchasePrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SalePrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @if (currentAccount != null && currentAccount.Level_account >= 1)
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Serial">
+                                <span class="material-symbols-outlined">
+                                    edit
+                                </span>
+                            </a>
+                        }
+                        <a asp-action="Details" asp-route-id="@item.Serial">
                             <span class="material-symbols-outlined">
-                                delete
+                                info
                             </span>
                         </a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-<div class="pagination-container d-flex gap-1 justify-content-center">
-    @for (int i = 0; i < total; i++)
-    {
-        @if (i + 1 == page)
+                        @if (currentAccount != null && currentAccount.Level_account >= 1)
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.Serial">
+                                <span class="material-symbols-outlined">
+                                    delete
+                                </span>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="pagination-container d-flex gap-1 justify-content-center">
+        @for (int i = 0; i < total; i++)
         {
-            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
+            @if (i + 1 == page)
+            {
+                <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
+            }
+            else if (total > 10 && i > 5 && i < 8)
+            {
+                <span>.</span>
+            }
+            else
+            {
+                <a class="btn btn-outline-primary"
+                   asp-action="Index" asp-route-page="@(i + 1)" asp-route-orderby="@orders" asp-route-orderbydesc="@ordersByDesc">
+                    @(i + 1)
+                </a>
+            }
         }
-        else if (total > 10 && i > 5 && i < 8)
-        {
-            <span>.</span>
-        }
-        else
-        {
-            <a class="btn btn-outline-primary"
-               asp-action="Index" asp-route-page="@(i + 1)">
-                @(i + 1)
-            </a>
-        }
-    }
+    </div>
 </div>
+
+@section Scripts{
+    <script>
+        function HandleOrderBy(asc) {
+            if (!asc) return;
+
+            var elem = document.querySelector('#list-container');
+            asc = asc.toLowerCase();
+            var page = @(page);
+
+            var url = `/Products/ProductListTable?orderby=${asc}&page=${page}`;
+            
+
+            $.get(url, function (data) {
+                console.log(data);
+                elem.innerHTML = data;
+            })
+        }
+        function HandleOrderByDesc(desc) {
+            if (!desc) return;
+            var page = @(page);
+
+            var elem = document.querySelector('#list-container');
+            desc = desc.toLowerCase();
+
+            var url = `/Products/ProductListTable?orderbydesc=${desc}&page=${page}`;
+
+
+            $.get(url, function (data) {
+                console.log(data);
+                elem.innerHTML = data;
+            })
+        }
+    </script>
+}

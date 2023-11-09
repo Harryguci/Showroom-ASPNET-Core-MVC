@@ -25,8 +25,8 @@ namespace ShowroomManagement.Models
         public string EmployeeId { get; set; }
 
         [JsonPropertyName("customerId")]
-        [Column("CustomerId")]
-        public string CustomerId { get; set; }
+        [Column("ClientId")]
+        public string ClientId { get; set; }
 
         [JsonPropertyName("level_account")]
         public int? Level_account { get; set; } = 0;

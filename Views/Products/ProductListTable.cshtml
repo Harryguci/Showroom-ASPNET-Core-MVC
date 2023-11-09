@@ -1,0 +1,200 @@
+﻿@using System.Security.Claims;
+@model IEnumerable<ShowroomManagement.Models.Products>
+
+@{
+    var orders = ViewBag.OrderBy;
+    var ordersByDesc = ViewBag.OrderByDesc;
+    var identity = Context.User.Identity as ClaimsIdentity;
+    Account currentAccount = null;
+
+    if (identity != null)
+    {
+        var accountClaims = identity.Claims;
+
+        currentAccount = new Account()
+                {
+                    Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
+                };
+
+        if (currentAccount != null && (currentAccount.Username == null || currentAccount.Username == string.Empty))
+        {
+            currentAccount = null;
+        }
+    }
+}
+
+@{
+    int page = ViewBag.currentPage;
+    int total = ViewBag.totalPage;
+    bool hasNext = ViewBag.nextPage;
+    int? trashNumber = ViewBag.trashNumber;
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="d-flex">
+                @Html.DisplayNameFor(model => model.ProductName)
+                @if (orders != null && orders.ToLower() == "productname")
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderByDesc('ProductName')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('ProductName')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                }
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PurchasePrice)
+                @if (orders != null && orders.ToLower() == "purchaseprice")
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderByDesc('purchaseprice')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('purchaseprice')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                }
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SalePrice)
+                @if (orders != null && orders.ToLower() == "saleprice")
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderByDesc('SalePrice')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('SalePrice')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                }
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+                @if (orders != null && orders.ToLower() == "quantity")
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderByDesc('Quantity')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('Quantity')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                }
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+                @if (orders != null && orders.ToLower() == "status")
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderByDesc('Status')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_less
+                        </span>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn p-0 m-0" onclick="HandleOrderBy('Status')">
+                        <span class="material-symbols-outlined my-auto">
+                            expand_more
+                        </span>
+                    </button>
+                }
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PurchasePrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SalePrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @if (currentAccount != null && currentAccount.Level_account >= 1)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Serial">
+                            <span class="material-symbols-outlined">
+                                edit
+                            </span>
+                        </a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.Serial">
+                        <span class="material-symbols-outlined">
+                            info
+                        </span>
+                    </a>
+                    @if (currentAccount != null && currentAccount.Level_account >= 1)
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Serial">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="pagination-container d-flex gap-1 justify-content-center">
+    @for (int i = 0; i < total; i++)
+    {
+        @if (i + 1 == page)
+        {
+            <button class="btn btn-outline-primary active" disabled>@(i + 1)</button>
+        }
+        else if (total > 10 && i > 5 && i < 8)
+        {
+            <span>.</span>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary"
+               asp-action="Index" asp-route-page="@(i + 1)" asp-route-orderby="@orders" asp-route-orderbydesc="@ordersByDesc">
+                @(i + 1)
+            </a>
+        }
+    }
+</div>
