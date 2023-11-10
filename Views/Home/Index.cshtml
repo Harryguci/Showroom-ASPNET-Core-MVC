@@ -43,22 +43,25 @@
     <p>Hơn cả một giải pháp quản lý. Làm việc mọi lúc mọi nơi.</p>
     <p>Detail: <a target="_blank" href="https://github.com/Harryguci/Showroom-ASPNET-Core-MVC">Showroom ASP.NET Core MVC</a>.</p>
 </div>
-<div class="dashboard-container my-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-6" style="max-width: 800px;">
-            <h2>Sản lượng bán theo năm</h2>
-            <canvas id="acquisitions"></canvas>
-        </div>
-        <div class="col-12 col-md-6" style="max-width: 500px; max-height: 500px">
-            <h2>Nhân sự và khách hàng</h2>
-            <canvas id="personnel"></canvas>
-        </div>
-        <div class="col-12" style="max-width: 1000px;">
-            <h2>Tăng trưởng doanh thu</h2>
-            <canvas id="stock"></canvas>
+@if (currentAccount.Level_account == 2)
+{
+    <div class="dashboard-container my-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6" style="max-width: 800px;">
+                <h2>Sản lượng bán theo năm</h2>
+                <canvas id="acquisitions"></canvas>
+            </div>
+            <div class="col-12 col-md-6" style="max-width: 500px; max-height: 500px">
+                <h2>Nhân sự và khách hàng</h2>
+                <canvas id="personnel"></canvas>
+            </div>
+            <div class="col-12" style="max-width: 1000px;">
+                <h2>Tăng trưởng doanh thu</h2>
+                <canvas id="stock"></canvas>
+            </div>
         </div>
     </div>
-</div>
+}
 <div class="container-md">
     <button class="btn btn-outline-primary" onclick="HandlePrintList(event)">In danh sách</button>
 </div>

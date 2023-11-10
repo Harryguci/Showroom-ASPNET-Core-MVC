@@ -6,7 +6,6 @@
     Employee currEmployee = (Employee)ViewBag.currEmployee;
 }
 <style>
-
     h2 {
         font-size: 2rem;
         font-weight: bold;
@@ -24,6 +23,20 @@
         color: white;
         margin: 1rem 0;
     }
+
+    #employee-list {
+        margin-left: 1rem;
+    }
+
+        #employee-list li {
+            cursor: pointer;
+        }
+
+            #employee-list li:hover,
+            #employee-list li.active {
+                background: rgb(10, 10, 50);
+                color: white;
+            }
 </style>
 
 <div class="row my-4" style="position: relative; flex-wrap: nowrap">
@@ -197,6 +210,31 @@
             <h3>Việc cần làm</h3>
             <div class="tasks-list"></div>
         </section>
+        @if (Model.Level_account == 2)
+        {
+            <section>
+                <h3>Giao việc</h3>
+                <div class="manager-tasks-list">
+                    <form name="manager-tasks-form" onsubmit="HandleSubmitManagerTask(event)">
+                        <div class="form-group">
+                            <label class="form-label">Nội dung</label>
+                            <input class="form-control" type="text" id="Content" name="Content" placeholder="Nội dung việc..." />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mã nhân viên</label>
+                            <input class="form-control" type="text" id="EmployeeId" name="EmployeeId" placeholder="Mã nhân viên..." onchange="HandleChangeEmployeeId(event)" onkeypress="HandleChangeEmployeeId(event)" />
+                            <div id="employee-list" class="d-none" style="box-shadow: 3px 3px 20px rgba(0,0,0,0.1)"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Hạn</label>
+                            <input class="form-control" type="date" id="Dateline" name="Dateline" onchange="HandleChangeEmployeeId(event)" onkeypress="HandleChangeEmployeeId(event)" />
+                            <div id="employee-list" class="d-none" style="box-shadow: 3px 3px 20px rgba(0,0,0,0.1)"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Gửi</button>
+                    </form>
+                </div>
+            </section>
+        }
     </div>
 </div>
 
@@ -225,11 +263,11 @@
                 $.ajax({
                     method: "GET",
                     url: `/api/TasksApi/Employees/@(Model.EmployeeId)`,
-                    success: function(response) {
+                    success: function (response) {
                         console.log(response)
                         // response = JSON.parse(response);
                         var html = '<ul>';
-                        for(var x of response) {
+                        for (var x of response) {
                             html += `<li class="d-flex gap-3"><p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p><p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p></li>`
                         }
 
@@ -242,4 +280,80 @@
         </script>
     }
 
+    <script>
+        async function HandleChangeEmployeeId(event) {
+            console.log(event.target.value);
+
+            var employeeId = event.target.value;
+            await $.ajax({
+                url: `/Employees/Search?employeeId=${employeeId}`,
+                type: 'GET',
+                dataType: 'json', // added data type
+                success: function (res) {
+                    // console.log(res);
+                    // alert(res);
+                    console.log(res[0].Firstname)
+                    // `<select class="form-control"><option>option</option></select>`
+                    var html = `<ul class="list-group">`;
+                    for (var i in res) {
+                        html += `<li class="list-group-item" value="${res[i].EmployeeId}">${res[i].Firstname} ${res[i].Lastname}</li>`
+                    }
+                    html += '</ul>';
+
+                    // $('#ClientId').val(res[0].ClientId)
+                    document.querySelector('#employee-list').classList.remove('d-none');
+                    document.querySelector('#employee-list').innerHTML = html
+                }
+            });
+
+            $('#employee-list li').on('click', function () {
+                $('#EmployeeId').val($(this).attr('value'))
+                $('#employee-list li').removeClass('active')
+                $(this).addClass('active');
+            })
+        }
+
+        async function HandleSubmitManagerTask(event) {
+            event.preventDefault();
+            
+            if (confirm("Bạn chắc chắn muốn gửi?")) {
+                var data = {
+                    EmployeeId: document.getElementById('EmployeeId').value,
+                    Content: document.getElementById('Content').value,
+                    Dateline: document.getElementById('Dateline').value
+                };
+
+                if (data.EmployeeId == '')
+                    return alert('Bạn phải điền mã nhân viên.');
+
+                if (data.Content == '')
+                    return alert('Bạn phải điền nội dung công việc.');
+
+                if (data.Dateline == '')
+                    return alert('Bạn phải chọn kỳ hạn cho công việc.');
+
+                var url = '/api/TasksApi/'
+
+                await fetch(url, {
+                    method: "post",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+
+                    //make sure to serialize your JSON body
+                    body: JSON.stringify(data)
+                })
+                    .then((response) => {
+                        alert('Giao việc thành công!!');
+
+                        document.getElementById('EmployeeId').value = '';
+                        document.getElementById('Content').value = '';
+                        document.getElementById('Dateline').value = '';
+                        document.getElementById('employee-list')classList.add('d-none')
+                        console.log(response);
+                    });
+            }
+        }
+    </script>
 }

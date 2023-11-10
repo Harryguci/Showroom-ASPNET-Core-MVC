@@ -8,7 +8,7 @@ namespace ShowroomManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class TasksApiController : ControllerBase
     {
         private readonly ShowroomContext _context;
@@ -77,8 +77,18 @@ namespace ShowroomManagement.Controllers
 
         // POST: api/TasksApi
         [HttpPost]
-        public async Task<ActionResult<Tasks>> PostTasks(Tasks tasks)
+        public async Task<ActionResult<Tasks>> PostTasks([Bind("EmployeeId,Content,Dateline")]Tasks tasks)
         {
+            var id = _context.Tasks.Select(p => p.Id).Take(1).OrderByDescending(p => p).FirstOrDefault();
+            id = (Convert.ToInt32(id.Substring(1)) + 1).ToString();
+            int len = id.Length;
+            for (int i = 0; i < 9 - len; i++)
+            {
+                id = "0" + id;
+            }
+            id = "T" + id;
+            tasks.Id = id;
+
             _context.Tasks.Add(tasks);
             try
             {

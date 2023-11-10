@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShowroomManagement.Data;
@@ -161,8 +162,6 @@ namespace ShowroomManagement.Controllers
         }
 
         // POST: Employees/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "2")]
@@ -370,30 +369,54 @@ namespace ShowroomManagement.Controllers
         // GET: Employees/Search
         [HttpGet]
         [Authorize(Roles = "2")]
-        public async Task<List<Employee>> Search(string q)
+        public async Task<List<Employee>> Search(string q, string employeeId)
         {
             if (_context.Employees == null)
                 return new List<Employee>();
-            q = q.ToLower().Trim();
 
-            var query = _context.Employees.Select(p => new Employee()
+            if (q != null)
+                q = q.ToLower().Trim();
+            if (employeeId != null)
+                employeeId = employeeId.ToLower().Trim();
+
+            if (employeeId != null)
             {
-                EmployeeId = p.EmployeeId,
-                Firstname = p.Firstname,
-                Lastname = p.Lastname,
-                DateBirth = p.DateBirth,
-                Cccd = p.Cccd,
-                Position = p.Position,
-                StartDate = p.StartDate,
-                Salary = p.Salary,
-                Email = p.Email,
-                Gender = p.Gender,
-                Deleted = p.Deleted,
-            }).Where(p => !p.Deleted && (p.Firstname.ToLower().Contains(q)
-            || (p.Lastname.ToLower().Contains(q))
-            || (p.EmployeeId.ToLower().Contains(q))));
-
-            return await query.ToListAsync();
+                return await _context.Employees.Select(p => new Employee()
+                {
+                    EmployeeId = p.EmployeeId,
+                    Firstname = p.Firstname,
+                    Lastname = p.Lastname,
+                    DateBirth = p.DateBirth,
+                    Cccd = p.Cccd,
+                    Position = p.Position,
+                    StartDate = p.StartDate,
+                    Salary = p.Salary,
+                    Email = p.Email,
+                    Gender = p.Gender,
+                    Deleted = p.Deleted,
+                }).Where(p => !p.Deleted && (p.Firstname.ToLower().Contains(employeeId)
+                || (p.Lastname.ToLower().Contains(employeeId))
+                || (p.EmployeeId.ToLower().Contains(employeeId)))).ToListAsync();
+            }
+            else
+            {
+                return await _context.Employees.Select(p => new Employee()
+                {
+                    EmployeeId = p.EmployeeId,
+                    Firstname = p.Firstname,
+                    Lastname = p.Lastname,
+                    DateBirth = p.DateBirth,
+                    Cccd = p.Cccd,
+                    Position = p.Position,
+                    StartDate = p.StartDate,
+                    Salary = p.Salary,
+                    Email = p.Email,
+                    Gender = p.Gender,
+                    Deleted = p.Deleted,
+                }).Where(p => !p.Deleted && (p.Firstname.ToLower().Contains(q)
+                || (p.Lastname.ToLower().Contains(q))
+                || (p.EmployeeId.ToLower().Contains(q)))).ToListAsync();
+            }
         }
     }
 }
