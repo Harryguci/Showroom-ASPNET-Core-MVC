@@ -5,39 +5,9 @@
     var role = Model.Level_account;
     Employee currEmployee = (Employee)ViewBag.currEmployee;
 }
-<style>
-    h2 {
-        font-size: 2rem;
-        font-weight: bold;
-        color: rgb(50,50, 150);
-    }
-
-    h2, h3 {
-        margin: 1rem 0;
-    }
-
-    .tasks-list ul li {
-        padding: 1rem;
-        border-radius: 5px;
-        background: rgb(150, 150, 255);
-        color: white;
-        margin: 1rem 0;
-    }
-
-    #employee-list {
-        margin-left: 1rem;
-    }
-
-        #employee-list li {
-            cursor: pointer;
-        }
-
-            #employee-list li:hover,
-            #employee-list li.active {
-                background: rgb(10, 10, 50);
-                color: white;
-            }
-</style>
+@section Styles{
+    <link rel="stylesheet" href="~/css/account/Person.css" asp-append-version="true" />
+}
 
 <div class="row my-4" style="position: relative; flex-wrap: nowrap">
     <div class="col-12 col-md-4">
@@ -259,16 +229,38 @@
     @if (Model.EmployeeId != null)
     {
         <script>
+            var tasksList = [];
             (function () {
                 $.ajax({
                     method: "GET",
                     url: `/api/TasksApi/Employees/@(Model.EmployeeId)`,
                     success: function (response) {
                         console.log(response)
+                        tasksList = response;
                         // response = JSON.parse(response);
                         var html = '<ul>';
                         for (var x of response) {
-                            html += `<li class="d-flex gap-3"><p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p><p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p></li>`
+                            if (!x.result) {
+                                html += `<li class="d-flex gap-3" style="justify-content: space-between;">
+                                                <div>
+                                                    <p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p>
+                                                    <p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p>
+                                                </div>
+                                                <div class="d-flex">
+                                                    <button onclick="HandleDoneTasks('${x.id}')" class="btn btn-outline-primary done-btn my-auto">Cập nhật</button>
+                                                </div>
+                                            </li>`
+                            } else {
+                                html += `<li class="d-flex gap-3" style="justify-content: space-between;">
+                                                            <div>
+                                                                <p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p>
+                                                                <p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p>
+                                                            </div>
+                                                            <div class="d-flex">
+                                                                <button class="btn btn-primary done-btn my-auto" disabled>Đã xong</button>
+                                                            </div>
+                                                        </li>`
+                            }
                         }
 
                         html += '</ul>'
@@ -281,79 +273,61 @@
     }
 
     <script>
-        async function HandleChangeEmployeeId(event) {
-            console.log(event.target.value);
+        var containerOfUpdateTaskForm;
+        function HandleDoneTasks(id) {
+            var curr;
+            console.log(id);
+            for (var x of tasksList) {
+                if (x.id === id) curr = x;
+            }
 
-            var employeeId = event.target.value;
-            await $.ajax({
-                url: `/Employees/Search?employeeId=${employeeId}`,
-                type: 'GET',
-                dataType: 'json', // added data type
-                success: function (res) {
-                    // console.log(res);
-                    // alert(res);
-                    console.log(res[0].Firstname)
-                    // `<select class="form-control"><option>option</option></select>`
-                    var html = `<ul class="list-group">`;
-                    for (var i in res) {
-                        html += `<li class="list-group-item" value="${res[i].EmployeeId}">${res[i].Firstname} ${res[i].Lastname}</li>`
-                    }
-                    html += '</ul>';
+            if (curr) {
+                console.log(curr);
+                var element = document.createElement('div');
+                element.innerHTML = `<div class="center update-task-container p-3 rounded-2" style="background: white">
+                                                            <section>
+                                                                <h3>Báo cáo công việc</h3>
+                                                                <div class="update-tasks-list">
+                                                                            <form name="update-tasks-form" onsubmit="HandleSubmitUpdateTask(event)">
+                                                                        <input type="hidden" name="Id" value="${curr.id}" />
+                                                                        <input type="hidden" name="EmployeeId" value="@Model.EmployeeId"/>
+                                                                        <div class="form-group">
+                                                                            <label class="form-label">Nội dung</label>
+                                                                            <input class="form-control" type="text" id="Content-update" name="Content" placeholder="Nội dung việc..." />
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label class="form-label">Báo cáo</label>
+                                                                                            <input class="form-control" type="text" id="Result" name="Result" placeholder="Báo cáo..." />
+                                                                        </div>
+                                                                        <button type="submit" class="btn btn-primary">Gửi</button>
+                                                                    </form>
+                                                                </div>
+                                                            </section>
+                                                        </div>`;
 
-                    // $('#ClientId').val(res[0].ClientId)
-                    document.querySelector('#employee-list').classList.remove('d-none');
-                    document.querySelector('#employee-list').innerHTML = html
+                element.style.position = 'fixed';
+                element.style.width = '100vw';
+                element.style.height = '100vh';
+                element.style.background = 'rgba(0,0,0,0.2)';
+                element.style.zIndex = '100';
+                element.style.top = '0';
+                element.style.left = '0';
+                element.onclick = (event) => {
+                    console.log(event.target);
+                    if (event.target === element)
+                        document.body.removeChild(element);
                 }
-            });
 
-            $('#employee-list li').on('click', function () {
-                $('#EmployeeId').val($(this).attr('value'))
-                $('#employee-list li').removeClass('active')
-                $(this).addClass('active');
-            })
-        }
+                document.body.appendChild(element);
 
-        async function HandleSubmitManagerTask(event) {
-            event.preventDefault();
-            
-            if (confirm("Bạn chắc chắn muốn gửi?")) {
-                var data = {
-                    EmployeeId: document.getElementById('EmployeeId').value,
-                    Content: document.getElementById('Content').value,
-                    Dateline: document.getElementById('Dateline').value
-                };
 
-                if (data.EmployeeId == '')
-                    return alert('Bạn phải điền mã nhân viên.');
+                document.querySelector('.update-task-container input[name="Content"]').value = curr.content;
+                document.querySelector('.update-task-container input[name="Content"]').disabled = true;
 
-                if (data.Content == '')
-                    return alert('Bạn phải điền nội dung công việc.');
-
-                if (data.Dateline == '')
-                    return alert('Bạn phải chọn kỳ hạn cho công việc.');
-
-                var url = '/api/TasksApi/'
-
-                await fetch(url, {
-                    method: "post",
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-
-                    //make sure to serialize your JSON body
-                    body: JSON.stringify(data)
-                })
-                    .then((response) => {
-                        alert('Giao việc thành công!!');
-
-                        document.getElementById('EmployeeId').value = '';
-                        document.getElementById('Content').value = '';
-                        document.getElementById('Dateline').value = '';
-                        document.getElementById('employee-list')classList.add('d-none')
-                        console.log(response);
-                    });
+                containerOfUpdateTaskForm = element;
             }
         }
     </script>
+
+    <script src="~/js/account/HandleEmployeeSite.js" defer></script>
 }

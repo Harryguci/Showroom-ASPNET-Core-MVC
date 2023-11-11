@@ -1,0 +1,46 @@
+﻿h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(50,50, 150);
+}
+
+h2, h3 {
+    margin: 1rem 0;
+}
+
+section {
+    margin: 2rem auto;
+}
+
+.tasks-list ul li {
+    padding: 1rem;
+    border-radius: 5px;
+    background: rgb(150, 150, 255);
+    color: white;
+    margin: 1rem 0;
+}
+
+#employee-list {
+    margin-left: 1rem;
+}
+
+    #employee-list li {
+        cursor: pointer;
+    }
+
+        #employee-list li:hover,
+        #employee-list li.active {
+            background: rgb(10, 10, 50);
+            color: white;
+        }
+
+button.done-btn {
+    color: white !important;
+    font-size: 0.7rem;
+    border-color: white !important;
+}
+
+.update-task-container {
+    width: 90vw;
+    max-width: 700px;
+}

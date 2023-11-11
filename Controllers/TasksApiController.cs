@@ -47,14 +47,17 @@ namespace ShowroomManagement.Controllers
 
         // PUT: api/TasksApi/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTasks(string id, Tasks tasks)
+        public async Task<IActionResult> PutTasks(string id, [Bind("Id,Content,Result")]Tasks tasks)
         {
             if (id != tasks.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(tasks).State = EntityState.Modified;
+            var currTask = _context.Tasks.Find(id);
+            currTask.Result = tasks.Result; 
+
+            _context.Update(currTask);
 
             try
             {
