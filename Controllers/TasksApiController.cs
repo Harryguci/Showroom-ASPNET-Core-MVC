@@ -8,7 +8,7 @@ namespace ShowroomManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class TasksApiController : ControllerBase
     {
         private readonly ShowroomContext _context;
@@ -42,7 +42,7 @@ namespace ShowroomManagement.Controllers
         [HttpGet("Employees/{EmployeeId}")]
         public async Task<ActionResult<IEnumerable<Tasks>>> GetFromEmployeeId(string EmployeeId)
         {
-            return await _context.Tasks.Where(p => p.EmployeeId == EmployeeId).ToListAsync();
+            return await _context.Tasks.Where(p => p.EmployeeId == EmployeeId && p.Dateline.AddDays(1) > DateTime.Now).ToListAsync();
         }
 
         // PUT: api/TasksApi/5
