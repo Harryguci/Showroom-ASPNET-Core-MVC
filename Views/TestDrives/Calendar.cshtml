@@ -41,7 +41,7 @@
         </div>
         <div class="d-flex gap-1" style="font-size: 1rem">
             <p class="d-block my-auto">Năm</p>
-          
+
             <select class="form-control" name="year" id="year" onchange="handleChange()">
                 @for (int y = 2015; y < DateTime.Now.Year; y++)
                 {
@@ -133,7 +133,7 @@
             var restorepage = $('body').html();
             var printcontentHTML = $(el).clone();
             var calendarTime = {
-               year: $('#year').val(),
+                year: $('#year').val(),
                 month: $('#month').val(),
             };
 
@@ -143,7 +143,7 @@
             $('body').html(restorepage);
         }
         function HandlePrintCalendar(event) {
-            var elem = document.querySelector('#calendar-container .calendar'); 
+            var elem = document.querySelector('#calendar-container .calendar');
             printContent('#calendar-container .calendar')
         }
     </script>

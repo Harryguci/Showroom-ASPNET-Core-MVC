@@ -46,7 +46,11 @@
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Gender" /> @Html.DisplayNameFor(model => model.Gender)
+                    @* <input class="form-check-input" asp-for="Gender" /> @Html.DisplayNameFor(model => model.Gender) *@
+                    <select id="Gender" name="Gender" class="form-control">
+                        <option value="true">Nam</option>
+                        <option value="false">Nữ</option>
+                    </select>
                 </label>
             </div>
             <div class="form-group">
