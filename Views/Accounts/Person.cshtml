@@ -197,8 +197,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Hạn</label>
-                            <input class="form-control" type="date" id="Dateline" name="Dateline" onchange="HandleChangeEmployeeId(event)" onkeypress="HandleChangeEmployeeId(event)" />
-                            <div id="employee-list" class="d-none" style="box-shadow: 3px 3px 20px rgba(0,0,0,0.1)"></div>
+                            <input class="form-control" type="date" id="Dateline" name="Dateline" />
                         </div>
                         <button type="submit" class="btn btn-primary">Gửi</button>
                     </form>
@@ -209,6 +208,11 @@
 </div>
 
 @section Scripts{
+    <script>
+        (function () {
+            document.querySelector('#Dateline').valueAsDate = new Date();
+        })()
+    </script>
     <script>
         function OpenChangeAvatarForm() {
             var changeForm = document.getElementById('update-avatar-form');
@@ -242,24 +246,24 @@
                         for (var x of response) {
                             if (!x.result) {
                                 html += `<li class="d-flex gap-3" style="justify-content: space-between;">
-                                                <div>
-                                                    <p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p>
-                                                    <p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p>
-                                                </div>
-                                                <div class="d-flex">
-                                                    <button onclick="HandleDoneTasks('${x.id}')" class="btn btn-outline-primary done-btn my-auto">Cập nhật</button>
-                                                </div>
-                                            </li>`
+                                                                        <div>
+                                                                            <p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p>
+                                                                            <p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p>
+                                                                        </div>
+                                                                        <div class="d-flex">
+                                                                            <button onclick="HandleDoneTasks('${x.id}')" class="btn btn-outline-primary done-btn my-auto">Cập nhật</button>
+                                                                        </div>
+                                                                    </li>`
                             } else {
                                 html += `<li class="d-flex gap-3" style="justify-content: space-between;">
-                                                            <div>
-                                                                <p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p>
-                                                                <p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p>
-                                                            </div>
-                                                            <div class="d-flex">
-                                                                <button class="btn btn-primary done-btn my-auto" disabled>Đã xong</button>
-                                                            </div>
-                                                        </li>`
+                                                                                    <div>
+                                                                                        <p class="fw-bold d-block my-auto" style="font-size: 1.5rem">${x.content}</p>
+                                                                                        <p class="d-block my-auto">${new Date(x.dateline).toLocaleDateString('en-GB')}</p>
+                                                                                    </div>
+                                                                                    <div class="d-flex">
+                                                                                        <button class="btn btn-primary done-btn my-auto" disabled>Đã xong</button>
+                                                                                    </div>
+                                                                                </li>`
                             }
                         }
 
@@ -285,25 +289,25 @@
                 console.log(curr);
                 var element = document.createElement('div');
                 element.innerHTML = `<div class="center update-task-container p-3 rounded-2" style="background: white">
-                                        <section>
-                                            <h3>Báo cáo công việc</h3>
-                                            <div class="update-tasks-list">
-                                                        <form name="update-tasks-form" onsubmit="HandleSubmitUpdateTask(event)">
-                                                    <input type="hidden" name="Id" value="${curr.id}" />
-                                                    <input type="hidden" name="EmployeeId" value="@Model.EmployeeId"/>
-                                                    <div class="form-group">
-                                                        <label class="form-label">Nội dung</label>
-                                                        <input class="form-control" type="text" id="Content-update" name="Content" placeholder="Nội dung việc..." />
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="form-label">Báo cáo</label>
-                                                                        <input class="form-control" type="text" id="Result" name="Result" placeholder="Báo cáo..." />
-                                                    </div>
-                                                    <button type="submit" class="btn btn-primary">Gửi</button>
-                                                </form>
-                                            </div>
-                                        </section>
-                                    </div>`;
+                                                        <section>
+                                                            <h3>Báo cáo công việc</h3>
+                                                            <div class="update-tasks-list">
+                                                                        <form name="update-tasks-form" onsubmit="HandleSubmitUpdateTask(event)">
+                                                                    <input type="hidden" name="Id" value="${curr.id}" />
+                                                                    <input type="hidden" name="EmployeeId" value="@Model.EmployeeId"/>
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">Nội dung</label>
+                                                                        <input class="form-control" type="text" id="Content-update" name="Content" placeholder="Nội dung việc..." />
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="form-label">Báo cáo</label>
+                                                                                        <input class="form-control" type="text" id="Result" name="Result" placeholder="Báo cáo..." />
+                                                                    </div>
+                                                                    <button type="submit" class="btn btn-primary">Gửi</button>
+                                                                </form>
+                                                            </div>
+                                                        </section>
+                                                    </div>`;
 
                 element.style.position = 'fixed';
                 element.style.width = '100vw';
