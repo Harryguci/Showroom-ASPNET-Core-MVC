@@ -7,13 +7,9 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using NuGet.Protocol;
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using Microsoft.Data.SqlClient;
-using System.Security.Principal;
 using System.Data;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 //using Newtonsoft.Json;
 
@@ -70,6 +66,7 @@ namespace ShowroomManagement.Controllers
 
         // GET: Home/Search
         [HttpGet]
+        [Authorize]
         public IActionResult Search(string q)
         {
             ViewBag.q = q;
@@ -107,6 +104,7 @@ namespace ShowroomManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "1,2")]
         public string SearchApi(string q)
         {
             if (q == null) return "[]";
@@ -166,6 +164,7 @@ namespace ShowroomManagement.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "2")]
         public async Task<string> GetToTalQuantity(string year)
         {
             var result = new List<int>();
@@ -186,6 +185,7 @@ namespace ShowroomManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "2")]
         public async Task<string> GetToTalQuantityEachYear(string year)
         {
             var result = new List<int>();

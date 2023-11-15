@@ -10,6 +10,7 @@ namespace ShowroomManagement.Models
             InEnterId = SourceId = string.Empty;
             EnteredDate = DateTime.Now;
         }
+
         [Key]
         [Display(Name = "ID")]
         [JsonPropertyName("InEnterId")]

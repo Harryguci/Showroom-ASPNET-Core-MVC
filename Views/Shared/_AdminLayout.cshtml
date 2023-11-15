@@ -10,6 +10,7 @@
         currentAccount = new Account()
                 {
                     Username = accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?.Value,
+                    EmployeeId = accountClaims.FirstOrDefault(p => p.Type == "EmployeeId")?.Value,
                     Level_account = Convert.ToInt32(accountClaims.FirstOrDefault(p => p.Type == ClaimTypes.Role)?.Value)
                 };
 

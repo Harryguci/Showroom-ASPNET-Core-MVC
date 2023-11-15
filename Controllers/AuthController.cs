@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -37,11 +35,12 @@ namespace ShowroomManagement.Controllers
             var username = account.Username;
             var password = account.Password;
 
-            Account user = Authenticate(new Account()
-            {
-                Username = username,
-                Password = password
-            });
+            Account user = Authenticate(
+                new Account()
+                {
+                    Username = username,
+                    Password = password
+                });
 
             if (user != null)
             {

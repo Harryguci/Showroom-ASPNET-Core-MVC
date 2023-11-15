@@ -14,8 +14,7 @@ namespace ShowroomManagement.Models
 
         [Key]
         [Display(Name = "ID")]
-        //[StringLength(maximumLength: 10)]
-        //[Required(ErrorMessage = "Bạn phải nhập Id")]
+        [StringLength(maximumLength: 10, ErrorMessage = "Mã quá dài")]
         public string DriveId { get; set; }
 
         [Display(Name = "Mã khách hàng")]
@@ -26,7 +25,7 @@ namespace ShowroomManagement.Models
         [Display(Name = "Mã nhân viên")]
         [Column(name: "EmployeeId")]
         [JsonPropertyName("EmployeeId")]
-        [StringLength(maximumLength: 10)]
+        [StringLength(maximumLength: 10, ErrorMessage = "Mã nhân viên quá dài")]
         public string EmployeeId { get; set; }
 
         [Display(Name = "Ngày đặt")]
