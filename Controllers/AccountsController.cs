@@ -9,9 +9,6 @@ using ShowroomManagement.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authentication;
 using System.Data;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ShowroomManagement.Controllers
 {

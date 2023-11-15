@@ -18,26 +18,31 @@ namespace ShowroomManagement.Models
         [JsonPropertyName("EmployeeId")]
         public string EmployeeId { get; set; }
 
+        [Required(ErrorMessage = "Bạn phải nhập họ")]
         [Display(Name = "Họ")]
-        [StringLength(maximumLength: 190)]
+        [StringLength(maximumLength: 190, ErrorMessage = "Họ quá dài")]
         [JsonPropertyName("Firstname")]
         public string Firstname { get; set; }
 
         [Display(Name = "Tên")]
+        [Required(ErrorMessage = "Bạn phải nhập tên")]
         [JsonPropertyName("Lastname")]
-        [StringLength(maximumLength: 190)]
+        [StringLength(maximumLength: 190, ErrorMessage = "Tên quá dài")]
         public string Lastname { get; set; }
 
         [Display(Name = "Ngày sinh")]
         [JsonPropertyName("DateBirth")]
         public DateTime DateBirth { get; set; }
 
+        [Required(ErrorMessage = "Bạn phải nhập CCCD")]
+        [StringLength(maximumLength: 12, MinimumLength = 9, ErrorMessage = "CCCD phải từ 9 đến 12 chữ số")]
         [Display(Name = "CCCD")]
         [JsonPropertyName("Cccd")]
         public string Cccd { get; set; }
 
         [Display(Name = "Vị trí")]
         [JsonPropertyName("Position")]
+        [Required(ErrorMessage = "Bạn phải nhập vị trí")]
         public string Position { get; set; }
 
         [Display(Name = "Ngày bắt đầu")]

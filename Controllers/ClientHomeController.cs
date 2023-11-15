@@ -44,14 +44,14 @@ namespace ShowroomManagement.Controllers
         }
 
         [AllowAnonymous]
-        [Authorize]
+        [Authorize(Roles = "0")]
         public IActionResult Booking()
         {
             return View();
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "0")]
         public async Task<IActionResult> Booking([Bind("BookDate, Note")] TestDrive testdrive)
         {
             // Handle booking
@@ -80,6 +80,7 @@ namespace ShowroomManagement.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "0")]
         public async Task<IActionResult> BookingListAsync()
         {
             var currentAccount = GetCurrentAccount();

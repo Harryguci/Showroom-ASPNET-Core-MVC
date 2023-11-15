@@ -14,10 +14,12 @@ namespace ShowroomManagement.Models
 
         [Key]
         [JsonPropertyName("username")]
+        [Required(ErrorMessage = "Bạn phải nhập username")]
         public string Username { get; set; }
 
         [Column(name: "Password_foruser", TypeName = "varbinary(500)")]
         [JsonPropertyName("password")]
+        [Required(ErrorMessage = "Bạn phải nhập password")]
         public string Password { get; set; }
         
         [JsonPropertyName("employeeId")]
