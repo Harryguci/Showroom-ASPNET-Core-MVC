@@ -9,6 +9,7 @@
         opacity: 0;
         transform: translate(0, 3rem)
     }
+
     100% {
         opacity: 1;
         transform: translate(0, 0)
@@ -41,6 +42,7 @@ form .form-group {
     background-color: rgb(50, 50, 50);
     border-color: rgb(50, 50, 50) !important;
 }
+
     .btn-primary:hover {
         background-color: rgb(0, 0, 150);
     }
@@ -57,11 +59,11 @@ form .form-group {
     position: relative;
 }
 
-.thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
 .center {
     position: absolute;
@@ -86,10 +88,28 @@ h1 {
     box-shadow: 3px 3px 10rem rgba(0,0,0,0.1);
 }
 
-#search-result .list-item {
-    padding: 0.5rem 1rem;
+    #search-result .list-item {
+        padding: 0.5rem 1rem;
+    }
+
+        #search-result .list-item:hover {
+            background: rgb(245, 245, 245);
+        }
+
+
+@media print {
+    .noprint {
+        visibility: hidden;
+    }
 }
 
-    #search-result .list-item:hover {
-        background: rgb(245, 245, 245);
+@media print {
+    @page {
+        size: 297mm 210mm; /* landscape */
     }
+
+    #calendar-container .calendar {
+        transform: rotate(90deg);
+        transform-origin: top left;
+    }
+}

@@ -9,6 +9,18 @@
     <link rel="stylesheet" href="~/css/calendar.css" />
 }
 
+<h1>Lịch tư vấn</h1>
+
+<div class="d-flex mb-3 gap-4">
+    <a asp-action="Index">
+        <i class="ti ti-list"></i>
+        Danh sách
+    </a>
+    <button id="export-excel-btn" class="btn my-0 p-0" style="color: rgb(100, 100, 250)" onclick="HandlePrintCalendar(event)">
+        <i class="ti ti-calendar"></i>
+        Xuất file PDF
+    </button>
+</div>
 <div class="calendar-container">
     <div class="calendar-header d-flex gap-2" style="justify-content: center">
         <div class="d-flex my-auto" style="max-width: 200px; gap: 1rem">
@@ -29,9 +41,7 @@
         </div>
         <div class="d-flex gap-1" style="font-size: 1rem">
             <p class="d-block my-auto">Năm</p>
-            @* <p id="year" class="d-block my-auto">
-            <b>@DateTime.Now.ToString("yyyy")</b>
-            </p> *@
+          
             <select class="form-control" name="year" id="year" onchange="handleChange()">
                 @for (int y = 2015; y < DateTime.Now.Year; y++)
                 {
@@ -113,8 +123,28 @@
             document.getElementById('calendar-container').removeChild(document.querySelector('#calendar-container .calendar'))
             document.getElementById('calendar-container').appendChild(response)
         }
-        
+
         // Render the data after the Html content is Loaded.
         window.onload = () => handleMonthChange();
+    </script>
+
+    <script>
+        function printContent(el) {
+            var restorepage = $('body').html();
+            var printcontentHTML = $(el).clone();
+            var calendarTime = {
+               year: $('#year').val(),
+                month: $('#month').val(),
+            };
+
+            $('body').empty().html(printcontentHTML);
+            $('body').prepend(`<p>Lịch tháng: ${calendarTime.month}/${calendarTime.year}</p>`);
+            window.print();
+            $('body').html(restorepage);
+        }
+        function HandlePrintCalendar(event) {
+            var elem = document.querySelector('#calendar-container .calendar'); 
+            printContent('#calendar-container .calendar')
+        }
     </script>
 }

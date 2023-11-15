@@ -6,12 +6,11 @@
     document.getElementsByClassName('notification-menu')[0].classList.remove('d-none');
 
     var url = `/api/TasksApi/Employees/${id}`;
-
     var tasksList = await fetch(url)
         .then(response => response.json());
     var listElem = document.createElement('ul');
 
-    console.log(tasksList);
+    //console.log(tasksList);
     for (var x of tasksList) {
         var li = document.createElement('li');
         var title = document.createElement('p');
@@ -31,11 +30,15 @@
 
     var elem = document.createElement('a');
     elem.style.textAlign = 'center';
-    elem.style.padding = '1rem';
+    elem.style.display = 'block';
+    elem.style.padding = '3px';
     elem.innerHTML = 'Xem tất cả';
     elem.setAttribute('href', '/Accounts/Person');
-    
-    listElem.appendChild(elem)
+
+    var li = document.createElement('li');
+    li.appendChild(elem);
+
+    listElem.appendChild(li)
 
     $('.notification-menu').html(listElem);
 }

@@ -5,10 +5,10 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Details</h1>
+<h1>Chi tiết</h1>
 
 <div>
-    <h4>Customer</h4>
+    <h4>Khách hàng</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -51,11 +51,11 @@
             @Html.DisplayNameFor(model => model.Gender)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Gender)
+            @(Model.Gender ? "Nam" : "Nữ")
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.ClientId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model?.ClientId">Sửa</a>
+    <a class="btn btn-outline-primary" asp-action="Index">Danh sách</a>
 </div>
