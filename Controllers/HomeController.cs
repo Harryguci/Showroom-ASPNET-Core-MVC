@@ -176,7 +176,7 @@ namespace ShowroomManagement.Controllers
             var result = new List<int>();
             for (var month = 1; month <= 12; month++)
             {
-                var query = await _context.
+                var query = await _context.SalesInvoices
                     .Where(p => p.SaleDate.Month == month)
                     .GroupBy(p => 1)
                     .Select(p => new { total = p.Sum(e => e.QuantitySale) })
