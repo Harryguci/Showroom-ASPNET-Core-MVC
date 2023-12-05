@@ -36,9 +36,15 @@ namespace ShowroomManagement.Controllers
                 var customerNum = _context.Customer.Count();
 
                 var listLimits = 10;
-                var employees = await _context.Employees.Take(listLimits).OrderByDescending(p => p.EmployeeId).ToListAsync();
-                var products = await _context.Products.Take(listLimits).OrderByDescending(p => p.Serial).ToListAsync();
-                var customers = await _context.Customer.Take(listLimits).OrderByDescending(p => p.ClientId).ToListAsync();
+
+                var employees = await _context.Employees.Take(listLimits)
+                    .OrderByDescending(p => p.EmployeeId).ToListAsync();
+
+                var products = await _context.Products.Take(listLimits)
+                    .OrderByDescending(p => p.Serial).ToListAsync();
+
+                var customers = await _context.Customer.Take(listLimits)
+                    .OrderByDescending(p => p.ClientId).ToListAsync();
 
                 ViewBag.customers = customers;
                 ViewBag.employees = employees;
@@ -170,7 +176,7 @@ namespace ShowroomManagement.Controllers
             var result = new List<int>();
             for (var month = 1; month <= 12; month++)
             {
-                var query = await _context.SalesInvoices
+                var query = await _context.
                     .Where(p => p.SaleDate.Month == month)
                     .GroupBy(p => 1)
                     .Select(p => new { total = p.Sum(e => e.QuantitySale) })
