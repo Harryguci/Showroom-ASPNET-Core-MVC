@@ -11,8 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Data;
 
-//using Newtonsoft.Json;
-
 namespace ShowroomManagement.Controllers
 {
     public class HomeController : Controller
